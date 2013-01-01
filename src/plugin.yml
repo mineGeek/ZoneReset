@@ -1,0 +1,10 @@
+name: RestoreIt
+main: com.github.mineGeek.RestoreIt.RestoreIt
+version: 1.0.0
+softdepend: [WorldEdit]
+commands:
+    restoreit:
+        description: List of what you can do at your level
+        aliases: [restoreme]
+        usage: /restoreit [full]
+        permission-message: You don't have permission fool

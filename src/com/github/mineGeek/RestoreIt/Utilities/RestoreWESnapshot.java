@@ -23,7 +23,7 @@ public class RestoreWESnapshot {
 	public RestoreWESnapshot( Player player, World world ) {
 		
 		this.player = player;
-		this.world = BukkitUtil.getLocalWorld( world );
+		this.world = Bukkit.getWorld( world );
 		
 	}
 	

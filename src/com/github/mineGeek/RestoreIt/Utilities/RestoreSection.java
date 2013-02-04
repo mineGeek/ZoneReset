@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -22,14 +21,21 @@ public class RestoreSection {
 	public Area area;
 	public String key;
 	public boolean requireNoPlayers = false;
-	public boolean transportPlayers = false;
 	public boolean removeSpawnPoints = false;
 	public Location resetSpawnPoints;
-	public Location transportPlayersTo;
+	public Location transportPlayers;
 	public boolean killEntities = false;
 	public List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
-	public Map<String, Location> spawnEntities = new HashMap<String, Location>();
+	public List<EntityLocation> spawnEntities = new ArrayList<EntityLocation>();
 	public List<String> lastErrors = new ArrayList<String>();
+	public String snapShotName = null;
+	public Map< String, String > schedule = new HashMap<String, String>();
+	public boolean onPlayerJoin = false;
+	public List<String> onPlayerJoinList = new ArrayList<String>();
+	public boolean onPlayerQuit = false;
+	public List<String> onPlayerQuitList = new ArrayList<String>();
+	public int onMinutes = 0;
+	public Location onInteractLocation = null;
 	
 	public boolean restore() {
 		
@@ -42,9 +48,9 @@ public class RestoreSection {
 		}
 		
 		
-		if ( this.transportPlayers ) {
+		if ( this.transportPlayers != null ) {
 			
-			this.movePlayersToLocation( this.area, this.transportPlayersTo );
+			this.movePlayersToLocation( this.area, this.transportPlayers );
 			
 		}
 		
@@ -62,15 +68,64 @@ public class RestoreSection {
 	}
 	
 	
+	public boolean isInteracting( Location l ) {
+		
+		return this.onInteractLocation.getBlock().equals( l.getBlock());
+		
+	}
+	
+	public boolean isPlayerJoin( String playerName ) {
+		
+		if ( this.onPlayerJoin ) {
+			
+			if ( this.onPlayerJoinList.isEmpty() ) return true;			
+			return this.onPlayerJoinList.contains( playerName );
+			
+		}
+		
+		return false;
+		
+	}
+	
+	public boolean isPlayerQuit( String playerName ) {
+		
+		if ( this.onPlayerQuit ) {
+			
+			if ( this.onPlayerQuitList.isEmpty() ) return true;			
+			return this.onPlayerQuitList.contains( playerName );
+			
+		}
+		
+		return false;		
+		
+	}
+	
+	public boolean 
+	
+	
+	public void setKillEntityExceptions( List<String> list ) {
+		
+		this.killEntityExceptions.clear();
+		
+		if ( list != null && list.size() > 0 ) {
+			
+			for ( String x : list ) {
+				this.killEntityExceptions.add( EntityType.fromName( x ) );
+			}
+			
+		}
+		
+	}
+	
 	public void spawnEntities() {
 		
 		if ( this.spawnEntities.size() > 0  ) {
 			
 			Server server = Bukkit.getServer();
 			
-			for ( String x : this.spawnEntities.keySet() ) {
+			for ( EntityLocation e : this.spawnEntities ) {
 				
-				server.getWorld( this.worldName ).spawnEntity( this.spawnEntities.get( x ), EntityType.fromName(x) );
+				server.getWorld( this.worldName ).spawnEntity( e.location, e.entityType );
 				
 			}
 			

@@ -20,86 +20,17 @@ public class Config {
 	 */
 	public static FileConfiguration c;
 	
-	
 	/**
-	 * If true, will increase item level when XP level increases
+	 * Text to display to player when there are players still in the zone
 	 */
-	public static Boolean XPLevelIncreasesItemLevel 	= true;
-		
-	
-	/**
-	 * If true, will decrease item level when XP level decreases
-	 */
-	public static Boolean XPLossReducesItemLevel 		= true;
-		
-	
-	/**
-	 * If true, will start off player with an item level equal to their
-	 * XP level
-	 */
-	public static Boolean ItemLevelDefaultsToXPLevel	= true;
-			
-	
-	/**
-	 * Text to display to player when there are no changes to rules to display
-	 */
-	public static String txtNoChangesToDisplay = "There are no changes to your rules.";
-	
-	
-	/**
-	 * text to display to player if there are no rules to display
-	 */
-	public static String txtNoRules = "You have no rules applied to you.";
-	
-	
-	/**
-	 * textual prefix for displaying changes in player rules that
-	 * have just been lifted
-	 */
-	public static String txtCanNowDo = "You can now ";
-	
-	
-	/**
-	 * Textual prefix for displaying changes in player rules who can
-	 * no longer do x
-	 */
-	public static String txtCanNoLongerDo = "You can no longer ";
-	
-	/**
-	 * The textual prefix for when we show the player a list of things
-	 * they can do
-	 */
-	public static String txtCanDoPrefix = "Unrestricted: ";
+	public static String txtPlayersStillInArea = "There are still players in the area";
 	
 
-	/**
-	 * the textual prefix for when we show the player what they can do next
-	 */
-	public static String txtCanDoNextPrefix = "Will change next: ";
-	
-	
-	/**
-	 * The textual prefix for when we show the player what they cannot do
-	 */
-	public static String txtCannotDoPrefix = "Restricted: ";
-	
-	
-	/**
-	 * The text for default restriction message
-	 */
-	public static String txtDefaultRestrictedMessage = "use this";
-	
-	
-	/**
-	 * Text for default cando message
-	 */
-	public static String txtDefaultUnrestrictedMessage = "use this";
-	
-	
 	/**
 	 * Timeout of restriction messages to prevent flooding player
 	 */
 	public static int spamPlayerMessageTimeout = 1500;
+	
 	
 	/**
 	 * Debugging parameters
@@ -108,19 +39,6 @@ public class Config {
 	public static boolean debug_area_chunkExit = false;
 	public static boolean debug_area_chunkChange = false;
 	
-	/**
-	 * Whether or not to monitor player locations. Will go to true if there
-	 * are any areaRules set up
-	 */
-	public static Boolean monitorPlayerLocations		= false;
-	
-	/**
-	 * Reference to Bukkit server
-	 * @return
-	 */
-	public static Server server() {
-		return Bukkit.getServer();
-	}
 	
 	/**
 	 * Loads all areaRules from the config

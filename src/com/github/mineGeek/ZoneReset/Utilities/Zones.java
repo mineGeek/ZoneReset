@@ -11,21 +11,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.EntityType;
 
-import com.github.mineGeek.ChallengeMe.Utilities.EntityLocation;
+public class Zones {
 
-public class Resets {
-
-	private static Map<String, RestoreSection> sections = new HashMap<String, RestoreSection>();
+	private static Map<String, Zone> sections = new HashMap<String, Zone>();
 	
-	public static RestoreSection getSection( String tag ) {
+	public static Zone getReset( String tag ) {
 		return sections.get( tag );
 	}
 	
 	public static void addSection( String tag, ConfigurationSection c ) {
 		
-		RestoreSection r = new RestoreSection();
+		Zone r = new Zone();
 
 		
 		/**
@@ -139,7 +136,7 @@ public class Resets {
 				
 				r.onPlayerQuit = c.getBoolean("reset.onPlayerQuit", false );
 				if ( r.onPlayerQuit ) {
-					r.onPlayerJoinQuit = c.getStringList("reset.onPlayerQuit");
+					r.onPlayerQuitList = c.getStringList("reset.onPlayerQuit");
 				}
 				
 			}
@@ -158,5 +155,9 @@ public class Resets {
 		
 	}
 	
+	
+	public static int count() {
+		return sections.size();
+	}
 	
 }

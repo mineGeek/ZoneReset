@@ -1,11 +1,13 @@
 package com.github.mineGeek.ZoneReset;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.mineGeek.ZoneReset.Commands.Reset;
+import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.RestoreWESnapshot;
+import com.github.mineGeek.ZoneReset.Utilities.Zone;
+import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 public class ZoneReset extends JavaPlugin {
 
@@ -20,17 +22,17 @@ public class ZoneReset extends JavaPlugin {
     public void onEnable() {
     	
 
-    	getCommand("restoreit").setExecutor( new Reset( this ) );
-    	getLogger().info( this.getName() + " enabled" );
+    	getCommand("reset").setExecutor( new Reset( this ) );
+    	Config.loadConfig();
+    	getLogger().info( this.getName() + " enabled loaded " + Zones.count() + " rules total.");
     	
     	
     	
     }
      
-    public Boolean restoreSnapShot( Player player, Location ne, Location sw ) {
+    public Boolean restoreSnapShot( Player player, Zone zone ) {
     	
-		RestoreWESnapshot restore = new RestoreWESnapshot( player, player.getWorld());
-		return restore.restore( ne, sw );
+		return RestoreWESnapshot.restore( player, zone );
     	
     }
     

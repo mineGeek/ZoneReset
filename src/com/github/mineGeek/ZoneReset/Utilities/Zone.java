@@ -14,7 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 
-public class Reset {
+public class Zone {
 
 	public String tag;
 	public String worldName;
@@ -100,7 +100,7 @@ public class Reset {
 		
 	}
 	
-	public boolean 
+
 	
 	
 	public void setKillEntityExceptions( List<String> list ) {
@@ -134,22 +134,22 @@ public class Reset {
 		
 	}
 	
-	public void clearLocationOfEntities( Area area, List<EntityType> exclusions ) {
+	public void clearLocationOfEntities( Area zone, List<EntityType> exclusions ) {
 		
 		List<Chunk> chunks = new ArrayList<Chunk>();
 	    
-		int fromX = ( (int)area.ne.getX()/16) -1 ;
-		int toX = ( (int)area.sw.getX()/16) + 1;
+		int fromX = ( (int)zone.ne.getX()/16) -1 ;
+		int toX = ( (int)zone.sw.getX()/16) + 1;
 		
-		int fromZ = ( (int)area.ne.getZ()/16) - 1;
-		int toZ = ( (int)area.sw.getZ()/16) + 1;
+		int fromZ = ( (int)zone.ne.getZ()/16) - 1;
+		int toZ = ( (int)zone.sw.getZ()/16) + 1;
 		
 		for( int x = fromX; x <= toX; x++ ) {
 
-			chunks.add( area.ne.getWorld().getChunkAt( x, fromZ ) );
+			chunks.add( zone.ne.getWorld().getChunkAt( x, fromZ ) );
 			
 			for ( int z = fromZ; z <= toZ; z++) {
-				chunks.add( area.ne.getWorld().getChunkAt(x, z) );
+				chunks.add( zone.ne.getWorld().getChunkAt(x, z) );
 			}
 			
 		}		
@@ -161,7 +161,7 @@ public class Reset {
 				for( Entity e : chunk.getEntities()) {
 
 					if ( !exclusions.contains( e.getType() ) ) { 
-						if ( area.intersectsWith( e.getLocation() ) ) {
+						if ( zone.intersectsWith( e.getLocation() ) ) {
 							e.remove();
 						}
 					}
@@ -194,7 +194,7 @@ public class Reset {
 	}
 
 	
-	private void movePlayersToLocation( Area area, Location location ) {
+	private void movePlayersToLocation( Area zone, Location location ) {
 		
 		Server server = Bukkit.getServer();
 		
@@ -204,7 +204,7 @@ public class Reset {
 		
 		for ( Player p : ps ) {
 			
-			if ( area.intersectsWith( p.getLocation() ) )  {
+			if ( zone.intersectsWith( p.getLocation() ) )  {
 				p.teleport( location );
 			}
 			
@@ -212,7 +212,7 @@ public class Reset {
 		
 	}
 	
-	private boolean areaContainsPlayers( Area area ) {
+	private boolean areaContainsPlayers( Area zone ) {
 		
 		Server server = Bukkit.getServer();
 		
@@ -222,7 +222,7 @@ public class Reset {
 		
 		for ( Player p : ps ) {
 			
-			if ( area.intersectsWith( p.getLocation() ) )  {
+			if ( zone.intersectsWith( p.getLocation() ) )  {
 				return true;
 			}
 			

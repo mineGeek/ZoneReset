@@ -1,4 +1,4 @@
-package com.github.mineGeek.RestoreIt.Utilities;
+package com.github.mineGeek.ZoneReset.Utilities;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,7 +40,7 @@ public class RestoreWESnapshot {
 			
 			
 			//BukkitPlayer localPlayer = wep.wrapPlayer( this.player );
-			RestoreItPlayer localPlayer = new RestoreItPlayer(wep, wep.getServerInterface(), this.player);
+			ZoneResetPlayer localPlayer = new ZoneResetPlayer(wep, wep.getServerInterface(), this.player);
 			LocalSession localSession = wep.getWorldEdit().getSession( localPlayer );
 			EditSession editSession = localSession.createEditSession( localPlayer );
 			CuboidRegionSelector region = new CuboidRegionSelector( this.world, l1, l2);

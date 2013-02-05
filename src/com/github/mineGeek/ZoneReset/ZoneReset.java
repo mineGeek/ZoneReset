@@ -1,13 +1,13 @@
-package com.github.mineGeek.RestoreIt;
+package com.github.mineGeek.ZoneReset;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.mineGeek.RestoreIt.Commands.Restore;
-import com.github.mineGeek.RestoreIt.Utilities.RestoreWESnapshot;
+import com.github.mineGeek.ZoneReset.Commands.Reset;
+import com.github.mineGeek.ZoneReset.Utilities.RestoreWESnapshot;
 
-public class RestoreIt extends JavaPlugin {
+public class ZoneReset extends JavaPlugin {
 
 	
     @Override
@@ -20,7 +20,7 @@ public class RestoreIt extends JavaPlugin {
     public void onEnable() {
     	
 
-    	getCommand("restoreit").setExecutor( new Restore( this ) );
+    	getCommand("restoreit").setExecutor( new Reset( this ) );
     	getLogger().info( this.getName() + " enabled" );
     	
     	

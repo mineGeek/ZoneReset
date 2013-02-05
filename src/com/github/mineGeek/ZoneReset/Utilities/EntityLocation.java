@@ -1,4 +1,4 @@
-package com.github.mineGeek.RestoreIt.Utilities;
+package com.github.mineGeek.ZoneReset.Utilities;
 
 import org.bukkit.Location;
 import org.bukkit.World;

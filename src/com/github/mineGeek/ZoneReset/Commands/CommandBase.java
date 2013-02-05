@@ -1,19 +1,19 @@
-package com.github.mineGeek.RestoreIt.Commands;
+package com.github.mineGeek.ZoneReset.Commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.github.mineGeek.RestoreIt.RestoreIt;
+import com.github.mineGeek.ZoneReset.ZoneReset;
 
 
 abstract class CommandBase  implements CommandExecutor{
 
-	protected RestoreIt 	plugin;
+	protected ZoneReset 	plugin;
 	protected String execMessage 	= null;
 	protected CommandSender sender 	= null;
 	
-	public CommandBase( RestoreIt plugin ) {
+	public CommandBase( ZoneReset plugin ) {
 		
 		this.plugin = plugin;
 		

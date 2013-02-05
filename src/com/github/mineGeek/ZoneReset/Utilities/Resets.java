@@ -1,4 +1,4 @@
-package com.github.mineGeek.RestoreIt.Utilities;
+package com.github.mineGeek.ZoneReset.Utilities;
 
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.bukkit.entity.EntityType;
 
 import com.github.mineGeek.ChallengeMe.Utilities.EntityLocation;
 
-public class RestoreSections {
+public class Resets {
 
 	private static Map<String, RestoreSection> sections = new HashMap<String, RestoreSection>();
 	

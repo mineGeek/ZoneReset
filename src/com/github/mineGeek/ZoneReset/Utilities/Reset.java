@@ -1,4 +1,4 @@
-package com.github.mineGeek.RestoreIt.Utilities;
+package com.github.mineGeek.ZoneReset.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 
-public class RestoreSection {
+public class Reset {
 
 	public String tag;
 	public String worldName;

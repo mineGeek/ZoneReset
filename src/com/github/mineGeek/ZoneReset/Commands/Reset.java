@@ -1,13 +1,13 @@
-package com.github.mineGeek.RestoreIt.Commands;
+package com.github.mineGeek.ZoneReset.Commands;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.github.mineGeek.RestoreIt.RestoreIt;
-import com.github.mineGeek.RestoreIt.Utilities.RestoreWESnapshot;
+import com.github.mineGeek.ZoneReset.ZoneReset;
+import com.github.mineGeek.ZoneReset.Utilities.RestoreWESnapshot;
 
-public class Restore extends CommandBase {
+public class Reset extends CommandBase {
 
-	public Restore(RestoreIt plugin) {
+	public Reset(ZoneReset plugin) {
 		super(plugin);
 	}
 

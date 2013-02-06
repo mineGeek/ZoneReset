@@ -26,14 +26,14 @@ public class RestoreWESnapshot {
 			
 			LocalWorld world = ( LocalWorld ) player.getWorld();
 			
-			Location ne = zone.area.ne;
-			Location sw = zone.area.sw;
+			Location ne = zone.getArea().ne;
+			Location sw = zone.getArea().sw;
 			
 			
 			Vector upper = new Vector( Math.max( ne.getX(), sw.getX()) , Math.max( ne.getY(), sw.getY() ), Math.max(ne.getZ(), sw.getZ()) );
 			Vector lower = new Vector( Math.min( ne.getX(), sw.getX()) , Math.min( ne.getY(), sw.getY() ), Math.min(ne.getZ(), sw.getZ()) );
 			
-			ZoneResetPlayer			localPlayer = new ZoneResetPlayer( we, we.getServerInterface(), player);
+			ZPlayer			localPlayer = new ZPlayer( we, we.getServerInterface(), player);
 			LocalSession 			localSession = we.getWorldEdit().getSession( localPlayer );
 			EditSession 			editSession = localSession.createEditSession( localPlayer );
 			CuboidRegionSelector 	region = new CuboidRegionSelector( world, upper, lower );			

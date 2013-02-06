@@ -53,7 +53,7 @@ public class Config {
 			
 			for ( String x : c.getConfigurationSection("zones").getKeys( false ) ) {
 				
-				Zones.addSection( x, c.getConfigurationSection("zones." + x) );
+				Zones.addZone( x, c.getConfigurationSection("zones." + x) );
 				
 			}
 			

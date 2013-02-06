@@ -5,62 +5,376 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+
 
 
 public class Zone {
 
-	public String tag;
-	public String worldName;
-	public Area area;
-	public String key;
-	public boolean requireNoPlayers = false;
-	public boolean removeSpawnPoints = false;
-	public Location resetSpawnPoints;
-	public Location transportPlayers;
-	public boolean killEntities = false;
-	public List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
-	public List<EntityLocation> spawnEntities = new ArrayList<EntityLocation>();
-	public List<String> lastErrors = new ArrayList<String>();
-	public String snapShotName = null;
-	public Map< String, String > schedule = new HashMap<String, String>();
-	public boolean onPlayerJoin = false;
-	public List<String> onPlayerJoinList = new ArrayList<String>();
-	public boolean onPlayerQuit = false;
-	public List<String> onPlayerQuitList = new ArrayList<String>();
-	public int onMinutes = 0;
-	public Location onInteractLocation = null;
+	
+	private String 	tag;
+	private String 	worldName;
+	
+	private Area 	area;
+	
+	private boolean requireNoPlayers = false;
+	private boolean removeSpawnPoints = false;
+	
+	private Location resetSpawnPoints;
+	private Location transportPlayers;
+	
+	private boolean killEntities = false;
+	private List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
+	private List<EntityLocation> spawnEntities = new ArrayList<EntityLocation>();
+	
+	private String snapShotName = null;
+	private Map< String, String > schedule = new HashMap<String, String>();
+	private boolean onPlayerJoin = false;
+	private List<String> onPlayerJoinList = new ArrayList<String>();
+	private boolean onPlayerQuit = false;
+	private List<String> onPlayerQuitList = new ArrayList<String>();
+	private int onMinutes = 0;
+	private Location onInteractLocation = null;
+	
+	
+
+	
+	/**
+	 * @return the tag
+	 */
+	public String getTag() {
+		return tag;
+	}
+
+
+	/**
+	 * @param tag the tag to set
+	 */
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+
+	/**
+	 * @return the worldName
+	 */
+	public String getWorldName() {
+		return worldName;
+	}
+
+
+	/**
+	 * @param worldName the worldName to set
+	 */
+	public void setWorldName(String worldName) {
+		this.worldName = worldName;
+	}
+
+
+	/**
+	 * @return the area
+	 */
+	public Area getArea() {
+		return area;
+	}
+
+	/**
+	 * @param area the area to set
+	 */
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+
+	/**
+	 * @return the requireNoPlayers
+	 */
+	public boolean isRequireNoPlayers() {
+		return requireNoPlayers;
+	}
+
+
+
+
+	/**
+	 * @param requireNoPlayers the requireNoPlayers to set
+	 */
+	public void setRequireNoPlayers(boolean requireNoPlayers) {
+		this.requireNoPlayers = requireNoPlayers;
+	}
+
+
+
+
+	/**
+	 * @return the removeSpawnPoints
+	 */
+	public boolean isRemoveSpawnPoints() {
+		return removeSpawnPoints;
+	}
+
+
+
+
+	/**
+	 * @param removeSpawnPoints the removeSpawnPoints to set
+	 */
+	public void setRemoveSpawnPoints(boolean removeSpawnPoints) {
+		this.removeSpawnPoints = removeSpawnPoints;
+	}
+
+	/**
+	 * @return the resetSpawnPoints
+	 */
+	public Location getResetSpawnPoints() {
+		return resetSpawnPoints;
+	}
+
+	/**
+	 * @param resetSpawnPoints the resetSpawnPoints to set
+	 */
+	public void setResetSpawnPoints(Location resetSpawnPoints) {
+		this.resetSpawnPoints = resetSpawnPoints;
+	}
+
+	/**
+	 * @return the transportPlayers
+	 */
+	public Location getTransportPlayers() {
+		return transportPlayers;
+	}
+
+	/**
+	 * @param transportPlayers the transportPlayers to set
+	 */
+	public void setTransportPlayers(Location transportPlayers) {
+		this.transportPlayers = transportPlayers;
+	}
+
+	/**
+	 * @return the killEntities
+	 */
+	public boolean isKillEntities() {
+		return killEntities;
+	}
+
+	/**
+	 * @param killEntities the killEntities to set
+	 */
+	public void setKillEntities(boolean killEntities) {
+		this.killEntities = killEntities;
+	}
+
+	/**
+	 * @return the killEntityExceptions
+	 */
+	public List<EntityType> getKillEntityExceptions() {
+		return killEntityExceptions;
+	}
+
+	/**
+	 * @return the spawnEntities
+	 */
+	public List<EntityLocation> getSpawnEntities() {
+		return spawnEntities;
+	}
+
+	/**
+	 * @param spawnEntities the spawnEntities to set
+	 */
+	public void setSpawnEntities(List<EntityLocation> spawnEntities) {
+		this.spawnEntities = spawnEntities;
+	}
+
+
+	/**
+	 * @return the snapShotName
+	 */
+	public String getSnapShotName() {
+		return snapShotName;
+	}
+
+
+	/**
+	 * @param snapShotName the snapShotName to set
+	 */
+	public void setSnapShotName(String snapShotName) {
+		this.snapShotName = snapShotName;
+	}
+
+
+
+	/**
+	 * @return the schedule
+	 */
+	public Map<String, String> getSchedule() {
+		return schedule;
+	}
+
+
+
+
+	/**
+	 * @param schedule the schedule to set
+	 */
+	public void setSchedule(Map<String, String> schedule) {
+		this.schedule = schedule;
+	}
+
+
+
+
+	/**
+	 * @return the onPlayerJoin
+	 */
+	public boolean isOnPlayerJoin() {
+		return onPlayerJoin;
+	}
+
+
+
+
+	/**
+	 * @param onPlayerJoin the onPlayerJoin to set
+	 */
+	public void setOnPlayerJoin(boolean onPlayerJoin) {
+		this.onPlayerJoin = onPlayerJoin;
+	}
+
+
+
+
+	/**
+	 * @return the onPlayerJoinList
+	 */
+	public List<String> getOnPlayerJoinList() {
+		return onPlayerJoinList;
+	}
+
+
+
+
+	/**
+	 * @param onPlayerJoinList the onPlayerJoinList to set
+	 */
+	public void setOnPlayerJoinList(List<String> onPlayerJoinList) {
+		this.onPlayerJoinList = onPlayerJoinList;
+	}
+
+
+
+
+	/**
+	 * @return the onPlayerQuit
+	 */
+	public boolean isOnPlayerQuit() {
+		return onPlayerQuit;
+	}
+
+
+
+
+	/**
+	 * @param onPlayerQuit the onPlayerQuit to set
+	 */
+	public void setOnPlayerQuit(boolean onPlayerQuit) {
+		this.onPlayerQuit = onPlayerQuit;
+	}
+
+
+
+
+	/**
+	 * @return the onPlayerQuitList
+	 */
+	public List<String> getOnPlayerQuitList() {
+		return onPlayerQuitList;
+	}
+
+
+
+
+	/**
+	 * @param onPlayerQuitList the onPlayerQuitList to set
+	 */
+	public void setOnPlayerQuitList(List<String> onPlayerQuitList) {
+		this.onPlayerQuitList = onPlayerQuitList;
+	}
+
+
+
+
+	/**
+	 * @return the onMinutes
+	 */
+	public int getOnMinutes() {
+		return onMinutes;
+	}
+
+
+
+
+	/**
+	 * @param onMinutes the onMinutes to set
+	 */
+	public void setOnMinutes(int onMinutes) {
+		this.onMinutes = onMinutes;
+	}
+
+
+
+
+	/**
+	 * @return the onInteractLocation
+	 */
+	public Location getOnInteractLocation() {
+		return onInteractLocation;
+	}
+
+
+
+
+	/**
+	 * @param onInteractLocation the onInteractLocation to set
+	 */
+	public void setOnInteractLocation(Location onInteractLocation) {
+		this.onInteractLocation = onInteractLocation;
+	}
+
+
 	
 	public boolean restore() {
 		
-		lastErrors.clear();
-		
-		if ( this.removeSpawnPoints ) {
+		/**
+		 * Reset spawn points
+		 */
+		if ( this.getResetSpawnPoints() != null ) {
 
-			this.resetSpawnPoints( this.area, this.resetSpawnPoints );
+			Utilities.resetZoneSpawnPoints( this );
+			
+		}
+		
+		/**
+		 * Move players out of zone
+		 */
+		if ( this.getTransportPlayers() != null ) {
+			
+			Utilities.movePlayersInZone( this );
 			
 		}
 		
 		
-		if ( this.transportPlayers != null ) {
-			
-			this.movePlayersToLocation( this.area, this.transportPlayers );
-			
-		}
 		
-		if ( requireNoPlayers && this.areaContainsPlayers( this.area ) ) {
-			lastErrors.add("Area contains players. Cannot proceed with restore.");
+		if ( requireNoPlayers && Utilities.zoneHasPlayers( this )  ) {
+
 			return false;
+			
 		}
 		
-		if ( killEntities ) this.clearLocationOfEntities( this.area, this.killEntityExceptions );
-		this.spawnEntities();
+		if ( killEntities ) Utilities.clearZoneOfEntities( this );
+		
+		Utilities.spawnEntitiesInZone( this );
 		
 		
 		return true;
@@ -70,7 +384,7 @@ public class Zone {
 	
 	public boolean isInteracting( Location l ) {
 		
-		return this.onInteractLocation.getBlock().equals( l.getBlock());
+		return this.onInteractLocation.getBlock().equals( l.getBlock() );
 		
 	}
 	
@@ -102,7 +416,6 @@ public class Zone {
 	
 
 	
-	
 	public void setKillEntityExceptions( List<String> list ) {
 		
 		this.killEntityExceptions.clear();
@@ -117,120 +430,13 @@ public class Zone {
 		
 	}
 	
-	public void spawnEntities() {
-		
-		if ( this.spawnEntities.size() > 0  ) {
-			
-			Server server = Bukkit.getServer();
-			
-			for ( EntityLocation e : this.spawnEntities ) {
-				
-				server.getWorld( this.worldName ).spawnEntity( e.location, e.entityType );
-				
-			}
-			
-		}
-		
-		
-	}
-	
-	public void clearLocationOfEntities( Area zone, List<EntityType> exclusions ) {
-		
-		List<Chunk> chunks = new ArrayList<Chunk>();
-	    
-		int fromX = ( (int)zone.ne.getX()/16) -1 ;
-		int toX = ( (int)zone.sw.getX()/16) + 1;
-		
-		int fromZ = ( (int)zone.ne.getZ()/16) - 1;
-		int toZ = ( (int)zone.sw.getZ()/16) + 1;
-		
-		for( int x = fromX; x <= toX; x++ ) {
-
-			chunks.add( zone.ne.getWorld().getChunkAt( x, fromZ ) );
-			
-			for ( int z = fromZ; z <= toZ; z++) {
-				chunks.add( zone.ne.getWorld().getChunkAt(x, z) );
-			}
-			
-		}		
-		
-		if ( chunks.size() > 0 ) {
-
-			for ( Chunk chunk : chunks ) {
-
-				for( Entity e : chunk.getEntities()) {
-
-					if ( !exclusions.contains( e.getType() ) ) { 
-						if ( zone.intersectsWith( e.getLocation() ) ) {
-							e.remove();
-						}
-					}
-				}
-
-			}
-			
-		}
-		
-		
-	}
-	
-	
-	private void resetSpawnPoints( Area area, Location location ) {
-		
-		Server server = Bukkit.getServer();		
-		Player[] ps = server.getOnlinePlayers();
-		
-		if ( ps.length == 0 ) return;
-		
-		for ( Player p : ps ) {
-			
-			if ( area.intersectsWith( p.getBedSpawnLocation() ) )  {
-				p.setBedSpawnLocation( location, true );
-			}
-			
-		}		
-		
-		
-	}
-
-	
-	private void movePlayersToLocation( Area zone, Location location ) {
-		
-		Server server = Bukkit.getServer();
-		
-		Player[] ps = server.getOnlinePlayers();
-		
-		if ( ps.length == 0 ) return;
-		
-		for ( Player p : ps ) {
-			
-			if ( zone.intersectsWith( p.getLocation() ) )  {
-				p.teleport( location );
-			}
-			
-		}
-		
-	}
-	
-	private boolean areaContainsPlayers( Area zone ) {
-		
-		Server server = Bukkit.getServer();
-		
-		Player[] ps = server.getOnlinePlayers();
-		
-		if ( ps.length == 0 ) return false;
-		
-		for ( Player p : ps ) {
-			
-			if ( zone.intersectsWith( p.getLocation() ) )  {
-				return true;
-			}
-			
-		}
-		
-		return false;
-		
-	}
-	
+	public void close() {
+		this.killEntityExceptions.clear();
+		this.spawnEntities.clear();
+		this.schedule.clear();
+		this.onPlayerJoinList.clear();
+		this.onPlayerQuitList.clear();
+		this.onInteractLocation = null;
+	}	
 	
 }

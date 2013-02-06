@@ -6,10 +6,10 @@ import com.sk89q.worldedit.ServerInterface;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-public class ZoneResetPlayer extends BukkitPlayer {
+public class ZPlayer extends BukkitPlayer {
 
 	
-	public ZoneResetPlayer(WorldEditPlugin plugin, ServerInterface server, Player player) {
+	public ZPlayer(WorldEditPlugin plugin, ServerInterface server, Player player) {
 		
 		super(plugin, server, player);
 	}

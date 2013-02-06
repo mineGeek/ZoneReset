@@ -19,7 +19,7 @@ public class Reset extends CommandBase {
 		
 		Player player = (Player)this.sender;
 		
-		Zone zone = Zones.getReset( args[0] );
+		Zone zone = Zones.getZone( args[0] );
 		return this.plugin.restoreSnapShot( player , zone );
 
 		

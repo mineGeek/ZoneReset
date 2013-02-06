@@ -14,13 +14,18 @@ import org.bukkit.configuration.ConfigurationSection;
 
 public class Zones {
 
-	private static Map<String, Zone> sections = new HashMap<String, Zone>();
+	private static Map<String, Zone> zones = new HashMap<String, Zone>();
 	
-	public static Zone getReset( String tag ) {
-		return sections.get( tag );
+	public static Zone getZone( String tag ) {
+		return zones.get( tag );
 	}
 	
-	public static void addSection( String tag, ConfigurationSection c ) {
+	public static Map<String, Zone> getZones() {
+		return zones;
+	}
+	
+	
+	public static void addZone( String tag, ConfigurationSection c ) {
 		
 		Zone r = new Zone();
 
@@ -28,7 +33,7 @@ public class Zones {
 		/**
 		 * Unique name for Zone
 		 */
-		r.tag = c.getString("tag");		
+		r.setTag( c.getString("tag") );		
 		
 		
 		/**
@@ -38,25 +43,25 @@ public class Zones {
 		List<Integer> ne = c.getIntegerList( "ne" );
 		List<Integer> sw = c.getIntegerList( "sw" );
 		Area a = new Area( Bukkit.getWorld( worldName ), ne, sw );
-		r.area = a;
+		r.setArea( a );
 		
 
 		/**
 		 * Remove all entities before reset?
 		 */
-		r.killEntities = c.getBoolean("entities.remove", false );
+		r.setKillEntities( c.getBoolean("entities.remove", false ) );
 		r.setKillEntityExceptions( c.getStringList( "entities.exceptions") ) ;
 		
 		/**
 		 * Remove any spawnPoints?
 		 */
-		r.removeSpawnPoints = c.getBoolean("actions.removeSpawnPointsInArea", false );
+		r.setRemoveSpawnPoints( c.getBoolean("actions.removeSpawnPointsInArea", false ) );
 		
 		
 		/**
 		 * Require zone to be void of humans?
 		 */
-		r.requireNoPlayers = c.getBoolean("requirements.noPlayersInArea", false);
+		r.setRequireNoPlayers( c.getBoolean("requirements.noPlayersInArea", false) );
 		
 		
 		/**
@@ -69,7 +74,7 @@ public class Zones {
 			double y = c.getDouble("actions.setSpawn.y");
 			double z = c.getDouble("actions.setSpawn.z");
 			
-			r.resetSpawnPoints = new Location( world, x, y, z );
+			r.setResetSpawnPoints( new Location( world, x, y, z ) );
 			
 		}
 		
@@ -97,7 +102,7 @@ public class Zones {
 				list.add( e );
 			}
 			
-			r.spawnEntities = list;
+			r.setSpawnEntities( list );
 			
 			
 		}
@@ -108,14 +113,14 @@ public class Zones {
 		 */
 		if ( c.isSet( "actions.movePlayers") ) {
 			List<Integer> l = c.getIntegerList( "actions.movePlayers" );
-			r.transportPlayers = new Location( Bukkit.getWorld( worldName), l.get(0), l.get(1), l.get(2) );
+			r.setTransportPlayers( new Location( Bukkit.getWorld( worldName), l.get(0), l.get(1), l.get(2) ) );
 		}
 		
 
 		/**
 		 * Specify specific snapshot name? Null for last snapshot
 		 */
-		if ( c.isSet( "snapshot") ) r.snapShotName = c.getString("snapshot");
+		if ( c.isSet( "snapshot") ) r.setSnapShotName( c.getString("snapshot") );
 		
 		
 		/**
@@ -125,29 +130,29 @@ public class Zones {
 			
 			if ( c.isSet( "reset.onPlayerJoin") ) {
 				
-				r.onPlayerJoin = c.getBoolean("reset.onPlayerJoin", false );
-				if ( r.onPlayerJoin ) {
-					r.onPlayerJoinList = c.getStringList("reset.onPlayerJoin");
+				r.setOnPlayerJoin( c.getBoolean("reset.onPlayerJoin", false ) );
+				if ( r.isOnPlayerJoin() ) {
+					r.setOnPlayerJoinList( c.getStringList("reset.onPlayerJoin") );
 				}
 				
 			}
 			
 			if ( c.isSet( "reset.onPlayerQuit") ) {
 				
-				r.onPlayerQuit = c.getBoolean("reset.onPlayerQuit", false );
-				if ( r.onPlayerQuit ) {
-					r.onPlayerQuitList = c.getStringList("reset.onPlayerQuit");
+				r.setOnPlayerQuit( c.getBoolean("reset.onPlayerQuit", false ) );
+				if ( r.isOnPlayerQuit() ) {
+					r.setOnPlayerQuitList( c.getStringList("reset.onPlayerQuit") );
 				}
 				
 			}
 			
 			if ( c.isSet( "reset.onMinutes") ) {
-				r.onMinutes = c.getInt( "reset.onMinutes");
+				r.setOnMinutes( c.getInt( "reset.onMinutes") );
 			}
 			
 			if ( c.isSet("reset.onInteract") ) {
 				List<Integer> l = c.getIntegerList("reset.onInteract");
-				r.onInteractLocation = new Location( Bukkit.getWorld( worldName), l.get(0), l.get(1), l.get(2) );
+				r.setOnInteractLocation(  new Location( Bukkit.getWorld( worldName), l.get(0), l.get(1), l.get(2) ) );
 			}
 			
 			
@@ -157,7 +162,20 @@ public class Zones {
 	
 	
 	public static int count() {
-		return sections.size();
+		return zones.size();
+	}
+	
+	public static void close() {
+		
+		if ( !zones.isEmpty() ) {
+			
+			for ( Zone z : zones.values() ) {
+				z.close();
+			}
+			zones.clear();	
+		}
+		
+		zones = null;
 	}
 	
 }

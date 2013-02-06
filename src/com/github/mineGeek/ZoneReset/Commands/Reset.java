@@ -1,10 +1,10 @@
 package com.github.mineGeek.ZoneReset.Commands;
 
-import org.bukkit.entity.Player;
+
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zones;
+import com.github.mineGeek.ZoneReset.Utilities.Utilities;
+
 
 
 public class Reset extends CommandBase {
@@ -16,11 +16,13 @@ public class Reset extends CommandBase {
 	@Override
 	protected Boolean exec( String cmdName, String[] args ) {
 		
+		Utilities.setZone();
+		return true;
 		
-		Player player = (Player)this.sender;
+		//Player player = (Player)this.sender;
 		
-		Zone zone = Zones.getZone( args[0] );
-		return this.plugin.restoreSnapShot( player , zone );
+		//Zone zone = Zones.getZone( args[0] );
+		//return this.plugin.restoreSnapShot( player , zone );
 
 		
 	}

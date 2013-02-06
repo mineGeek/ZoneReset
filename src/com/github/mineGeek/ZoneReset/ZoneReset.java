@@ -33,9 +33,9 @@ public class ZoneReset extends JavaPlugin {
     @Override
     public void onEnable() {
     	
-
+		this.saveDefaultConfig();
     	getCommand("reset").setExecutor( new Reset( this ) );
-    	Config.loadConfig();
+    	//Config.loadConfig();
     	getLogger().info( this.getName() + " enabled loaded " + Zones.count() + " rules total.");
     	
     	

@@ -1,9 +1,9 @@
 name: RestoreIt
-main: com.github.mineGeek.RestoreIt.RestoreIt
+main: com.github.mineGeek.ZoneReset.ZoneReset
 version: 1.0.0
 softdepend: [WorldEdit]
 commands:
-    restoreit:
+    reset:
         description: List of what you can do at your level
         aliases: [restoreme]
         usage: /restoreit [full]

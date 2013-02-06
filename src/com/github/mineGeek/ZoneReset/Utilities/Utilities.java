@@ -1,5 +1,10 @@
 package com.github.mineGeek.ZoneReset.Utilities;
 
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+
 
 public class Utilities {
 
@@ -149,6 +155,35 @@ public class Utilities {
 		}
 		
 		
-	}	
+	}
+	
+	public static void setZone() {
+		//247,69, 241
+		//256, 61, 208
+		World world = Bukkit.getWorld( "pickleMasherd");
+		Location ne = new Location( world, 247, 69, 241 );
+		Location sw = new Location( world, 256, 61, 208 );
+		
+		
+		ZoneBlocks z = new ZoneBlocks( "pickleMasherd", ne.toVector() , sw.toVector() );
+		
+		z.setBlocks();
+		
+        FileOutputStream fileOut;
+		try {
+			fileOut = new FileOutputStream( Bukkit.getPluginManager().getPlugin("ZoneReset").getDataFolder() + File.pathSeparator + "employee.ser");
+	        ObjectOutputStream out =  new ObjectOutputStream(fileOut);
+	        out.writeObject( z );
+	        out.close();
+	        fileOut.close();			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
+		
+	}
 	
 }

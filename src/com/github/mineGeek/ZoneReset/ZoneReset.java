@@ -1,5 +1,6 @@
 package com.github.mineGeek.ZoneReset;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,20 @@ public class ZoneReset extends JavaPlugin {
     public void onEnable() {
     	
 		this.saveDefaultConfig();
+		
     	getCommand("reset").setExecutor( new Reset( this ) );
+    	Config.snapShotFolder = this.getDataFolder() + File.separator + "snapshots";
+    	
+    	File file = new File( Config.snapShotFolder );
+    	
+    	if ( !file.isDirectory() ) {
+    		try {
+    			file.mkdir();
+    		} catch (Exception e ) {
+    			this.getLogger().info("Failed making plugins/ZoneReset/snapshots");
+    		}
+    	}
+    	
     	//Config.loadConfig();
     	getLogger().info( this.getName() + " enabled loaded " + Zones.count() + " rules total.");
     	

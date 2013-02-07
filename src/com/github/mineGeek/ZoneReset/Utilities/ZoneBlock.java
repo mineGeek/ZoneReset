@@ -13,7 +13,6 @@ public class ZoneBlock implements Serializable {
 	public int x;
 	public int y;
 	public int z;
-	public String worldName;
 	public int materialId;
 	public byte data;
 	

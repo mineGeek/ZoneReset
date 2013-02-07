@@ -1,4 +1,4 @@
-name: RestoreIt
+name: ZoneReset
 main: com.github.mineGeek.ZoneReset.ZoneReset
 version: 1.0.0
 softdepend: [WorldEdit]

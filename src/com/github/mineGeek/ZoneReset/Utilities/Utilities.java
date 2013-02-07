@@ -2,8 +2,10 @@ package com.github.mineGeek.ZoneReset.Utilities;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,13 +167,14 @@ public class Utilities {
 		Location sw = new Location( world, 256, 61, 208 );
 		
 		
-		ZoneBlocks z = new ZoneBlocks( "pickleMasherd", ne.toVector() , sw.toVector() );
+		ZoneBlocks z = new ZoneBlocks( ne, sw );
 		
 		z.setBlocks();
 		
         FileOutputStream fileOut;
 		try {
-			fileOut = new FileOutputStream( Bukkit.getPluginManager().getPlugin("ZoneReset").getDataFolder() + File.pathSeparator + "employee.ser");
+
+			fileOut = new FileOutputStream( Config.snapShotFolder + File.separator + "employee.ser");
 	        ObjectOutputStream out =  new ObjectOutputStream(fileOut);
 	        out.writeObject( z );
 	        out.close();
@@ -180,8 +183,24 @@ public class Utilities {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		
+	}
+	
+	public static void loadZone() {
+		
+		ZoneBlocks z = null;
+		
+		try {
+			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + "employee.ser" );
+			ObjectInputStream in = new ObjectInputStream( fileIn );
+			z = ( ZoneBlocks ) in.readObject();
+			in.close();
+			fileIn.close();
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		
 	}

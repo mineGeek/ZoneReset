@@ -24,6 +24,8 @@ public class Config {
 	public static String txtPlayersStillInArea = "There are still players in the area";
 	
 
+	public static String snapShotFolder;
+	
 	/**
 	 * Timeout of restriction messages to prevent flooding player
 	 */

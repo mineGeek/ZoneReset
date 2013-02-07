@@ -16,7 +16,8 @@ public class Reset extends CommandBase {
 	@Override
 	protected Boolean exec( String cmdName, String[] args ) {
 		
-		Utilities.setZone();
+		//Utilities.setZone();
+		Utilities.loadZone();
 		return true;
 		
 		//Player player = (Player)this.sender;

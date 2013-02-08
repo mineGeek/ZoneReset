@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.pre;
+package com.github.mineGeek.ZoneReset.nms.pre;
 
 import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;

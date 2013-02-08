@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
-
 
 
 public class ZoneBlocks implements Serializable {
@@ -60,6 +58,10 @@ public class ZoneBlocks implements Serializable {
 				}
 			}
 		}
+		
+	}
+	
+	public void restoreBlocks() {
 		
 	}
 	

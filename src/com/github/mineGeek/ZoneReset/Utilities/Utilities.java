@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -19,9 +21,38 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.github.mineGeek.ZoneReset.Player.Markers;
+
 
 public class Utilities {
 
+	public static Map<String, Markers> playerMarkers = new HashMap<String, Markers>();
+	
+	public static void clearPlayerMarkers() {
+		
+		if ( !playerMarkers.isEmpty() ) {
+			
+			for ( String x : playerMarkers.keySet() ) {
+				if ( Bukkit.getPlayer(x) != null ) {
+					playerMarkers.get( x ).unhighlight( Bukkit.getPlayer( x ) );
+				}
+			}
+			
+		}
+		
+	}
+	
+	public static void showPlayerMarkers( Player player ) {
+		if ( playerMarkers.containsKey( player.getName() ) ) {
+			playerMarkers.get( player.getName() ).highlight(player);
+		}
+	}
+	
+	public static void hidePlayerMarkers( Player player ) {
+		if ( playerMarkers.containsKey( player.getName() ) ) {
+			playerMarkers.get( player.getName() ).unhighlight(player);
+		}		
+	}
 	
 	public static boolean zoneHasPlayers( Zone zone ) {
 		return zoneHasPlayers( zone.getArea() );
@@ -203,5 +234,10 @@ public class Utilities {
 		
 		
 	}
+	
+
+	
+	
+	
 	
 }

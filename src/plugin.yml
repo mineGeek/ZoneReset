@@ -8,3 +8,10 @@ commands:
         aliases: [restoreme]
         usage: /restoreit [full]
         permission-message: You don't have permission fool
+    save:
+        description: Save an active Zone
+        aliases: [savezone]
+        usage: /save [name]
+        permission: ZoneReset.editzone
+        permission-message: You lack the skillz
+    

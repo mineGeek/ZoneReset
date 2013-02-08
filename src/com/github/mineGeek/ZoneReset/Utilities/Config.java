@@ -31,7 +31,7 @@ public class Config {
 	 */
 	public static int spamPlayerMessageTimeout = 1500;
 	
-	
+	public static int wandId = 294;
 	/**
 	 * Debugging parameters
 	 */
@@ -79,6 +79,8 @@ public class Config {
 		Config.debug_area_chunkEntrance		= c.getBoolean("debug.area.chunkEntrance", false);
 		Config.debug_area_chunkExit			= c.getBoolean("debug.area.chunkExit", false);
 		Config.debug_area_chunkChange		= c.getBoolean("debug.area.chunkChange", false);
+		
+		Config.wandId						= c.getInt("wand", 294 );
 		
 		Config.loadZonesFromConfig( c );
 	}

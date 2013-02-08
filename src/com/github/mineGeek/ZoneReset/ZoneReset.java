@@ -10,7 +10,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.github.mineGeek.ZoneReset.Commands.Reset;
+import com.github.mineGeek.ZoneReset.Commands.Save;
+import com.github.mineGeek.ZoneReset.Events.Listeners;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
+import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.Utilities.RestoreWESnapshot;
 import com.github.mineGeek.ZoneReset.Utilities.Zone;
 import com.github.mineGeek.ZoneReset.Utilities.Zones;
@@ -22,6 +25,7 @@ public class ZoneReset extends JavaPlugin {
     @Override
     public void onDisable() {
 
+    	Utilities.clearPlayerMarkers();
     	for ( BukkitTask task : this.tasks ) {
     		task.cancel();
     	}
@@ -37,6 +41,7 @@ public class ZoneReset extends JavaPlugin {
 		this.saveDefaultConfig();
 		
     	getCommand("reset").setExecutor( new Reset( this ) );
+    	getCommand("save").setExecutor( new Save( this ) );
     	Config.snapShotFolder = this.getDataFolder() + File.separator + "snapshots";
     	
     	File file = new File( Config.snapShotFolder );
@@ -51,6 +56,7 @@ public class ZoneReset extends JavaPlugin {
     	
     	//Config.loadConfig();
     	getLogger().info( this.getName() + " enabled loaded " + Zones.count() + " rules total.");
+    	this.getServer().getPluginManager().registerEvents( new Listeners(), this);
     	
     	
     	

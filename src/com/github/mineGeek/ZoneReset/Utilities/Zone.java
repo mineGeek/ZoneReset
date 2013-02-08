@@ -1,5 +1,11 @@
 package com.github.mineGeek.ZoneReset.Utilities;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -427,6 +433,51 @@ public class Zone {
 			}
 			
 		}
+		
+	}
+	
+	
+	public boolean loadBlocks() {
+				
+		try {
+			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + this.tag + ".ser" );
+			ObjectInputStream in = new ObjectInputStream( fileIn );
+			ZoneBlocks z = ( ZoneBlocks ) in.readObject();
+			in.close();
+			fileIn.close();
+		} catch ( IOException e ) {
+			e.printStackTrace();
+			return false;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		
+		
+		return true;
+		
+	}
+	
+	public boolean saveBlocks() {
+		
+        FileOutputStream fileOut;
+        ZoneBlocks z = this.area.getBlocks();
+        
+		try {
+
+			fileOut = new FileOutputStream( Config.snapShotFolder + File.separator + this.tag + ".ser");
+	        ObjectOutputStream out =  new ObjectOutputStream(fileOut);
+	        out.writeObject( z );
+	        out.close();
+	        fileOut.close();
+	        
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 		
 	}
 	

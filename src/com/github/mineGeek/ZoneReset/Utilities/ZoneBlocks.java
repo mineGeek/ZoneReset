@@ -40,7 +40,7 @@ public class ZoneBlocks implements Serializable {
 		this.worldName = ne.getWorld().getName();
 	}
 	
-	public void setBlocks() {
+	public void copyBlocks() {
 		
 		
 		int fromX = Math.min( this.neX, this.swX );

@@ -108,6 +108,17 @@ public class Area {
 		
 	}
 	
+	
+	public ZoneBlocks getBlocks() {
+		
+		ZoneBlocks z = new ZoneBlocks( this.ne, this.sw );
+		z.copyBlocks();
+		return z;
+		
+	}
+	
+	
+	
 	/**
 	 * Good guy closure
 	 */

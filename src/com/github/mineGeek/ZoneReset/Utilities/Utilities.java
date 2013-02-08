@@ -159,17 +159,16 @@ public class Utilities {
 		
 	}
 	
-	public static void setZone() {
+	public static void saveZone( Zone zone ) {
 		//247,69, 241
 		//256, 61, 208
-		World world = Bukkit.getWorld( "pickleMasherd");
-		Location ne = new Location( world, 247, 69, 241 );
-		Location sw = new Location( world, 256, 61, 208 );
 		
+		Location ne = zone.getArea().ne;
+		Location sw = zone.getArea().sw;
+				
+		ZoneBlocks z = new ZoneBlocks( zone.getArea().ne, zone.getArea().sw );
 		
-		ZoneBlocks z = new ZoneBlocks( ne, sw );
-		
-		z.setBlocks();
+		z.copyBlocks();
 		
         FileOutputStream fileOut;
 		try {

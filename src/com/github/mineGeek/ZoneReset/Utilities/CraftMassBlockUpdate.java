@@ -40,6 +40,7 @@ public class CraftMassBlockUpdate implements MassBlockUpdate {
 	}
 
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public boolean setBlock(int x, int y, int z, int blockId, int data) {
 		minX = Math.min(minX, x);

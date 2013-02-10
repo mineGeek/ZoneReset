@@ -6,29 +6,45 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+
+import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
+import com.github.mineGeek.ZoneReset.nms.NMSHelper;
 
 
 
 public class Zone {
 
+	public enum ZRTrigger { ZR_ONJOIN, ZR_ONQUIT, ZR_ONINTERACT };
 	
 	private String 	tag;
 	private String 	worldName;
 	
-	private Area 	area;
+	private Area 	area = new Area();
 	
 	private boolean requireNoPlayers = false;
 	private boolean removeSpawnPoints = false;
 	
-	private Location resetSpawnPoints;
-	private Location transportPlayers;
+	private String resetSpawnPointsWorldName;
+	private int resetSpawnPointsX;
+	private int resetSpawnPointsY;
+	private int resetSpawnPointsZ;
+	
+	private String transportPlayersWorldName;
+	private int transportPlayersX;
+	private int transportPlayersY;
+	private int transportPlayersZ;
 	
 	private boolean killEntities = false;
 	private List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
@@ -40,11 +56,51 @@ public class Zone {
 	private List<String> onPlayerJoinList = new ArrayList<String>();
 	private boolean onPlayerQuit = false;
 	private List<String> onPlayerQuitList = new ArrayList<String>();
-	private int onMinutes = 0;
+	private Long onMinutes = (long) 0;
+	private String onMinutesFormat = null;
+	private int onInteractMaterialId = 0;
 	private Location onInteractLocation = null;
+	private String onInteractLocationWorld;
+	private int onInteractLocationX;
+	private int onInteractLocationY;
+	private int onInteractLocationZ;
 	
 	
-
+	public Zone() {}
+	
+	public Zone( Zone clone, String newTag ) {
+		
+		this.tag = newTag;
+		this.area = clone.area;
+		this.killEntities = clone.killEntities;
+		this.killEntityExceptions = clone.killEntityExceptions;
+		this.onInteractMaterialId = clone.onInteractMaterialId;
+		this.onInteractLocation = clone.onInteractLocation;
+		this.onInteractLocationWorld = clone.onInteractLocationWorld;
+		this.onInteractLocationX = clone.onInteractLocationX;
+		this.onInteractLocationY = clone.onInteractLocationY;
+		this.onInteractLocationZ = clone.onInteractLocationZ;
+		this.onMinutesFormat = clone.onMinutesFormat;
+		this.onMinutes = clone.onMinutes;
+		this.onPlayerJoin = clone.onPlayerJoin;
+		this.onPlayerJoinList = clone.onPlayerJoinList;
+		this.onPlayerQuit = clone.onPlayerQuit;
+		this.onPlayerQuitList = clone.onPlayerQuitList;
+		this.removeSpawnPoints = clone.removeSpawnPoints;
+		this.requireNoPlayers = clone.requireNoPlayers;
+		this.resetSpawnPointsWorldName = clone.resetSpawnPointsWorldName;
+		this.resetSpawnPointsX = clone.resetSpawnPointsX;
+		this.resetSpawnPointsY = clone.resetSpawnPointsY;
+		this.resetSpawnPointsZ = clone.resetSpawnPointsZ;
+		this.schedule = clone.schedule;
+		this.transportPlayersWorldName = clone.transportPlayersWorldName;
+		this.transportPlayersX = clone.transportPlayersX;
+		this.transportPlayersY = clone.transportPlayersY;
+		this.transportPlayersZ = clone.transportPlayersZ;
+		this.worldName = clone.worldName;
+		
+		
+	}
 	
 	/**
 	 * @return the tag
@@ -82,6 +138,9 @@ public class Zone {
 	 * @return the area
 	 */
 	public Area getArea() {
+		
+		if ( area.worldName == null )  area.worldName = this.worldName;
+		
 		return area;
 	}
 
@@ -133,29 +192,59 @@ public class Zone {
 	/**
 	 * @return the resetSpawnPoints
 	 */
-	public Location getResetSpawnPoints() {
-		return resetSpawnPoints;
+	public Location getResetSpawnLocation() {
+		
+		Location r = null;
+		
+		if ( this.resetSpawnPointsWorldName != null ) {
+			World world = Bukkit.getWorld( this.resetSpawnPointsWorldName );
+			
+			if ( world != null ) {
+				r = new Location( world, this.resetSpawnPointsX, this.resetSpawnPointsY, this.resetSpawnPointsZ );
+			}
+		}
+		
+		return r;
+		
 	}
 
 	/**
 	 * @param resetSpawnPoints the resetSpawnPoints to set
 	 */
-	public void setResetSpawnPoints(Location resetSpawnPoints) {
-		this.resetSpawnPoints = resetSpawnPoints;
+	public void setResetSpawnPoints(String worldName, int x, int y, int z ) {
+
+		this.resetSpawnPointsWorldName = worldName;
+		this.resetSpawnPointsX = x;
+		this.resetSpawnPointsY = y;
+		this.resetSpawnPointsZ = z;
+		
 	}
 
 	/**
 	 * @return the transportPlayers
 	 */
 	public Location getTransportPlayers() {
-		return transportPlayers;
+		Location r = null;
+		
+		if ( this.transportPlayersWorldName != null ) {
+			World world = Bukkit.getWorld( this.transportPlayersWorldName );
+			
+			if ( world != null ) {
+				r = new Location( world, this.transportPlayersX, this.transportPlayersY, this.transportPlayersZ );
+			}
+		}
+		
+		return r;
 	}
 
 	/**
 	 * @param transportPlayers the transportPlayers to set
 	 */
-	public void setTransportPlayers(Location transportPlayers) {
-		this.transportPlayers = transportPlayers;
+	public void setTransportPlayers( String worldName, int x, int y, int z) {
+		this.transportPlayersWorldName = worldName;
+		this.transportPlayersX = x;
+		this.transportPlayersY = y;
+		this.transportPlayersZ = z;
 	}
 
 	/**
@@ -310,11 +399,39 @@ public class Zone {
 
 
 
+	public String getOnMinutesFormat() {
+		return this.onMinutesFormat;
+	}
+	
+	public void setOnMinutesFormat( String value ) {
+		
+		this.onMinutesFormat = value;
+		
+		if ( value == null ) return;
+		
+		try {
+			Matcher match = Pattern.compile("(?:(\\d+)d)?(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s)?").matcher( value );
+			Long secs = (long) 0;	
+			
+			if ( match.find() ) {
+			
+				if ( match.group(1) != null ) secs = 60*60*24 * Long.parseLong( match.group(1) );
+				if ( match.group(2) != null ) secs += 60*60* Long.parseLong( match.group(2) );
+				if ( match.group(3) != null ) secs += 60* Long.parseLong( match.group(3) );
+				if ( match.group(4) != null ) secs += Long.parseLong( match.group(4) );
+				
+			}
+			
+			this.setOnMinutes( secs );
+		} catch ( Exception e ) {}
+		
+	}
+	
 
 	/**
 	 * @return the onMinutes
 	 */
-	public int getOnMinutes() {
+	public Long getOnMinutes() {
 		return onMinutes;
 	}
 
@@ -324,17 +441,33 @@ public class Zone {
 	/**
 	 * @param onMinutes the onMinutes to set
 	 */
-	public void setOnMinutes(int onMinutes) {
+	public void setOnMinutes(Long onMinutes) {
 		this.onMinutes = onMinutes;
 	}
 
 
+	public int getOnInteractMaterialId() {
+		return this.onInteractMaterialId;
+	}
 
+	public void setOnInteractMaterialId( int value ) {
+		this.onInteractMaterialId = value;
+	}
 
 	/**
 	 * @return the onInteractLocation
 	 */
 	public Location getOnInteractLocation() {
+		
+		if ( this.onInteractLocation == null && this.onInteractLocationWorld != null ) {
+			
+			World world = Bukkit.getWorld( this.onInteractLocationWorld );
+			
+			if ( world != null ) {
+				this.onInteractLocation = new Location( world, this.onInteractLocationX, this.onInteractLocationY, this.onInteractLocationZ );
+			}
+		}
+		
 		return onInteractLocation;
 	}
 
@@ -344,8 +477,13 @@ public class Zone {
 	/**
 	 * @param onInteractLocation the onInteractLocation to set
 	 */
-	public void setOnInteractLocation(Location onInteractLocation) {
-		this.onInteractLocation = onInteractLocation;
+	public void setOnInteractLocation( String worldName, int x, int y, int z ) {
+
+		this.onInteractLocationWorld = worldName;
+		this.onInteractLocationX = x;
+		this.onInteractLocationY = y;
+		this.onInteractLocationZ = z;
+		
 	}
 
 
@@ -355,7 +493,8 @@ public class Zone {
 		/**
 		 * Reset spawn points
 		 */
-		if ( this.getResetSpawnPoints() != null ) {
+		Location l = this.getResetSpawnLocation();
+		if ( l != null ) {
 
 			Utilities.resetZoneSpawnPoints( this );
 			
@@ -364,7 +503,8 @@ public class Zone {
 		/**
 		 * Move players out of zone
 		 */
-		if ( this.getTransportPlayers() != null ) {
+		l = this.getTransportPlayers();
+		if ( l != null ) {
 			
 			Utilities.movePlayersInZone( this );
 			
@@ -379,6 +519,9 @@ public class Zone {
 		}
 		
 		if ( killEntities ) Utilities.clearZoneOfEntities( this );
+		
+		
+		this.loadBlocks();
 		
 		Utilities.spawnEntitiesInZone( this );
 		
@@ -437,14 +580,59 @@ public class Zone {
 	}
 	
 	
+	public void restoreBlocks( ZoneBlocks z ) {
+		
+		try {
+			NMSAbstraction nms = NMSHelper.init( Bukkit.getPluginManager().getPlugin("ZoneReset") );
+			
+			if ( nms == null ) {
+				//bah./ use bukkit
+			} else {
+				
+				List<ZoneBlock> b = z.getBlocks();
+				World w = Bukkit.getWorld( this.worldName );
+				MassBlockUpdate mbu = CraftMassBlockUpdate.createMassBlockUpdater( w );
+				if ( !b.isEmpty() ) {
+					
+					for ( ZoneBlock zb : b ) {
+						mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);						
+					}
+					
+					mbu.notifyClients();
+					
+				}
+				
+			}			
+			
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		
+
+		
+	}
+	
 	public boolean loadBlocks() {
 				
 		try {
-			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + this.tag + ".ser" );
+			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + this.getTag() + ".ser" );
 			ObjectInputStream in = new ObjectInputStream( fileIn );
 			ZoneBlocks z = ( ZoneBlocks ) in.readObject();
 			in.close();
 			fileIn.close();
+			this.restoreBlocks(z);
 		} catch ( IOException e ) {
 			e.printStackTrace();
 			return false;

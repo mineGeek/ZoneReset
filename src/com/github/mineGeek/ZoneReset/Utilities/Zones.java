@@ -9,12 +9,16 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+
+import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRTrigger;
 
 public class Zones {
 
 	private static Map<String, Zone> zones = new HashMap<String, Zone>();
+	private static Map<String, String> interactKeys = new HashMap<String, String>();
 	
 	public static Zone getZone( String tag ) {
 		return zones.get( tag );
@@ -24,6 +28,76 @@ public class Zones {
 		return zones;
 	}
 	
+	public static void loadInteractKeys() {
+		
+		interactKeys.clear();
+		
+		for ( Zone z : zones.values() ) {
+			if ( z.getOnInteractLocation() != null ) {
+				Location l = z.getOnInteractLocation();
+				String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + z.getOnInteractMaterialId();
+				Bukkit.getLogger().info( i );
+				interactKeys.put(i, z.getTag() );
+			}
+		}
+		
+	}
+	
+	public static void trigger( ZRTrigger type, Material m, Location l ) {
+		
+		if ( type == ZRTrigger.ZR_ONINTERACT ) {
+			
+		}
+		
+	}
+	
+	
+	public static void triggerPlayerJoin( Player p ) {
+		
+		for ( Zone z : zones.values() ) {
+			
+			if ( z.isOnPlayerJoin() ) {
+				z.restore();
+			} else if ( z.getOnPlayerJoinList().contains( p.getName() ) ) {
+				z.restore();
+			}
+			
+		}
+		
+	}
+	
+	public static void triggerPlayerQuit( Player p ) {
+		
+		for ( Zone z : zones.values() ) {
+			
+			if ( z.isOnPlayerQuit() ) {
+				z.restore();
+			} else if ( z.getOnPlayerQuitList().contains( p.getName() ) ) {
+				z.restore();
+			}
+			
+		}
+		
+	}
+	
+	public static void triggerInteract( Material m, Location l ) {
+
+		
+		String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + m.getId();
+		Bukkit.getLogger().info( i );
+		
+		for ( String x : interactKeys.keySet() ) {
+			Bukkit.getLogger().info( x );
+		}
+		
+		if ( interactKeys.containsKey(i) ) {
+		
+			Zone z = zones.get( interactKeys.get(i) );
+			if ( z != null ) z.restore();
+			
+		}
+		
+	}	
 	
 	public static void addZone( String tag, ConfigurationSection c ) {
 		
@@ -33,48 +107,49 @@ public class Zones {
 		/**
 		 * Unique name for Zone
 		 */
-		r.setTag( c.getString("tag") );		
+		r.setTag( tag );		
 		
 		
 		/**
 		 * Set world name for Zone and cuboid
 		 */
-		String worldName = c.getString( "worldName", "world" );
-		List<Integer> ne = c.getIntegerList( "ne" );
-		List<Integer> sw = c.getIntegerList( "sw" );
-		Area a = new Area( Bukkit.getWorld( worldName ), ne, sw );
-		r.setArea( a );
+		String worldName = c.getString( "world", "world" );
+		
+		r.setWorldName( worldName );
+		
+		if ( c.isSet( "ne" ) && c.isSet( "sw") ) {
+			List<Integer> ne = c.getIntegerList( "ne" );
+			List<Integer> sw = c.getIntegerList( "sw" );
+			Area a = new Area( worldName, ne, sw );
+			r.setArea( a );
+		}
 		
 
 		/**
 		 * Remove all entities before reset?
 		 */
-		r.setKillEntities( c.getBoolean("entities.remove", false ) );
-		r.setKillEntityExceptions( c.getStringList( "entities.exceptions") ) ;
+		r.setKillEntities( c.getBoolean("pre.removeEntities", false ) );
+		r.setKillEntityExceptions( c.getStringList( "pre.keepEntities") ) ;
 		
 		/**
 		 * Remove any spawnPoints?
 		 */
-		r.setRemoveSpawnPoints( c.getBoolean("actions.removeSpawnPointsInArea", false ) );
+		r.setRemoveSpawnPoints( c.getBoolean("pre.removeSpawnPoints", false ) );
 		
 		
 		/**
 		 * Require zone to be void of humans?
 		 */
-		r.setRequireNoPlayers( c.getBoolean("requirements.noPlayersInArea", false) );
+		r.setRequireNoPlayers( c.getBoolean("requirements.noPlayers", false) );
 		
 		
 		/**
 		 *  Set players in cuboids new spawnpoint?
 		 */
-		if ( c.isSet( "actions.setSpawn" ) ) {
-			
-			World world = Bukkit.getWorld( worldName );
-			double x = c.getDouble("actions.setSpawn.x");
-			double y = c.getDouble("actions.setSpawn.y");
-			double z = c.getDouble("actions.setSpawn.z");
-			
-			r.setResetSpawnPoints( new Location( world, x, y, z ) );
+		if ( c.isSet( "pre.setSpawn" ) ) {
+			List<Integer> l = c.getIntegerList( "pre.setSpawn.location" );
+			String spawnWorldName = c.getString("pre.setSpawn.world", worldName );
+			r.setResetSpawnPoints( spawnWorldName, l.get(0), l.get(1), l.get(2) );				
 			
 		}
 		
@@ -82,13 +157,13 @@ public class Zones {
 		/**
 		 * Spawn any specific entities
 		 */
-		if ( c.isSet("actions.spawnEntities") ) {
+		if ( c.isSet("post.spawnEntities") ) {
 			
 			
 			List<EntityLocation> list = new ArrayList<EntityLocation>();
 			
-				
-			List<?> spawnList = c.getList( "actions.spawnEntities" );			
+			
+			List<?> spawnList = c.getList( "post.spawnEntities" );			
 			Iterator<?> i = spawnList.iterator();
 			while ( i.hasNext() ) {
 				@SuppressWarnings("unchecked")
@@ -98,7 +173,7 @@ public class Zones {
 				Integer y = (Integer)l.get(2);
 				Integer z = (Integer)l.get(3);				
 				
-				EntityLocation e = new EntityLocation( eName, Bukkit.getWorld( worldName ), x, y, z );
+				EntityLocation e = new EntityLocation( eName, worldName, x, y, z );
 				list.add( e );
 			}
 			
@@ -111,9 +186,9 @@ public class Zones {
 		/**
 		 * Move players in Zone to specific point on reset
 		 */
-		if ( c.isSet( "actions.movePlayers") ) {
-			List<Integer> l = c.getIntegerList( "actions.movePlayers" );
-			r.setTransportPlayers( new Location( Bukkit.getWorld( worldName), l.get(0), l.get(1), l.get(2) ) );
+		if ( c.isSet( "pre.movePlayers") ) {
+			List<Integer> l = c.getIntegerList( "pre.movePlayers.location" );
+			r.setTransportPlayers( c.getString("pre.movePlayers.world", worldName ), l.get(0), l.get(1), l.get(2) );
 		}
 		
 
@@ -126,37 +201,42 @@ public class Zones {
 		/**
 		 * Set schedule for reset
 		 */
-		if ( c.isSet( "reset") ) {
+		if ( c.isSet( "trigger") ) {
 			
-			if ( c.isSet( "reset.onPlayerJoin") ) {
+			if ( c.isSet( "trigger.onPlayerJoin") ) {
 				
-				r.setOnPlayerJoin( c.getBoolean("reset.onPlayerJoin", false ) );
-				if ( r.isOnPlayerJoin() ) {
-					r.setOnPlayerJoinList( c.getStringList("reset.onPlayerJoin") );
-				}
+				r.setOnPlayerJoin( c.getBoolean("trigger.onPlayerJoin", false ) );
 				
 			}
 			
-			if ( c.isSet( "reset.onPlayerQuit") ) {
+			if ( c.isSet( "trigger.whenPlayersJoin" ) ) {
+				r.setOnPlayerJoinList( c.getStringList("trigger.whenPlayersJoin") );
+			}
+			
+			if ( c.isSet( "trigger.onPlayerQuit") ) {
 				
-				r.setOnPlayerQuit( c.getBoolean("reset.onPlayerQuit", false ) );
-				if ( r.isOnPlayerQuit() ) {
-					r.setOnPlayerQuitList( c.getStringList("reset.onPlayerQuit") );
-				}
+				r.setOnPlayerQuit( c.getBoolean("trigger.onPlayerQuit", false ) );
 				
 			}
 			
-			if ( c.isSet( "reset.onMinutes") ) {
-				r.setOnMinutes( c.getInt( "reset.onMinutes") );
+			if ( c.isSet( "trigger.whenPlayersQuit" ) ) {
+				r.setOnPlayerQuitList( c.getStringList("trigger.whenPlayersQuit") );
+			}			
+			
+			if ( c.isSet( "trigger.onTimer") ) {
+				r.setOnMinutesFormat( c.getString( "trigger.onTimer") );
 			}
 			
-			if ( c.isSet("reset.onInteract") ) {
-				List<Integer> l = c.getIntegerList("reset.onInteract");
-				r.setOnInteractLocation(  new Location( Bukkit.getWorld( worldName), l.get(0), l.get(1), l.get(2) ) );
+			if ( c.isSet("trigger.onInteract.location") ) {
+				r.setOnInteractMaterialId( c.getInt("trigger.onInteract.item", 0));
+				List<Integer> l = c.getIntegerList("trigger.onInteract.location");
+				r.setOnInteractLocation( c.getString("trigger.onInteract.world", worldName), l.get(0), l.get(1), l.get(2) );
 			}
 			
 			
 		}
+		
+		Zones.zones.put( tag , r );
 		
 	}
 	

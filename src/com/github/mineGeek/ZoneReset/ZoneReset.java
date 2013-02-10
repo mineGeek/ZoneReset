@@ -9,12 +9,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.github.mineGeek.ZoneReset.Commands.Cancel;
+import com.github.mineGeek.ZoneReset.Commands.Edit;
 import com.github.mineGeek.ZoneReset.Commands.Reset;
 import com.github.mineGeek.ZoneReset.Commands.Save;
 import com.github.mineGeek.ZoneReset.Events.Listeners;
+import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneReset.Utilities.RestoreWESnapshot;
 import com.github.mineGeek.ZoneReset.Utilities.Zone;
 import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
@@ -24,8 +26,14 @@ public class ZoneReset extends JavaPlugin {
 	
     @Override
     public void onDisable() {
-
-    	Utilities.clearPlayerMarkers();
+   	
+    	
+    	Markers.close();
+    	
+    	for ( Player p : getServer().getOnlinePlayers() ) {
+    		Utilities.clearPlayerMetaData(p);
+    	}
+    	
     	for ( BukkitTask task : this.tasks ) {
     		task.cancel();
     	}
@@ -42,6 +50,9 @@ public class ZoneReset extends JavaPlugin {
 		
     	getCommand("reset").setExecutor( new Reset( this ) );
     	getCommand("save").setExecutor( new Save( this ) );
+    	getCommand("zr").setExecutor( new Edit( this ) );
+    	getCommand("cancel").setExecutor( new Cancel( this ) );
+    	Config.c = this.getConfig();
     	Config.snapShotFolder = this.getDataFolder() + File.separator + "snapshots";
     	
     	File file = new File( Config.snapShotFolder );
@@ -54,7 +65,7 @@ public class ZoneReset extends JavaPlugin {
     		}
     	}
     	
-    	//Config.loadConfig();
+    	Config.loadConfig();
     	getLogger().info( this.getName() + " enabled loaded " + Zones.count() + " rules total.");
     	this.getServer().getPluginManager().registerEvents( new Listeners(), this);
     	
@@ -88,11 +99,7 @@ public class ZoneReset extends JavaPlugin {
     	
     }
     
-    public Boolean restoreSnapShot( Player player, Zone zone ) {
-    	
-		return RestoreWESnapshot.restore( player, zone );
-    	
-    }
+
     
 	
 }

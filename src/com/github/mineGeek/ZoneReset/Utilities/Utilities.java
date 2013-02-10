@@ -8,51 +8,26 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-import com.github.mineGeek.ZoneReset.Player.Markers;
 
 
 public class Utilities {
 
-	public static Map<String, Markers> playerMarkers = new HashMap<String, Markers>();
-	
-	public static void clearPlayerMarkers() {
-		
-		if ( !playerMarkers.isEmpty() ) {
-			
-			for ( String x : playerMarkers.keySet() ) {
-				if ( Bukkit.getPlayer(x) != null ) {
-					playerMarkers.get( x ).unhighlight( Bukkit.getPlayer( x ) );
-				}
-			}
-			
-		}
-		
-	}
-	
-	public static void showPlayerMarkers( Player player ) {
-		if ( playerMarkers.containsKey( player.getName() ) ) {
-			playerMarkers.get( player.getName() ).highlight(player);
-		}
-	}
-	
-	public static void hidePlayerMarkers( Player player ) {
-		if ( playerMarkers.containsKey( player.getName() ) ) {
-			playerMarkers.get( player.getName() ).unhighlight(player);
-		}		
-	}
+
 	
 	public static boolean zoneHasPlayers( Zone zone ) {
 		return zoneHasPlayers( zone.getArea() );
@@ -79,8 +54,21 @@ public class Utilities {
 	}
 	
 	
+	public static void clearPlayerMetaData( Player p ) {
+		
+		Plugin plug = Bukkit.getPluginManager().getPlugin("ZoneReset");
+		String[] keys = {"ZREditMode", "ZR_1", "ZR_2", "zr", "zra", "zrinteract" };
+		
+		for ( String x : keys ) {
+			p.removeMetadata( x , plug );
+		}
+		
+		
+		
+	}
+	
 	public static void resetZoneSpawnPoints( Zone zone ) {
-		resetZoneSpawnPoints( zone.getArea(), zone.getResetSpawnPoints() );
+		resetZoneSpawnPoints( zone.getArea(), zone.getResetSpawnLocation() );
 	}
 	
 	public static void resetZoneSpawnPoints( Area area, Location location ) {
@@ -128,22 +116,86 @@ public class Utilities {
 		clearLocationOfEntities( zone.getArea(), zone.getKillEntityExceptions() );
 	}
 	
+	public static List<EntityLocation> getEntitiesInZone( Zone zone ) {
+		
+		List<Chunk> chunks = new ArrayList<Chunk>();
+	    Area area = zone.getArea();
+	    List<EntityLocation> l = new ArrayList<EntityLocation>();
+	    
+		Location ne = area.ne();
+		Location sw = area.sw();
+		
+		int fromX = Math.min( ne.getChunk().getX(), sw.getChunk().getX() );
+		int toX = Math.max( ne.getChunk().getX(), sw.getChunk().getX() );
+		
+		int fromZ = Math.min( ne.getChunk().getZ(), sw.getChunk().getZ() );
+		int toZ = Math.max( ne.getChunk().getZ(), sw.getChunk().getZ() );
+		
+		
+		for( int x = fromX; x <= toX; x++ ) {
+			
+			for ( int z = fromZ; z <= toZ; z++) {
+				chunks.add( ne.getWorld().getChunkAt(x, z) );
+			}
+			
+		}		
+		
+		if ( chunks.size() > 0 ) {
+
+			for ( Chunk chunk : chunks ) {
+				
+				for( Entity e : chunk.getEntities()) {
+ 
+					if ( area.intersectsWith( e.getLocation() ) ) {
+						
+						if ( e.getType().name() != null && e.getType() != EntityType.PLAYER && !(e instanceof Item ) ) {
+							
+								l.add( new EntityLocation( e.getType().name(), e.getType().getTypeId(), e.getWorld().getName(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ); 
+						}
+					}
+				}
+
+			}
+			
+		}
+		
+		return l;
+		
+		
+	}
+	
+	public static Material getMaterialFromEntity( Entity entity ) {
+		
+		Class<?>[] interfaces = entity.getClass().getInterfaces();
+		if ( interfaces.length == 1 ) {
+			String s = interfaces[0].getSimpleName();
+			Material mat = Material.matchMaterial(s);
+			if ( mat != null ) return mat;
+		}
+		
+		return null;
+		
+	}	
+	
 	public static void clearLocationOfEntities( Area area, List<EntityType> exclusions ) {
 		
 		List<Chunk> chunks = new ArrayList<Chunk>();
 	    
-		int fromX = ( (int)area.ne.getX()/16) -1 ;
-		int toX = ( (int)area.sw.getX()/16) + 1;
+		Location ne = area.ne();
+		Location sw = area.sw();
 		
-		int fromZ = ( (int)area.ne.getZ()/16) - 1;
-		int toZ = ( (int)area.sw.getZ()/16) + 1;
+		int fromX = ( (int)ne.getX()/16) -1 ;
+		int toX = ( (int)sw.getX()/16) + 1;
+		
+		int fromZ = ( (int)ne.getZ()/16) - 1;
+		int toZ = ( (int)sw.getZ()/16) + 1;
 		
 		for( int x = fromX; x <= toX; x++ ) {
 
-			chunks.add( area.ne.getWorld().getChunkAt( x, fromZ ) );
+			chunks.add( ne.getWorld().getChunkAt( x, fromZ ) );
 			
 			for ( int z = fromZ; z <= toZ; z++) {
-				chunks.add( area.ne.getWorld().getChunkAt(x, z) );
+				chunks.add( ne.getWorld().getChunkAt(x, z) );
 			}
 			
 		}		
@@ -153,10 +205,11 @@ public class Utilities {
 			for ( Chunk chunk : chunks ) {
 
 				for( Entity e : chunk.getEntities()) {
-
-					if ( !exclusions.contains( e.getType() ) ) { 
-						if ( area.intersectsWith( e.getLocation() ) ) {
-							e.remove();
+					if ( !( e instanceof Player ) ) {
+						if ( !exclusions.contains( e.getType() ) ) { 
+							if ( area.intersectsWith( e.getLocation() ) ) {
+								e.remove();
+							}
 						}
 					}
 				}
@@ -180,8 +233,9 @@ public class Utilities {
 			World world = Bukkit.getServer().getWorld( worldName );
 			
 			for ( EntityLocation e : list ) {
-				
-				world.spawnEntity( e.location, e.entityType );
+				if ( e.entityType != null ) {
+					world.spawnEntity( e.getLocation(), e.entityType );
+				}
 				
 			}
 			
@@ -194,10 +248,10 @@ public class Utilities {
 		//247,69, 241
 		//256, 61, 208
 		
-		Location ne = zone.getArea().ne;
-		Location sw = zone.getArea().sw;
+		Location ne = zone.getArea().ne();
+		Location sw = zone.getArea().sw();
 				
-		ZoneBlocks z = new ZoneBlocks( zone.getArea().ne, zone.getArea().sw );
+		ZoneBlocks z = new ZoneBlocks( ne, sw );
 		
 		z.copyBlocks();
 		

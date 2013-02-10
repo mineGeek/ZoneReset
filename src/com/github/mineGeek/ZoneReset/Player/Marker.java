@@ -45,9 +45,10 @@ public class Marker {
 		Location l1 = new Location( Bukkit.getWorld( worldName ), x[0], y[0], z[0] );
 		Location l2 = new Location( Bukkit.getWorld( worldName ), x[1], y[1], z[1] );
 		Location l3 = new Location( Bukkit.getWorld( worldName ), x[2], y[2], z[2] );
-		player.sendBlockChange( l1,  89, (byte)0 );
+		
 		player.sendBlockChange( l2,  41, (byte)0 );
 		player.sendBlockChange( l3,  41, (byte)0 );
+		player.sendBlockChange( l1,  89, (byte)0 );
 		
 		
 	}

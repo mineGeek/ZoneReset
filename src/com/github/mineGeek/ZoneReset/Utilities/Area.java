@@ -2,6 +2,7 @@ package com.github.mineGeek.ZoneReset.Utilities;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -16,19 +17,64 @@ public class Area {
 	/**
 	 * corner 1 of area
 	 */
-	public Location ne;
-	
-	
-	
-	
+	private Location cachedNe;
+	private int neX;
+	private int neY;
+	private int neZ;
+		
 	/**
 	 * opposite corner of cuboid
 	 */
-	public Location sw;
+	public Location cachedSw;
+	private int swX;
+	private int swY;
+	private int swZ;
+	
+	public String worldName = null;
 	
 	
 	
 	
+	public Location ne() {
+		
+		if ( cachedNe == null ) {
+			
+			World world = Bukkit.getWorld( this.worldName );
+			if ( world != null ) {
+				cachedNe = new Location( world, neX, neY, neZ );
+			}
+			
+		}
+		
+		return cachedNe;
+	}
+	
+	public void setNe( Location ne ) {
+		this.worldName = ne.getWorld().getName();
+		this.cachedNe = ne;
+	}
+	
+	public Location sw() {
+		
+		if ( cachedSw == null ) {
+			
+			World world = Bukkit.getWorld( this.worldName );
+			if ( world != null ) {
+				cachedSw = new Location( world, swX, swY, swZ );
+			}
+			
+		}
+		
+		return cachedSw;
+	}
+	
+	public void setSw( Location sw ) {
+		this.worldName = sw.getWorld().getName();
+		this.cachedSw = sw;
+	}
+	
+	
+	public Area() {}
 	
 	/**
 	 * Constuctor taking the 2 points of cuboid
@@ -36,10 +82,9 @@ public class Area {
 	 * @param sw
 	 */
 	public Area( Location ne, Location sw ) {
-		this.ne = ne;
-		this.sw = sw;
+		this.cachedNe = ne;
+		this.cachedSw = sw;
 	}
-	
 	
 	
 	
@@ -60,6 +105,20 @@ public class Area {
 		
 	}
 	
+	public Area( String worldName, Integer neX, Integer neY, Integer neZ, Integer swX, Integer swY, Integer swZ ) {
+		
+		this.neX = neX;
+		this.neY = neY;
+		this.neZ = neZ;
+		this.swX = swX;
+		this.swY = swY;
+		this.swZ = swZ;
+		this.worldName = worldName;
+		
+		this.cachedNe = null;
+		this.cachedSw = null;
+		
+	}	
 	
 	
 	
@@ -73,7 +132,19 @@ public class Area {
 		this( world, ne.get(0), ne.get(1), ne.get(2), sw.get(0), sw.get(1), sw.get(2));
 	}
 	
-	
+	public Area( String worldName, List<Integer> ne, List<Integer> sw ) {
+
+		this.cachedNe = null;
+		this.cachedSw = null;
+		this.neX = ne.get(0);
+		this.neY = ne.get(1);
+		this.neZ = ne.get(2);
+		this.swX = sw.get(0);
+		this.swY = sw.get(1);
+		this.swZ = sw.get(2);
+		this.worldName = worldName;
+
+	}	
 	
 	
 	
@@ -96,6 +167,9 @@ public class Area {
 	 */
 	public Boolean intersectsWith( Location l ) {	
 
+		Location ne = ne();
+		Location sw = sw();
+		
 		if ( l.getWorld().getName().equals( ne.getWorld().getName() ) ) {
 			if ( ( Math.max( ne.getX(), sw.getX() ) < l.getX() - 1 ) || ( Math.min( ne.getX(), sw.getX() ) >= l.getX() ) ) return false;
 			if ( ( Math.max( ne.getZ(), sw.getZ() ) < l.getZ() - 1 ) || ( Math.min( ne.getZ(), sw.getZ() ) >= l.getZ() ) ) return false;
@@ -111,7 +185,7 @@ public class Area {
 	
 	public ZoneBlocks getBlocks() {
 		
-		ZoneBlocks z = new ZoneBlocks( this.ne, this.sw );
+		ZoneBlocks z = new ZoneBlocks( this.ne(), this.sw() );
 		z.copyBlocks();
 		return z;
 		
@@ -123,8 +197,8 @@ public class Area {
 	 * Good guy closure
 	 */
 	public void close() {
-		this.ne = null;
-		this.sw = null;
+		this.cachedNe = null;
+		this.cachedSw = null;
 	}
 
 	

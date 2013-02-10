@@ -38,6 +38,10 @@ public class ZoneBlocks implements Serializable {
 		this.worldName = ne.getWorld().getName();
 	}
 	
+	public ArrayList<ZoneBlock> getBlocks() {
+		return this.blocks;
+	}
+	
 	public void copyBlocks() {
 		
 		

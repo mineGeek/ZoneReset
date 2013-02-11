@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.github.mineGeek.ZoneReset.Utilities.SpawnInterface.ZR_SPAWN_TYPE;
 import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRTrigger;
 
 public class Zones {
@@ -162,27 +163,24 @@ public class Zones {
 		if ( c.isSet("post.spawnEntities") ) {
 			
 			List<Map<?, ?>> entities = c.getMapList("post.spawnEntities");
-			
-			String name = null;
-			List<Integer> location = null;
-			
+						
 			if ( !entities.isEmpty() ) {
 				
 				for (Map<?, ?> m : entities ) {
 					
 					if ( !m.isEmpty() ) {
 						
-						Iterator<?> i = m.entrySet().iterator();
-						while ( i.hasNext() ) {
+						if ( m.containsKey("type") ) {
 							
+							SpawnInterface spawn = null;
+							
+							ZR_SPAWN_TYPE t = ZR_SPAWN_TYPE.valueOf( (String) m.get("type") );
 
-							Map.Entry<String, Object> e = (Entry<String, Object>) i.next();
-							
-							if ( e.getKey().equalsIgnoreCase("name") ) {
+							if ( t.equals( ZR_SPAWN_TYPE.ITEM ) ) {
 								
-							} else if ( e.getKey().equalsIgnoreCase( "location") ) {
-
-									List<Integer> l = (ArrayList<Integer>)e.getValue();						
+								spawn = new ItemSpawn();
+								spawn.setList( m );
+								r.getSpawnEntities().add( spawn );
 								
 							}
 							
@@ -193,27 +191,6 @@ public class Zones {
 				}
 				
 			}
-			
-	/*		
-			List<EntityLocation> list = new ArrayList<EntityLocation>();
-			
-			
-			List<?> spawnList = c.getList( "post.spawnEntities" );			
-			Iterator<?> i = spawnList.iterator();
-			while ( i.hasNext() ) {
-				@SuppressWarnings("unchecked")
-				List<Object> l = (List<Object>) i.next();
-				String eName = l.get(0).toString();
-				Integer x = (Integer)l.get(1);
-				Integer y = (Integer)l.get(2);
-				Integer z = (Integer)l.get(3);				
-				
-				EntityLocation e = new EntityLocation( eName, worldName, x, y, z );
-				list.add( e );
-			}
-			
-			r.setSpawnEntities( list );
-			*/
 			
 		}
 		

@@ -1,26 +1,14 @@
 package com.github.mineGeek.ZoneReset.Utilities;
 
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.ContainerBlock;
-import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -199,14 +187,10 @@ public class Utilities {
 						 for( ItemStack it : ih ) {
 							 
 							 if ( it != null ) {
-							 
-								 int m1 = it.getTypeId();
-								 byte b1 = it.getData().getData();
-								 short d1 = it.getDurability();
-								 int q1 = it.getAmount();
+					
 								 
 								 ItemSpawn invItem = new ItemSpawn( it.getType(), it.getData().getData(), it.getDurability(), it.getAmount() );
-								 l.add( invItem );
+								 item.contains.add( invItem );
 							 }
 							 
 							 
@@ -298,13 +282,9 @@ public class Utilities {
 		
 		if ( list.size() > 0  ) {
 			
-			World world = Bukkit.getServer().getWorld( worldName );
 			
 			for ( SpawnInterface e : list ) {
 				e.spawn();
-				//if ( e.entityType != null ) {
-				//	world.spawnEntity( e.getLocation(), e.entityType );
-				//}
 				
 			}
 			
@@ -313,50 +293,6 @@ public class Utilities {
 		
 	}
 	
-	public static void saveZone( Zone zone ) {
-		//247,69, 241
-		//256, 61, 208
-		
-		Location ne = zone.getArea().ne();
-		Location sw = zone.getArea().sw();
-				
-		ZoneBlocks z = new ZoneBlocks( ne, sw );
-		
-		z.copyBlocks();
-		
-        FileOutputStream fileOut;
-		try {
-
-			fileOut = new FileOutputStream( Config.snapShotFolder + File.separator + "employee.ser");
-	        ObjectOutputStream out =  new ObjectOutputStream(fileOut);
-	        out.writeObject( z );
-	        out.close();
-	        fileOut.close();			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public static void loadZone() {
-		
-		ZoneBlocks z = null;
-		
-		try {
-			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + "employee.ser" );
-			ObjectInputStream in = new ObjectInputStream( fileIn );
-			z = ( ZoneBlocks ) in.readObject();
-			in.close();
-			fileIn.close();
-		} catch ( IOException e ) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
 	
 
 	

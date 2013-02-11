@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -100,11 +102,17 @@ public class ItemSpawn implements SpawnInterface {
 			for ( Map<?, ?> inner : items ) {
 				this.contains.add( new ItemSpawn( inner ) );
 			}
+			boolean a = true;
+			a = false;
 		}		
 		
 	}
 	
 	public Map<?, ?> getList( ItemSpawn i ) {
+		return this.getList( i, false );
+	}
+	
+	public Map<?, ?> getList( ItemSpawn i, boolean noContainer ) {
 		
 		Map<String, Object> r = new HashMap<String, Object>();
 		if ( i.material != null ) r.put( "item", this.material.getId() );
@@ -117,12 +125,15 @@ public class ItemSpawn implements SpawnInterface {
 			r.put("enchants", this.enhants );
 		}
 		
-		if ( !this.contains.isEmpty() ) {
-			List<Map<?, ?>> inners = new ArrayList<Map<?, ?>>();
-			for( ItemSpawn inner : this.contains ) {
-				inners.add( this.getList( inner) );
+		if ( !noContainer) {
+			if ( !this.contains.isEmpty() ) {
+				List<Map<?, ?>> inners = new ArrayList<Map<?, ?>>();
+				for( ItemSpawn inner : this.contains ) {
+					inners.add( this.getList( inner, true) );
+				}
+				r.put("contains", inners);
+				
 			}
-			
 		}
 		
 		return r;
@@ -144,7 +155,13 @@ public class ItemSpawn implements SpawnInterface {
 
 	@Override
 	public void spawn() {
-		// TODO Auto-generated method stub
+		
+		
+		World world = Bukkit.getWorld( this.worldName );
+		ItemStack i = new ItemStack();
+		Entity e = world.spawnEntity( new Location( world, this.x, this.y, this.z), this.material.getId() );
+		world.
+		
 		
 	}
 

@@ -48,7 +48,7 @@ public class Zone {
 	
 	private boolean killEntities = false;
 	private List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
-	private List<EntityLocation> spawnEntities = new ArrayList<EntityLocation>();
+	private List<SpawnInterface> spawnEntities = new ArrayList<SpawnInterface>();
 	
 	private String snapShotName = null;
 	private Map< String, String > schedule = new HashMap<String, String>();
@@ -271,14 +271,14 @@ public class Zone {
 	/**
 	 * @return the spawnEntities
 	 */
-	public List<EntityLocation> getSpawnEntities() {
+	public List<SpawnInterface> getSpawnEntities() {
 		return spawnEntities;
 	}
 
 	/**
 	 * @param spawnEntities the spawnEntities to set
 	 */
-	public void setSpawnEntities(List<EntityLocation> spawnEntities) {
+	public void setSpawnEntities(List<SpawnInterface> spawnEntities) {
 		this.spawnEntities = spawnEntities;
 	}
 

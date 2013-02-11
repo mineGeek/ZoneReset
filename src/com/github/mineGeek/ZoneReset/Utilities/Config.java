@@ -139,13 +139,14 @@ public class Config {
 		//post
 		if ( z.getSpawnEntities() != null ) {
 			
-			List<EntityLocation> l = z.getSpawnEntities();
+			List<SpawnInterface> l = z.getSpawnEntities();
 			List<Object> o = new ArrayList<Object>();
 			
 			
-			for( EntityLocation e : l ) {
-				Bukkit.getLogger().info( e.entityType.name() );
-				o.add( new ArrayList<Object>(Arrays.asList( e.entityType.name(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ) );
+			for( SpawnInterface e : l ) {
+				//Bukkit.getLogger().info( e.entityType.name() );
+				o.add( e.getList() );
+				//o.add( new ArrayList<Object>(Arrays.asList( e.entityType.name(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ) );
 				
 			}
 			

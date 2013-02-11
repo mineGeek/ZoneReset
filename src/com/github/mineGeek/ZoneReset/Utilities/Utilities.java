@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -16,11 +18,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.ContainerBlock;
 import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 
@@ -116,11 +125,11 @@ public class Utilities {
 		clearLocationOfEntities( zone.getArea(), zone.getKillEntityExceptions() );
 	}
 	
-	public static List<EntityLocation> getEntitiesInZone( Zone zone ) {
+	public static List<SpawnInterface> getEntitiesInZone( Zone zone ) {
 		
 		List<Chunk> chunks = new ArrayList<Chunk>();
 	    Area area = zone.getArea();
-	    List<EntityLocation> l = new ArrayList<EntityLocation>();
+	    List<SpawnInterface> l = new ArrayList<SpawnInterface>();
 	    
 		Location ne = area.ne();
 		Location sw = area.sw();
@@ -148,12 +157,69 @@ public class Utilities {
  
 					if ( area.intersectsWith( e.getLocation() ) ) {
 						
-						if ( e.getType().name() != null && e.getType() != EntityType.PLAYER && !(e instanceof Item ) ) {
+						SpawnInterface spawn = null;
+						
+						if ( e instanceof Player ) {
 							
-								l.add( new EntityLocation( e.getType().name(), e.getType().getTypeId(), e.getWorld().getName(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ); 
+							
+							
+						} else if ( e instanceof Creature ) {
+							//mob
+							
+						} else if ( e instanceof Monster ) {
+							
+
+							
+						} else if ( e instanceof Item ) {
+							
+							ItemStack i = ((Item)e).getItemStack();
+							spawn = new ItemSpawn(i, e.getLocation() );
+							
+							
+							
+						}
+						
+						if ( spawn != null ) {
+							
+							
+							l.add( spawn );
+								//l.add( new EntityLocation( e.getType().name(), e.getType().getTypeId(), e.getWorld().getName(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ); 
 						}
 					}
 				}
+				
+				for ( BlockState bs : chunk.getTileEntities() ) {
+					
+					if ( area.intersectsWith( bs.getLocation() ) ) {
+						
+						 ItemSpawn item = new ItemSpawn( bs.getBlock().getType(), bs.getBlock().getData(), (short)0, 1, bs.getLocation().getWorld().getName(), bs.getLocation().getBlockX(), bs.getLocation().getBlockY(), bs.getLocation().getBlockZ());
+
+						 Inventory ih = ((InventoryHolder) bs).getInventory();
+						 
+						 for( ItemStack it : ih ) {
+							 
+							 if ( it != null ) {
+							 
+								 int m1 = it.getTypeId();
+								 byte b1 = it.getData().getData();
+								 short d1 = it.getDurability();
+								 int q1 = it.getAmount();
+								 
+								 ItemSpawn invItem = new ItemSpawn( it.getType(), it.getData().getData(), it.getDurability(), it.getAmount() );
+								 l.add( invItem );
+							 }
+							 
+							 
+						 }
+						 
+						 l.add( item );
+						 //Material m, byte data, short durability, int qty, String worldName, int x, int y, int z
+						
+						
+					}
+					
+				}
+				
 
 			}
 			
@@ -163,6 +229,8 @@ public class Utilities {
 		
 		
 	}
+	
+
 	
 	public static Material getMaterialFromEntity( Entity entity ) {
 		
@@ -226,16 +294,17 @@ public class Utilities {
 		spawnEntities( zone.getWorldName(), zone.getSpawnEntities() );
 	}
 	
-	public static void spawnEntities( String worldName, List< EntityLocation> list ) {
+	public static void spawnEntities( String worldName, List< SpawnInterface> list ) {
 		
 		if ( list.size() > 0  ) {
 			
 			World world = Bukkit.getServer().getWorld( worldName );
 			
-			for ( EntityLocation e : list ) {
-				if ( e.entityType != null ) {
-					world.spawnEntity( e.getLocation(), e.entityType );
-				}
+			for ( SpawnInterface e : list ) {
+				e.spawn();
+				//if ( e.entityType != null ) {
+				//	world.spawnEntity( e.getLocation(), e.entityType );
+				//}
 				
 			}
 			

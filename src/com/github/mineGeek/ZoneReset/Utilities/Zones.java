@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -99,6 +100,7 @@ public class Zones {
 		
 	}	
 	
+	@SuppressWarnings("unchecked")
 	public static void addZone( String tag, ConfigurationSection c ) {
 		
 		Zone r = new Zone();
@@ -159,7 +161,40 @@ public class Zones {
 		 */
 		if ( c.isSet("post.spawnEntities") ) {
 			
+			List<Map<?, ?>> entities = c.getMapList("post.spawnEntities");
 			
+			String name = null;
+			List<Integer> location = null;
+			
+			if ( !entities.isEmpty() ) {
+				
+				for (Map<?, ?> m : entities ) {
+					
+					if ( !m.isEmpty() ) {
+						
+						Iterator<?> i = m.entrySet().iterator();
+						while ( i.hasNext() ) {
+							
+
+							Map.Entry<String, Object> e = (Entry<String, Object>) i.next();
+							
+							if ( e.getKey().equalsIgnoreCase("name") ) {
+								
+							} else if ( e.getKey().equalsIgnoreCase( "location") ) {
+
+									List<Integer> l = (ArrayList<Integer>)e.getValue();						
+								
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+	/*		
 			List<EntityLocation> list = new ArrayList<EntityLocation>();
 			
 			
@@ -178,7 +213,7 @@ public class Zones {
 			}
 			
 			r.setSpawnEntities( list );
-			
+			*/
 			
 		}
 		
@@ -238,6 +273,59 @@ public class Zones {
 		
 		Zones.zones.put( tag , r );
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static EntityInfoItem getItemFromConfigSection( Map<?, ?> map ) {
+		
+		EntityInfoItem e = null;
+		
+		if ( !map.isEmpty() ) {
+			
+			Iterator<?> i = map.entrySet().iterator();
+			
+			while ( i.hasNext() ) {
+				
+				Map.Entry<String, Object> entry = (Entry<String, Object>) i.next();
+				
+				if ( entry.getKey().equalsIgnoreCase("name") ) {
+					
+				} else if ( entry.getKey().equalsIgnoreCase( "location") ) {
+
+						List<Integer> l = (ArrayList<Integer>)entry.getValue();
+				}
+				
+			}			
+			
+		}
+		
+		return e;
+	}
+	
+	public static List<EntityInfoItem> getItemsFromConfigSection( String path, ConfigurationSection c ) {
+		
+		List<EntityInfoItem> result = new ArrayList<EntityInfoItem>();
+		
+		if ( c.isSet("post.spawnEntities") ) {
+			
+			List<Map<?, ?>> entities = c.getMapList("post.spawnEntities");
+			
+			String name = null;
+			List<Integer> location = null;
+			
+			if ( !entities.isEmpty() ) {
+				
+				for (Map<?, ?> m : entities ) {
+					
+					EntityInfoItem ent = getItemFromConfigSection( m );
+					if ( ent != null ) result.add( ent );
+					
+				}
+				
+			}
+		}
+		
+		return result;
 	}
 	
 	

@@ -8,13 +8,17 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -182,7 +186,13 @@ public class Utilities {
 						
 						 ItemSpawn item = new ItemSpawn( bs.getBlock().getType(), bs.getBlock().getData(), (short)0, 1, bs.getLocation().getWorld().getName(), bs.getLocation().getBlockX(), bs.getLocation().getBlockY(), bs.getLocation().getBlockZ());
 
-						 Inventory ih = ((InventoryHolder) bs).getInventory();
+						 Inventory ih = null;
+								 
+						 if ( bs instanceof Chest ) {
+							 ih = ((Chest) bs).getBlockInventory();
+						 } else {
+							 ih = ((InventoryHolder) bs).getInventory();
+						 }
 						 
 						 for( ItemStack it : ih ) {
 							 
@@ -256,11 +266,51 @@ public class Utilities {
 
 			for ( Chunk chunk : chunks ) {
 
+				for ( BlockState bs : chunk.getTileEntities() ) {
+					
+					if ( area.intersectsWith( bs.getLocation()) ) {
+					
+						if ( bs instanceof InventoryHolder ) {
+							
+							((InventoryHolder)bs).getInventory().clear();
+							
+						}
+						bs.getBlock().setType( Material.AIR);
+						/*
+						if ( bs instanceof Chest ) {
+							
+							Chest c = (Chest) bs;
+							
+							if ( c.getInventory().getHolder().getInventory() instanceof DoubleChestInventory ) {
+								
+								DoubleChestInventory dci = (DoubleChestInventory) c.getInventory();
+								Chest c1 = (Chest) dci.getLeftSide().getHolder();
+								Chest c2 = (Chest) dci.getRightSide().getHolder();
+								c1.getInventory().clear();
+								c2.getInventory().clear();
+								chunk.getWorld().getBlockAt( c1.getLocation()).setType( Material.AIR );
+								chunk.getWorld().getBlockAt( c2.getLocation() ).setType( Material.AIR );									
+							}
+							
+						}
+						*/
+						
+					}					
+					
+					
+				}
+				
 				for( Entity e : chunk.getEntities()) {
 					if ( !( e instanceof Player ) ) {
 						if ( !exclusions.contains( e.getType() ) ) { 
 							if ( area.intersectsWith( e.getLocation() ) ) {
-								e.remove();
+								
+								if ( e instanceof DoubleChest ) {
+									
+
+								} else {
+									e.remove();
+								}
 							}
 						}
 					}

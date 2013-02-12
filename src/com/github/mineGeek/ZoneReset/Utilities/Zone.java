@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
@@ -595,7 +596,10 @@ public class Zone {
 				if ( !b.isEmpty() ) {
 					
 					for ( ZoneBlock zb : b ) {
-						mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);						
+						mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);
+						if ( zb.materialId == Material.CHEST.getId() ) {
+							w.getBlockAt( zb.x, zb.y, zb.z).getState().update( true );
+						}
 					}
 					
 					mbu.notifyClients();

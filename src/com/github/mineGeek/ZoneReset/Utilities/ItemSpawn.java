@@ -10,8 +10,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.BrewingStand;
+import org.bukkit.block.Chest;
+import org.bukkit.block.ContainerBlock;
+import org.bukkit.block.Furnace;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 public class ItemSpawn implements SpawnInterface {
 
@@ -75,8 +86,8 @@ public class ItemSpawn implements SpawnInterface {
 	public void setList( Map<?,?> item ) {
 		
 		if ( item.containsKey("item") ) this.material = Material.getMaterial( (Integer) item.get("item") );		
-		if ( item.containsKey("data") ) this.data = (Byte) item.get("data");
-		if ( item.containsKey("durability" ) ) this.durability = (Short) item.get("durability");
+		if ( item.containsKey("data") && item.get("data") != null ) this.data = Byte.valueOf( String.valueOf( item.get("data") ) );
+		if ( item.containsKey("durability" ) && item.get( "durability") != null ) this.durability = Short.valueOf( String.valueOf( item.get("durability") ));
 		if ( item.containsKey("qty") ) this.qty = (Integer) item.get("qty");
 		if ( item.containsKey("world") ) this.worldName = (String) item.get("world");
 		if ( item.containsKey("location") ) {
@@ -115,21 +126,23 @@ public class ItemSpawn implements SpawnInterface {
 	public Map<?, ?> getList( ItemSpawn i, boolean noContainer ) {
 		
 		Map<String, Object> r = new HashMap<String, Object>();
+		
 		if ( i.material != null ) r.put( "item", this.material.getId() );
 		if ( i.data != 0) r.put( "data", this.data );
 		if ( i.durability != 0 ) r.put( "durability", this.durability );
 		if ( i.qty != 0 ) r.put("qty", this.qty );
 		if ( i.worldName != null ) r.put("world", this.worldName );
-		r.put("location", new ArrayList<Integer>( Arrays.asList( this.x, this.y, this.z  )));
+		if ( !noContainer) r.put("location", new ArrayList<Integer>( Arrays.asList( this.x, this.y, this.z  )));
 		if ( !this.enhants.isEmpty() ) {
 			r.put("enchants", this.enhants );
 		}
 		
 		if ( !noContainer) {
+			r.put("type", ZR_SPAWN_TYPE.ITEM.toString() );
 			if ( !this.contains.isEmpty() ) {
 				List<Map<?, ?>> inners = new ArrayList<Map<?, ?>>();
 				for( ItemSpawn inner : this.contains ) {
-					inners.add( this.getList( inner, true) );
+					inners.add( inner.getList( inner, true) );
 				}
 				r.put("contains", inners);
 				
@@ -153,15 +166,44 @@ public class ItemSpawn implements SpawnInterface {
 		this.enhants = e;
 	}
 
+	public ItemStack getItemStack() {
+		ItemStack i = new ItemStack( this.material );
+		if ( this.qty != null  ) i.setAmount( this.qty );
+		if ( this.data != null ) i.setData( new MaterialData( this.data) );
+		if ( this.durability != null) i.setDurability( this.durability );
+		
+	
+		return i;
+	}
+	
 	@Override
 	public void spawn() {
-		
+	
 		
 		World world = Bukkit.getWorld( this.worldName );
-		ItemStack i = new ItemStack();
-		Entity e = world.spawnEntity( new Location( world, this.x, this.y, this.z), this.material.getId() );
-		world.
+		Location l = new Location( world, this.x, this.y, this.z );
+		ItemStack i = this.getItemStack();
 		
+		
+		if ( !i.getType().equals( Material.CHEST ) && !i.getType().equals( Material.FURNACE )) {			
+			//assume a dropped item?
+			world.dropItem( l, i);
+			
+		} else {
+		
+			//a container?
+			Block b = l.getBlock();
+			//b.setType( i.getType() );
+			BlockState bs = b.getState();
+			bs.update( true );
+			Inventory inv = ((InventoryHolder)bs).getInventory();
+						
+			for ( ItemSpawn sp : this.contains ) {
+				
+				inv.addItem( sp.getItemStack() );
+				
+			}
+		}
 		
 	}
 

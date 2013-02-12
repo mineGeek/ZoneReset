@@ -96,8 +96,7 @@ public class Config {
 		Config.c = null;
 		
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public static void saveZoneConfig( Zone z ) {
 		
 		String path = "zones." + z.getTag() + ".";

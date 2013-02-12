@@ -3,6 +3,8 @@ package com.github.mineGeek.ZoneReset.Utilities;
 import java.io.Serializable;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 
 public class ZoneBlock implements Serializable {
 
@@ -21,6 +23,9 @@ public class ZoneBlock implements Serializable {
 		this.y = block.getY();
 		this.z = block.getZ();
 		this.materialId = block.getTypeId();
-		this.data = block.getData();
+		this.data = block.getState().getRawData();
+		
+		
+				
 	}
 }

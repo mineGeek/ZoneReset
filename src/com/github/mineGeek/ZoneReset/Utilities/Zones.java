@@ -15,16 +15,67 @@ import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
+import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
 import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRTrigger;
+import com.github.mineGeek.ZoneRest.Data.DataStore;
 
 public class Zones {
 
 	private static Map<String, Zone> zones = new HashMap<String, Zone>();
 	private static Map<String, String> interactKeys = new HashMap<String, String>();
+	private static String dataFolder;
+	
 	
 	public static Zone getZone( String tag ) {
 		return zones.get( tag );
 	}
+	
+	public static void setDataFolder( String folder ) {
+		Zones.dataFolder = folder;
+	}
+	
+	
+	public static void loadDataZones() {
+		
+		if ( !zones.isEmpty() ) {
+			for ( Zone z : zones.values() ) {
+				loadDataZone( z );
+			}
+		}
+		
+	}
+	public static void loadDataZone( Zone zone ) {
+		
+		DataStore o = new DataStore( Zones.dataFolder );
+		o.setFileName( zone.getTag() );
+		o.load();
+		zone.setLastResetMethod( ZRMethod.valueOf( o.getAsString( "lastResetMethod", "NONE") ) );
+		zone.setLastReset( o.getAsLong( "lastReset", null ) );
+		zone.setLastTimedReset( o.getAsLong( "lastTimedRest", null ) );
+		
+	}
+
+	
+	public static void saveDataZones() {
+		
+		if ( !zones.isEmpty() ) {
+			for ( Zone z : zones.values() ) {
+				saveZoneData( z );
+			}
+		}
+		
+	}	
+	public static void saveZoneData( Zone zone ) {
+		
+		DataStore o = new DataStore( Zones.dataFolder );
+		o.setFileName( zone.getTag() );
+		o.set("lastResetMethod", zone.getLastResetMethod().toString() );
+		o.set("lastReset", zone.getLastReset() );
+		o.set("lastTimedReset", zone.getLastTimedReset() );
+		o.save();
+		
+	}
+	
 	
 	public static Map<String, Zone> getZones() {
 		return zones;
@@ -290,6 +341,8 @@ public class Zones {
 	public static void close() {
 		
 		if ( !zones.isEmpty() ) {
+			
+			Zones.saveDataZones();
 			
 			for ( Zone z : zones.values() ) {
 				z.close();

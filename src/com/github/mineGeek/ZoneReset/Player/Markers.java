@@ -118,7 +118,7 @@ public class Markers {
 	
 	public static void close() {
 		
-		if ( !markers.isEmpty() ) {
+		if ( markers != null && !markers.isEmpty() ) {
 			
 			for ( String x : markers.keySet() ) {
 				
@@ -130,10 +130,11 @@ public class Markers {
 				
 			}
 			
-			for ( List<Marker> m : markers.values() ) {
-				m.clear();
+			if ( markers.values().isEmpty() ) {
+				for ( List<Marker> m : markers.values() ) {
+					m.clear();
+				}
 			}
-			
 			markers.clear();
 			
 		}

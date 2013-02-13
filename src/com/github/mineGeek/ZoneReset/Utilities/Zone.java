@@ -32,6 +32,12 @@ import com.github.mineGeek.ZoneRest.Data.ZRBlocks;
 public class Zone {
 
 	public enum ZRTrigger { ZR_ONJOIN, ZR_ONQUIT, ZR_ONINTERACT };
+	public enum ZRMethod { NONE, MANUAL, TIMED, ONJOIN, ONQUIT, ONINTERACT}
+	
+	public ZRMethod lastRestMethod = ZRMethod.NONE;
+	public Long lastReset;
+	public Long lastTimedReset;
+	public Long nextTimedReset;
 	
 	private String 	tag;
 	private String 	worldName;
@@ -110,6 +116,11 @@ public class Zone {
 		this.worldName = clone.worldName;
 		this.playerInventory = clone.playerInventory;
 		this.mobs = clone.mobs;
+		this.lastRestMethod = clone.lastRestMethod;
+		this.lastReset = clone.lastReset;
+		this.lastTimedReset = clone.lastTimedReset;
+		this.nextTimedReset = clone.nextTimedReset;
+		
 		
 	}
 	
@@ -191,8 +202,38 @@ public class Zone {
 	}
 
 
+	public ZRMethod getLastResetMethod() {
+		return this.lastRestMethod;
+	}
+	
+	public void setLastResetMethod( ZRMethod method ) {
+		this.lastRestMethod = method;
+	}
 
-
+	public Long getLastReset() {
+		return this.lastReset;
+	}
+	
+	public void setLastReset( Long value ) {
+		this.lastReset = value;
+	}
+	
+	public Long getLastTimedReset() {
+		return this.lastTimedReset;
+	}
+	
+	public void setLastTimedReset( Long value ) {
+		this.lastTimedReset = value;
+	}
+	
+	public Long getNextTimedReset() {
+		return this.nextTimedReset;
+	}
+	
+	public void setNextTimedRest( Long value ) {
+		this.nextTimedReset = value;
+	}
+	
 	/**
 	 * @param removeSpawnPoints the removeSpawnPoints to set
 	 */

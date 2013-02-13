@@ -12,37 +12,85 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
+
+/**
+ * Special item spawner that containes other items
+ * Will not spawn base item, but will fill container
+ * at Location with its contents
+ * 
+ * @author Moí
+ *
+ */
 public class SpawnContainer extends SpawnBase {
 
+	/**
+	 * The material ID of the container
+	 */
 	private Material material;
+	
+	/**
+	 * List of items to fill container with
+	 */
 	private List<ItemSpawn> items = new ArrayList<ItemSpawn>();
 	
-	
-	
+	/**
+	 * Returns container material
+	 * @return
+	 */
 	public Material getMaterial() {
 		return this.material;
 	}
 	
+	/**
+	 * Sets container material
+	 * @param m
+	 */
 	public void setMaterial( Material m ) {
 		this.material = m;
 	}
 	
+	/**
+	 * Returns list of items to spawn in container
+	 * @return
+	 */
 	public List<ItemSpawn> getItems() {
 		return this.items;
 	}
 	
+	/**
+	 * Sets the items to fill the container with
+	 * @param items
+	 */
 	public void setItems( List<ItemSpawn> items ) {
 		this.items = items;
 	}
 	
+	/**
+	 * Clear any items in the spawn queue
+	 */
 	public void clearItems() {
 		this.items.clear();
 	}
 	
+	/**
+	 * Add an item to add to the spawn queue
+	 * @param item
+	 */
 	public void addItem( ItemSpawn item ) {
 		this.items.add( item );
 	}
 	
+	
+	/**
+	 * Standard constructor
+	 */
+	public SpawnContainer() {}
+	
+	/**
+	 * Constructor that take the container Block and 
+	 * calculates the inventory from there
+	 * @param block
+	 */
 	public SpawnContainer( Block block ) {
 		
 		this.setType( ZRSPAWNTYPE.CONTAINER );
@@ -63,8 +111,10 @@ public class SpawnContainer extends SpawnBase {
 		
 	}
 
-	public SpawnContainer() {}
-
+	/**
+	 * Returns a Map representation of this object
+	 * for easy saving to config file.
+	 */
 	@Override
 	public Map<String, Object> getList() {
 		
@@ -76,19 +126,23 @@ public class SpawnContainer extends SpawnBase {
 			List<Object> items = new ArrayList<Object>();
 			
 			for ( ItemSpawn x : this.getItems() ) {
-				
-				//remove spam tags
+				//remove redundant tags
 				Map<String, Object> m = x.getList();
 				m.remove("type");
 				
 				items.add( m );
 			}
+			
 			r.put("contains", items );
+			
 		}
 		
 		return r;
 	}
 	
+	/**
+	 * Sets this object from a config list object
+	 */
 	public void setList( Map<String, Object> list ) {
 		
 		super.setList( list );
@@ -111,6 +165,9 @@ public class SpawnContainer extends SpawnBase {
 		}
 	}
 
+	/**
+	 * Handles spawning of item and its contents
+	 */
 	@Override
 	public void spawn() {
 		
@@ -137,6 +194,5 @@ public class SpawnContainer extends SpawnBase {
 		}
 		
 	}
-
 
 }

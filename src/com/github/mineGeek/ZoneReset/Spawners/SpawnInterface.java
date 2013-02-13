@@ -2,6 +2,11 @@ package com.github.mineGeek.ZoneReset.Spawners;
 
 import java.util.Map;
 
+/**
+ * Interface for handling classes responsible for spawning items and entities
+ * @author Moí
+ *
+ */
 public interface SpawnInterface {
 
 	public enum ZRSPAWNTYPE {ITEM, CONTAINER, MOB, INVENTORY};

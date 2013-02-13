@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Utilities;
+package com.github.mineGeek.ZoneRest.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,11 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 
-public class ZoneBlocks implements Serializable {
 
-	/**
-	 * 
-	 */
+public class ZRBlocks implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	private int neX;
 	private int neY;
@@ -23,9 +21,9 @@ public class ZoneBlocks implements Serializable {
 	
 	private String worldName;
 	
-	private ArrayList<ZoneBlock> blocks = new ArrayList<ZoneBlock>();
+	private ArrayList<ZRBlock> blocks = new ArrayList<ZRBlock>();
 	
-	public ZoneBlocks( Location ne, Location sw ) {
+	public ZRBlocks( Location ne, Location sw ) {
 		
 		this.neX = ne.getBlockX();
 		this.neY = ne.getBlockY();
@@ -36,9 +34,10 @@ public class ZoneBlocks implements Serializable {
 		this.swZ = sw.getBlockZ();
 		
 		this.worldName = ne.getWorld().getName();
+		
 	}
 	
-	public ArrayList<ZoneBlock> getBlocks() {
+	public ArrayList<ZRBlock> getBlocks() {
 		return this.blocks;
 	}
 	
@@ -58,16 +57,11 @@ public class ZoneBlocks implements Serializable {
 		for ( int x = fromX; x <= toX; x++ ) {
 			for ( int z=fromZ; z <= toZ; z++ ) {
 				for (int y=fromY; y<=toY; y++ ) {
-					blocks.add( new ZoneBlock( world.getBlockAt(x, y, z)));
+					blocks.add( new ZRBlock( world.getBlockAt(x, y, z)));
 				}
 			}
 		}
 		
 	}
-	
-	public void restoreBlocks() {
-		
-	}
-	
 	
 }

@@ -1,16 +1,16 @@
 package com.github.mineGeek.ZoneReset.Utilities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
@@ -18,11 +18,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.DoubleChestInventory;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+
+import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
+import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 
 
 
@@ -117,11 +121,15 @@ public class Utilities {
 		clearLocationOfEntities( zone.getArea(), zone.getKillEntityExceptions() );
 	}
 	
-	public static List<SpawnInterface> getEntitiesInZone( Zone zone ) {
+	public static Map<ZRSPAWNTYPE, List<SpawnInterface>> getEntitiesInZone( Zone zone ) {
 		
 		List<Chunk> chunks = new ArrayList<Chunk>();
 	    Area area = zone.getArea();
 	    List<SpawnInterface> l = new ArrayList<SpawnInterface>();
+	    
+	    List<SpawnInterface> mobs = new ArrayList<SpawnInterface>();
+	    List<SpawnInterface> items = new ArrayList<SpawnInterface>();
+	    List<SpawnInterface> containers = new ArrayList<SpawnInterface>();
 	    
 		Location ne = area.ne();
 		Location sw = area.sw();
@@ -153,21 +161,23 @@ public class Utilities {
 						
 						if ( e instanceof Player ) {
 							
-							
+							//Do nothing!
 							
 						} else if ( e instanceof Creature ) {
-							//mob
+							
+							spawn = new MobSpawner( e );
+							mobs.add( spawn );
 							
 						} else if ( e instanceof Monster ) {
 							
-
+							spawn = new MobSpawner( e );
+							mobs.add( spawn );
 							
 						} else if ( e instanceof Item ) {
 							
 							ItemStack i = ((Item)e).getItemStack();
-							spawn = new ItemSpawn(i, e.getLocation() );
-							
-							
+							spawn = new ItemSpawn( i );
+							items.add( spawn );
 							
 						}
 						
@@ -184,7 +194,11 @@ public class Utilities {
 					
 					if ( area.intersectsWith( bs.getLocation() ) ) {
 						
-						 ItemSpawn item = new ItemSpawn( bs.getBlock().getType(), bs.getBlock().getData(), (short)0, 1, bs.getLocation().getWorld().getName(), bs.getLocation().getBlockX(), bs.getLocation().getBlockY(), bs.getLocation().getBlockZ());
+						SpawnContainer s = new SpawnContainer( bs.getBlock() );
+						l.add( s );
+						containers.add( s );
+						/*
+						 ItemSpawnOld item = new ItemSpawnOld( bs.getBlock().getType(), bs.getBlock().getData(), (short)0, 1, bs.getLocation().getWorld().getName(), bs.getLocation().getBlockX(), bs.getLocation().getBlockY(), bs.getLocation().getBlockZ());
 
 						 Inventory ih = null;
 								 
@@ -199,7 +213,7 @@ public class Utilities {
 							 if ( it != null ) {
 					
 								 
-								 ItemSpawn invItem = new ItemSpawn( it.getType(), it.getData().getData(), it.getDurability(), it.getAmount() );
+								 ItemSpawnOld invItem = new ItemSpawnOld( it.getType(), it.getData().getData(), it.getDurability(), it.getAmount() );
 								 item.contains.add( invItem );
 							 }
 							 
@@ -208,7 +222,7 @@ public class Utilities {
 						 
 						 l.add( item );
 						 //Material m, byte data, short durability, int qty, String worldName, int x, int y, int z
-						
+						*/
 						
 					}
 					
@@ -219,7 +233,21 @@ public class Utilities {
 			
 		}
 		
-		return l;
+		Map<ZRSPAWNTYPE, List<SpawnInterface>> result = new HashMap<ZRSPAWNTYPE, List<SpawnInterface>>();
+		
+		if ( !mobs.isEmpty() ) {
+			result.put( ZRSPAWNTYPE.MOB, mobs );
+		}
+		
+		if ( !items.isEmpty() ) {
+			result.put( ZRSPAWNTYPE.ITEM, items );
+		}
+		
+		if ( !containers.isEmpty() ) {
+			result.put( ZRSPAWNTYPE.CONTAINER, containers );
+		}
+		
+		return result;
 		
 		
 	}
@@ -324,22 +352,34 @@ public class Utilities {
 	}
 	
 	
-	public static void spawnEntitiesInZone( Zone zone ) {
-		spawnEntities( zone.getWorldName(), zone.getSpawnEntities() );
-	}
-	
-	public static void spawnEntities( String worldName, List< SpawnInterface> list ) {
+	public static void spawnEntities( Map<ZRSPAWNTYPE, List< SpawnInterface>> spawns ) {
 		
-		if ( list.size() > 0  ) {
+		if ( !spawns.isEmpty()  ) {
 			
+			if ( spawns.containsKey( ZRSPAWNTYPE.MOB ) ) {
+				spawnList( spawns.get( ZRSPAWNTYPE.MOB) );
+			}
 			
-			for ( SpawnInterface e : list ) {
-				e.spawn();
-				
+			if ( spawns.containsKey( ZRSPAWNTYPE.ITEM ) ) {
+				spawnList( spawns.get( ZRSPAWNTYPE.ITEM) );
+			}
+			
+			if ( spawns.containsKey( ZRSPAWNTYPE.CONTAINER ) ) {
+				spawnList( spawns.get( ZRSPAWNTYPE.CONTAINER) );
 			}
 			
 		}
 		
+		
+	}
+	
+	public static void spawnList( List< SpawnInterface> spawn ) {
+		
+		if ( !spawn.isEmpty() ) {
+			for ( SpawnInterface s : spawn ) {
+				s.spawn();
+			}
+		}
 		
 	}
 	

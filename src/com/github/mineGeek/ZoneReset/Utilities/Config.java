@@ -3,10 +3,14 @@ package com.github.mineGeek.ZoneReset.Utilities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 
 
 /**
@@ -99,6 +103,8 @@ public class Config {
 
 	public static void saveZoneConfig( Zone z ) {
 		
+		if ( z == null ) return;
+		
 		String path = "zones." + z.getTag() + ".";
 		
 		if ( z.getArea().ne() != null ) {		
@@ -135,21 +141,41 @@ public class Config {
 		}
 		
 		
-		//post
-		if ( z.getSpawnEntities() != null ) {
+		//Post
+		if ( !z.getSpawns().isEmpty() ) {
 			
-			List<SpawnInterface> l = z.getSpawnEntities();
-			List<Object> o = new ArrayList<Object>();
+			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.INVENTORY ) ) {
+				
+				//set players inventory
+				
+				c.set( path + "post.setInventory", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.INVENTORY) ) );
+			}	
 			
+			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.ITEM ) || z.getSpawns().containsKey( ZRSPAWNTYPE.CONTAINER) ) {
 			
-			for( SpawnInterface e : l ) {
-				//Bukkit.getLogger().info( e.entityType.name() );
-				o.add( e.getList() );
-				//o.add( new ArrayList<Object>(Arrays.asList( e.entityType.name(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ) );
+				//set items
+				List< Map<String, Object>> items = new ArrayList< Map<String, Object>>();
+				if ( z.getSpawns().containsKey( ZRSPAWNTYPE.ITEM ) ) {
+					items.addAll( formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.ITEM ) ) );
+				}
+				
+				if ( z.getSpawns().containsKey( ZRSPAWNTYPE.CONTAINER ) ) {
+					items.addAll( formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.CONTAINER ) ) );
+				}
+				
+				if ( !items.isEmpty() ) {
+					c.set( path + "post.spawnItems", items );
+				}
+			}
+					
+			
+			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.MOB ) ) {
+				
+				c.set( "post.spawnMobs", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.MOB ) ) );
+				
 				
 			}
-			
-			c.set(path + "post.spawnEntities", o );
+				
 			
 		}
 		
@@ -174,6 +200,22 @@ public class Config {
 		Bukkit.getPluginManager().getPlugin("ZoneReset").saveConfig();
 		
 		
+		
+	}
+
+	public static List< Map<String, Object>> formatSpawnForConfig( List<SpawnInterface> spawn ) {
+		
+		List< Map<String, Object>> result = new ArrayList< Map<String, Object>>();
+		
+		if ( !spawn.isEmpty() ) {
+			
+			for( SpawnInterface s : spawn ) {
+				result.add( s.getList() );
+			}
+			
+		}
+		
+		return result;
 		
 	}
 	

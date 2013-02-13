@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import com.github.mineGeek.ZoneRest.Data.ZRBlocks;
+
 /**
  * Utility class for staking out areas as a cuboid
  *
@@ -183,9 +185,9 @@ public class Area {
 	}
 	
 	
-	public ZoneBlocks getBlocks() {
+	public ZRBlocks getBlocks() {
 		
-		ZoneBlocks z = new ZoneBlocks( this.ne(), this.sw() );
+		ZRBlocks z = new ZRBlocks( this.ne(), this.sw() );
 		z.copyBlocks();
 		return z;
 		

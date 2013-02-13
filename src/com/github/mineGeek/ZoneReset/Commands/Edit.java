@@ -218,7 +218,7 @@ public class Edit extends CommandBase {
 				
 			} else if ( args[1].equals("entities" ) ) {
 				
-				z.setSpawnEntities( Utilities.getEntitiesInZone( z ) );
+				z.setSpawns( Utilities.getEntitiesInZone( z ) );
 				execMessage = "All entities in zone " + z.getTag() + " are set.";
 				
 			} else if ( args[1].equalsIgnoreCase("removespawn" ) ) {

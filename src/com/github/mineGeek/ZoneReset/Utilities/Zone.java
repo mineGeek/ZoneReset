@@ -20,10 +20,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
+import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
+import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
 import com.github.mineGeek.ZoneReset.nms.NMSHelper;
-
-
+import com.github.mineGeek.ZoneRest.Data.ZRBlock;
+import com.github.mineGeek.ZoneRest.Data.ZRBlocks;
 
 public class Zone {
 
@@ -33,6 +37,8 @@ public class Zone {
 	private String 	worldName;
 	
 	private Area 	area = new Area();
+	
+	private Map< ZRSPAWNTYPE, List<SpawnInterface>> spawns = new HashMap< ZRSPAWNTYPE, List<SpawnInterface>>();
 	
 	private boolean requireNoPlayers = false;
 	private boolean removeSpawnPoints = false;
@@ -50,6 +56,9 @@ public class Zone {
 	private boolean killEntities = false;
 	private List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
 	private List<SpawnInterface> spawnEntities = new ArrayList<SpawnInterface>();
+	private List<ItemSpawn> playerInventory = new ArrayList<ItemSpawn>();
+	private List<MobSpawner> mobs = new ArrayList<MobSpawner>();
+	private List<ItemSpawn> drops = new ArrayList<ItemSpawn>();
 	
 	private String snapShotName = null;
 	private Map< String, String > schedule = new HashMap<String, String>();
@@ -99,7 +108,8 @@ public class Zone {
 		this.transportPlayersY = clone.transportPlayersY;
 		this.transportPlayersZ = clone.transportPlayersZ;
 		this.worldName = clone.worldName;
-		
+		this.playerInventory = clone.playerInventory;
+		this.mobs = clone.mobs;
 		
 	}
 	
@@ -208,6 +218,7 @@ public class Zone {
 		return r;
 		
 	}
+	
 
 	/**
 	 * @param resetSpawnPoints the resetSpawnPoints to set
@@ -248,6 +259,86 @@ public class Zone {
 		this.transportPlayersZ = z;
 	}
 
+	public List<ItemSpawn> getPlayerInventory() {
+		return this.playerInventory;
+	}
+	
+	public void setPlayerInventory( List<ItemSpawn> list ) {
+		this.playerInventory = list;
+	}
+	
+	public void clearPlayerInventory() {
+		this.playerInventory.clear();
+	}
+	
+	public void addPlayerInventoryItem( ItemSpawn item ) {
+		this.playerInventory.add( item );
+	}
+	
+	
+	public List<MobSpawner> getMobList() {
+		return this.mobs;
+	}
+	
+	public void setMobList( List<MobSpawner> list ) {
+		this.mobs = list;
+	}
+	
+	public void clearMobList() {
+		this.mobs.clear();
+	}
+	
+	public void addMobItem( MobSpawner mob ) {
+		this.mobs.add( mob );
+	}
+	
+	public List<ItemSpawn> getDropList() {
+		return this.drops;
+	}
+	
+	public void setDropList( List<ItemSpawn> list ) {
+		this.drops = list;
+	}
+	
+	public void clearDropList() {
+		this.drops.clear();
+	}
+	
+	public void addDropItem( ItemSpawn item ) {
+		this.drops.add( item );
+	}
+	
+	public Map<ZRSPAWNTYPE, List<SpawnInterface>> getSpawns() {
+		return this.spawns;
+	}
+	
+	public void setSpawns( Map<ZRSPAWNTYPE, List<SpawnInterface>> list ) {
+		this.spawns = list;
+	}
+	
+	public void clearSpawnList() {
+		this.spawns.clear();
+	}
+	
+	public void setSpawns( ZRSPAWNTYPE z, List<SpawnInterface> list ) {
+		
+		this.spawns.put( z, list );
+
+	}
+	
+	public void addSpawn( ZRSPAWNTYPE z, SpawnInterface s ) {
+		
+		if ( this.spawns.containsKey( z ) ) {
+			this.spawns.get(z).add( s );
+		} else {
+			
+			List<SpawnInterface> list = new ArrayList<SpawnInterface>();
+			list.add( s );
+			this.spawns.put( z, list );
+			
+		}
+	}
+	
 	/**
 	 * @return the killEntities
 	 */
@@ -524,7 +615,7 @@ public class Zone {
 		
 		this.loadBlocks();
 		
-		Utilities.spawnEntitiesInZone( this );
+		Utilities.spawnEntities( this.getSpawns() );
 		
 		
 		return true;
@@ -581,7 +672,7 @@ public class Zone {
 	}
 	
 	
-	public void restoreBlocks( ZoneBlocks z ) {
+	public void restoreBlocks( ZRBlocks z ) {
 		
 		try {
 			NMSAbstraction nms = NMSHelper.init( Bukkit.getPluginManager().getPlugin("ZoneReset") );
@@ -590,12 +681,12 @@ public class Zone {
 				//bah./ use bukkit
 			} else {
 				
-				List<ZoneBlock> b = z.getBlocks();
+				List<ZRBlock> b = z.getBlocks();
 				World w = Bukkit.getWorld( this.worldName );
 				MassBlockUpdate mbu = CraftMassBlockUpdate.createMassBlockUpdater( w );
 				if ( !b.isEmpty() ) {
 					
-					for ( ZoneBlock zb : b ) {
+					for ( ZRBlock zb : b ) {
 						mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);
 						if ( zb.materialId == Material.CHEST.getId() ) {
 							w.getBlockAt( zb.x, zb.y, zb.z).getState().update( true );
@@ -633,7 +724,7 @@ public class Zone {
 		try {
 			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + this.getTag() + ".ser" );
 			ObjectInputStream in = new ObjectInputStream( fileIn );
-			ZoneBlocks z = ( ZoneBlocks ) in.readObject();
+			ZRBlocks z = ( ZRBlocks ) in.readObject();
 			in.close();
 			fileIn.close();
 			this.restoreBlocks(z);
@@ -654,7 +745,7 @@ public class Zone {
 	public boolean saveBlocks() {
 		
         FileOutputStream fileOut;
-        ZoneBlocks z = this.area.getBlocks();
+        ZRBlocks z = this.area.getBlocks();
         
 		try {
 

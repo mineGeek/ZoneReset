@@ -1,12 +1,8 @@
 package com.github.mineGeek.ZoneReset.Utilities;
 
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,7 +10,11 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.github.mineGeek.ZoneReset.Utilities.SpawnInterface.ZR_SPAWN_TYPE;
+import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
+import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
+import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRTrigger;
 
 public class Zones {
@@ -158,36 +158,70 @@ public class Zones {
 		
 		
 		/**
-		 * Spawn any specific entities
+		 * Set players inventory
 		 */
-		if ( c.isSet("post.spawnEntities") ) {
+		r.clearPlayerInventory();
+		if ( c.isSet( "post.setInventory") ) {
 			
-			List<Map<?, ?>> entities = c.getMapList("post.spawnEntities");
-						
-			if ( !entities.isEmpty() ) {
+			List<Map<?, ?>> items = c.getMapList("post.playerInventory");
+			
+			if ( !items.isEmpty() ) {
 				
-				for (Map<?, ?> m : entities ) {
+				for ( Map<?, ?> item : items ) {
+					ItemSpawn i = new ItemSpawn();
+					i.setWorldName( worldName );
+					i.setList( (Map<String, Object>) item );
+					r.addSpawn( ZRSPAWNTYPE.INVENTORY, i );
+				}
+				
+			}
+			
+		}
+		
+		if ( c.isSet("post.spawnMobs") ) {
+			
+			List<Map<?, ?>> mobs = c.getMapList("post.spawnMobs");
+			
+			if ( !mobs.isEmpty() ) {
+				
+				for ( Map<?, ?> mob : mobs ) {
+					MobSpawner mobItem = new MobSpawner();
+					mobItem.setWorldName( worldName );
+					mobItem.setList( (Map<String, Object>) mob );
+					r.addSpawn( ZRSPAWNTYPE.MOB, mobItem );
+				}
+				
+			}
+			
+		}
+		
+		
+		if ( c.isSet( "post.spawnItems") ) {
+			
+			List< Map<?, ?> > spawns = c.getMapList( "post.spawnItems");
+			
+			if ( !spawns.isEmpty() ) {
+				
+				for ( Map<?, ?> spawn : spawns ) {
 					
-					if ( !m.isEmpty() ) {
+					SpawnInterface si = null;
+					
+					if ( spawn.containsKey( "type") ) {
 						
-						if ( m.containsKey("type") ) {
-							
-							SpawnInterface spawn = null;
-							
-							ZR_SPAWN_TYPE t = ZR_SPAWN_TYPE.valueOf( (String) m.get("type") );
-
-							if ( t.equals( ZR_SPAWN_TYPE.ITEM ) ) {
-								
-								spawn = new ItemSpawn();
-								spawn.setList( m );
-								r.getSpawnEntities().add( spawn );
-								
-							}
-							
+						if ( ZRSPAWNTYPE.valueOf( spawn.get("type").toString().toUpperCase() ).equals( ZRSPAWNTYPE.ITEM ) ) {
+							si = new ItemSpawn();
+						} else if ( ZRSPAWNTYPE.valueOf( spawn.get("type").toString().toUpperCase() ).equals( ZRSPAWNTYPE.CONTAINER ) ) {
+							si = new SpawnContainer();
 						}
 						
 					}
 					
+					if ( si != null ) {
+						si.setWorldName( worldName );
+						si.setList( (Map<String, Object>) spawn );
+						r.addSpawn( ZRSPAWNTYPE.valueOf( spawn.get("type").toString().toUpperCase() ), si);
+					}
+
 				}
 				
 			}
@@ -202,12 +236,6 @@ public class Zones {
 			List<Integer> l = c.getIntegerList( "pre.movePlayers.location" );
 			r.setTransportPlayers( c.getString("pre.movePlayers.world", worldName ), l.get(0), l.get(1), l.get(2) );
 		}
-		
-
-		/**
-		 * Specify specific snapshot name? Null for last snapshot
-		 */
-		if ( c.isSet( "snapshot") ) r.setSnapShotName( c.getString("snapshot") );
 		
 		
 		/**
@@ -252,58 +280,6 @@ public class Zones {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static EntityInfoItem getItemFromConfigSection( Map<?, ?> map ) {
-		
-		EntityInfoItem e = null;
-		
-		if ( !map.isEmpty() ) {
-			
-			Iterator<?> i = map.entrySet().iterator();
-			
-			while ( i.hasNext() ) {
-				
-				Map.Entry<String, Object> entry = (Entry<String, Object>) i.next();
-				
-				if ( entry.getKey().equalsIgnoreCase("name") ) {
-					
-				} else if ( entry.getKey().equalsIgnoreCase( "location") ) {
-
-						List<Integer> l = (ArrayList<Integer>)entry.getValue();
-				}
-				
-			}			
-			
-		}
-		
-		return e;
-	}
-	
-	public static List<EntityInfoItem> getItemsFromConfigSection( String path, ConfigurationSection c ) {
-		
-		List<EntityInfoItem> result = new ArrayList<EntityInfoItem>();
-		
-		if ( c.isSet("post.spawnEntities") ) {
-			
-			List<Map<?, ?>> entities = c.getMapList("post.spawnEntities");
-			
-			String name = null;
-			List<Integer> location = null;
-			
-			if ( !entities.isEmpty() ) {
-				
-				for (Map<?, ?> m : entities ) {
-					
-					EntityInfoItem ent = getItemFromConfigSection( m );
-					if ( ent != null ) result.add( ent );
-					
-				}
-				
-			}
-		}
-		
-		return result;
-	}
 	
 	
 	public static int count() {

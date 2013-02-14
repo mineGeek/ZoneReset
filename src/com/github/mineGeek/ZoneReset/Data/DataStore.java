@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Data;
+package com.github.mineGeek.ZoneReset.Data;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Base object for saving/loading customer data
+ * Base object for saving/loading data
  * from flat file
  *
  */

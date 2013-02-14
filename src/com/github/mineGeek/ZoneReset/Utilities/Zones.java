@@ -10,14 +10,14 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.github.mineGeek.ZoneReset.Data.Area;
+import com.github.mineGeek.ZoneReset.Data.DataStore;
 import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
 import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
-import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRTrigger;
-import com.github.mineGeek.ZoneRest.Data.DataStore;
 
 public class Zones {
 
@@ -95,15 +95,6 @@ public class Zones {
 		}
 		
 	}
-	
-	public static void trigger( ZRTrigger type, Material m, Location l ) {
-		
-		if ( type == ZRTrigger.ZR_ONINTERACT ) {
-			
-		}
-		
-	}
-	
 	
 	public static void triggerPlayerJoin( Player p ) {
 		
@@ -211,7 +202,7 @@ public class Zones {
 		/**
 		 * Set players inventory
 		 */
-		r.clearPlayerInventory();
+		//r.clearPlayerInventory();
 		if ( c.isSet( "post.setInventory") ) {
 			
 			List<Map<?, ?>> items = c.getMapList("post.playerInventory");

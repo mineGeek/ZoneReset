@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Utilities;
+package com.github.mineGeek.ZoneReset.Data;
 
 import java.util.List;
 
@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import com.github.mineGeek.ZoneRest.Data.ZRBlocks;
 
 /**
  * Utility class for staking out areas as a cuboid
@@ -14,8 +13,6 @@ import com.github.mineGeek.ZoneRest.Data.ZRBlocks;
  */
 public class Area {
 
-	
-	
 	/**
 	 * corner 1 of area
 	 */
@@ -36,7 +33,10 @@ public class Area {
 	
 	
 	
-	
+	/**
+	 * Return the NE corner
+	 * @return
+	 */
 	public Location ne() {
 		
 		if ( cachedNe == null ) {
@@ -51,11 +51,19 @@ public class Area {
 		return cachedNe;
 	}
 	
+	/**
+	 * Set the NE corner with a Location object
+	 * @param ne
+	 */
 	public void setNe( Location ne ) {
 		this.worldName = ne.getWorld().getName();
 		this.cachedNe = ne;
 	}
 	
+	/**
+	 * Return the SW corner of the area
+	 * @return
+	 */
 	public Location sw() {
 		
 		if ( cachedSw == null ) {
@@ -70,26 +78,32 @@ public class Area {
 		return cachedSw;
 	}
 	
+	/**
+	 * Set the SW corner of region with a Location object
+	 * @param sw
+	 */
 	public void setSw( Location sw ) {
 		this.worldName = sw.getWorld().getName();
 		this.cachedSw = sw;
 	}
 	
 	
+	/**
+	 * Just look purdy.
+	 */
 	public Area() {}
 	
 	/**
-	 * Constuctor taking the 2 points of cuboid
+	 * Constructor taking the 2 points of cuboid
 	 * @param ne
 	 * @param sw
 	 */
 	public Area( Location ne, Location sw ) {
-		this.cachedNe = ne;
-		this.cachedSw = sw;
+		
+		this.setNe( ne );		
+		this.setSw( sw );
+		
 	}
-	
-	
-	
 	
 	/**
 	 * Constructor that sets all points at once
@@ -107,6 +121,16 @@ public class Area {
 		
 	}
 	
+	/**
+	 * Another way of constructing
+	 * @param worldName
+	 * @param neX
+	 * @param neY
+	 * @param neZ
+	 * @param swX
+	 * @param swY
+	 * @param swZ
+	 */
 	public Area( String worldName, Integer neX, Integer neY, Integer neZ, Integer swX, Integer swY, Integer swZ ) {
 		
 		this.neX = neX;
@@ -122,8 +146,6 @@ public class Area {
 		
 	}	
 	
-	
-	
 	/**
 	 * Constructor that sets all variables from lists
 	 * @param world
@@ -134,6 +156,12 @@ public class Area {
 		this( world, ne.get(0), ne.get(1), ne.get(2), sw.get(0), sw.get(1), sw.get(2));
 	}
 	
+	/**
+	 * Look. Another constructor
+	 * @param worldName
+	 * @param ne
+	 * @param sw
+	 */
 	public Area( String worldName, List<Integer> ne, List<Integer> sw ) {
 
 		this.cachedNe = null;
@@ -148,8 +176,6 @@ public class Area {
 
 	}	
 	
-	
-	
 	/**
 	 * Constructor that sets all vars from a single list
 	 * @param world
@@ -159,9 +185,6 @@ public class Area {
 		this( world, loc.get(0), loc.get(1), loc.get(2), loc.get(3), loc.get(4), loc.get(5));
 	}
 
-	
-	
-	
 	/**
 	 * Will return true if location passed is within the cuboid
 	 * @param l
@@ -184,7 +207,11 @@ public class Area {
 		
 	}
 	
-	
+	/**
+	 * Get all the ZRBlocks in this area.
+	 * TODO: Won't this fart out if only 1 location object is set?
+	 * @return
+	 */
 	public ZRBlocks getBlocks() {
 		
 		ZRBlocks z = new ZRBlocks( this.ne(), this.sw() );
@@ -192,7 +219,6 @@ public class Area {
 		return z;
 		
 	}
-	
 	
 	
 	/**

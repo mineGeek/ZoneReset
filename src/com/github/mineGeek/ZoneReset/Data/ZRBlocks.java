@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Data;
+package com.github.mineGeek.ZoneReset.Data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +8,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 
-
+/**
+ * Container for all zones in a cuboid
+ * @author moí
+ *
+ */
 public class ZRBlocks implements Serializable {
 
 	private static final long serialVersionUID = 1L;

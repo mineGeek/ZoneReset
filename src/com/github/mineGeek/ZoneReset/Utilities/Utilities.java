@@ -22,6 +22,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.github.mineGeek.ZoneReset.Data.Area;
 import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
 import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;

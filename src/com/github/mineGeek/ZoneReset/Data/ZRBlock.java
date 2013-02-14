@@ -1,9 +1,14 @@
-package com.github.mineGeek.ZoneRest.Data;
+package com.github.mineGeek.ZoneReset.Data;
 
 import java.io.Serializable;
 
 import org.bukkit.block.Block;
 
+/**
+ * Block data object
+ * @author moí
+ *
+ */
 public class ZRBlock implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -14,6 +19,7 @@ public class ZRBlock implements Serializable {
 	public byte data;
 	
 	public ZRBlock ( Block block ) {
+		
 		this.x = block.getX();
 		this.y = block.getY();
 		this.z = block.getZ();

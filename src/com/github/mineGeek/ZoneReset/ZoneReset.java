@@ -112,12 +112,14 @@ public class ZoneReset extends JavaPlugin {
     	 * Set up config
     	 */
     	Config.c = this.getConfig();
-    	Config.snapShotFolder = this.getDataFolder() + File.separator + "snapshots";
+    	Config.folderPlugin = this.getDataFolder().toString();
+    	Config.folderPlayers = this.getDataFolder().toString() + File.separator + "players";
+    	Config.folderSnapshots = this.getDataFolder().toString() + File.separator + "snapshots";
     	
     	/**
     	 * Zone serialize directory
     	 */
-    	File file = new File( Config.snapShotFolder );
+    	File file = new File( Config.folderSnapshots );
     	
     	if ( !file.isDirectory() ) {
     		try {

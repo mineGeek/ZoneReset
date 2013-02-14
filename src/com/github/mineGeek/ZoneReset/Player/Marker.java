@@ -5,7 +5,17 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-
+/**
+ * A point to highlight a vector
+ * to a player. Credit for the visual
+ * material goes to the dude that wrote 
+ * the grief prevention plugin. I liked the
+ * glowstone and gold flags so I used those.
+ * Implementation is all Moí though.
+ * 
+ * @author Moí
+ *
+ */
 public class Marker {
 
 	int[] x = {0,0,0};
@@ -15,7 +25,12 @@ public class Marker {
 	byte[] data = {0,0,0};
 	String worldName;
 	
-	
+	/**
+	 * Constructor taking the block and flags positions we will mark
+	 * @param block
+	 * @param flag1
+	 * @param flag2
+	 */
 	public Marker( Block block, Block flag1, Block flag2 ) {
 	
 		worldName = block.getWorld().getName();
@@ -40,6 +55,11 @@ public class Marker {
 		
 	}
 	
+	/**
+	 * Swaps out marked blocks for highlighted ones.
+	 * Specifically Glowstone flanked by gold
+	 * @param player
+	 */
 	public void highlight( Player player ) {
 		
 		Location l1 = new Location( Bukkit.getWorld( worldName ), x[0], y[0], z[0] );
@@ -53,6 +73,11 @@ public class Marker {
 		
 	}
 	
+	/**
+	 * Swaps out the marked blocks and returns them back to 
+	 * what they were before they were marked
+	 * @param player
+	 */
 	public void unhighlight( Player player ) {
 		
 		for ( int i=0; i<3 ; i++ ) {

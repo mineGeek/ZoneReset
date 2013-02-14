@@ -11,6 +11,9 @@ public class Set extends CommandBase {
 		super(plugin);
 	}
 
+	/**
+	 * Allows setting of zone properties in game.
+	 */
 	@Override
 	protected Boolean exec( String cmdName, String[] args ) {
 		
@@ -38,13 +41,14 @@ public class Set extends CommandBase {
 		if ( key.equals( "world" ) ) {
 			
 			z.setWorldName( args[1] );
+			
 			mess = z.getTag() + " world set to " + args[1];
 			
 		} else if ( key.equals("zone") ) {
 			
 			if ( args.length == 1 ) {
 				
-				this.setAreaEdit( p , this.getAreaEdit(p));
+				this.setAreaEdit( p , !this.getAreaEdit(p));
 				
 			} else if ( args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") ) {
 				
@@ -59,11 +63,12 @@ public class Set extends CommandBase {
 			
 		} else if ( key.equals( "req") ) {
 			
-			if ( args.length < 3) {
+			if ( args.length < 2 ) {
 				mess = "Incorrect number of parameters";
+				return false;
 			}
 			
-			String noun = args[2].toLowerCase();
+			String noun = args[1].toLowerCase();
 			
 			if ( noun.equals( "players" ) ) {
 				
@@ -75,19 +80,19 @@ public class Set extends CommandBase {
 					z.setRequireNoPlayers( false );
 				}
 				
-				mess = z.getTag() + ( !z.isRequireNoPlayers() ? " does not require " : " requires " ) + "zone to be empty of players";
+				mess = z.getTag() + ( !z.isRequireNoPlayers() ? " does not require " : " now requires " ) + "zone to be empty of players";
 				
 			}
 			
 		} else if ( key.equals("no") ) {
 			
-			String noun = args[2].toLowerCase();
+			String noun = args[1].toLowerCase();
 			
 			if ( noun.equals("mobs") ) {
 				
 				if ( args.length == 2 ) {
 					z.setKillEntities( !z.isKillEntities() );
-				} else if ( args[3].equalsIgnoreCase( "on" ) || args[3].equalsIgnoreCase("true") ) {
+				} else if ( args[2].equalsIgnoreCase( "on" ) || args[2].equalsIgnoreCase("true") ) {
 					z.setKillEntities( true );
 				} else {
 					z.setKillEntities( false );
@@ -99,20 +104,53 @@ public class Set extends CommandBase {
 				
 				if ( args.length == 2 ) {
 					z.setRemoveSpawnPoints( !z.isRemoveSpawnPoints() );
-				} else if ( args[3].equalsIgnoreCase( "on" ) || args[3].equalsIgnoreCase("true") ) {
+				} else if ( args[2].equalsIgnoreCase( "on" ) || args[2].equalsIgnoreCase("true") ) {
 					z.setRemoveSpawnPoints( true );
 				} else {
 					z.setRemoveSpawnPoints( false );
 				}
 				
-				mess = z.getTag() + ( !z.isRemoveSpawnPoints() ? " will remove " : " will NOT remove " ) + "any online player spawn points in zone.";
+				mess = z.getTag() + ( z.isRemoveSpawnPoints() ? " will remove " : " will NOT remove " ) + "any online player spawn points in zone.";
 				
 			}
 			
 			
 		} else if ( key.equals("location") || key.equals("loc") ) {
 			
-			if ( args.length != 6 ) {
+			if ( args.length == 2 ) {
+				
+				if ( args[1].equalsIgnoreCase( "move" ) ) {
+					z.setTransportPlayers( p.getWorld().getName(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ() );
+					mess = "Any players in '" + z.getTag() + "' will be moved to your current location on reset";
+					return true;
+					
+				} else if ( args[1].equalsIgnoreCase( "spawn") ) {
+					
+					z.setResetSpawnPoints( p.getWorld().getName(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ() );
+					mess = "Any players in '" + z.getTag() + "' will have their spawn point set to here on reset.";
+					return true;
+					
+				}
+				
+			} else if ( args.length == 3 && args[2].equalsIgnoreCase( "none" ) ) {
+				
+				if ( args[1].equalsIgnoreCase( "move" ) ) {
+					z.setTransportPlayers( null, 0, 0, 0 );
+					
+					mess = "Any players in '" + z.getTag() + "' will be no longer be moved on reset.";
+					return true;
+					
+				} else if ( args[1].equalsIgnoreCase( "spawn") ) {
+					
+					z.setResetSpawnPoints(  null, 0, 0, 0 );
+					mess = "Any players in '" + z.getTag() + "' will no longer have spawn points reset.";
+					return true;
+					
+				}				
+				
+			}
+			
+			if ( args.length < 6 ) {
 				
 				mess = "Invalid number of arguments. Expected: /set loc NOUN ACTION x y z";
 				return false;

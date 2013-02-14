@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Data;
+package com.github.mineGeek.ZoneReset.Data;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;

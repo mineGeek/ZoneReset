@@ -20,56 +20,105 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
-import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
-import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
+import com.github.mineGeek.ZoneReset.Data.Area;
+import com.github.mineGeek.ZoneReset.Data.ZRBlock;
+import com.github.mineGeek.ZoneReset.Data.ZRBlocks;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
 import com.github.mineGeek.ZoneReset.nms.NMSHelper;
-import com.github.mineGeek.ZoneRest.Data.ZRBlock;
-import com.github.mineGeek.ZoneRest.Data.ZRBlocks;
 
 public class Zone {
 
-	public enum ZRTrigger { ZR_ONJOIN, ZR_ONQUIT, ZR_ONINTERACT };
-	public enum ZRMethod { NONE, MANUAL, TIMED, ONJOIN, ONQUIT, ONINTERACT}
+	/**
+	 * Methods for triggers
+	 */
+	public enum 	ZRMethod { NONE, MANUAL, TIMED, ONJOIN, ONQUIT, ONINTERACT}
+	public enum		ZRAREA { NONE, CUBOID, WORLD, SERVER }
 	
-	public ZRMethod lastRestMethod = ZRMethod.NONE;
-	public Long lastReset;
-	public Long lastTimedReset;
-	public Long nextTimedReset;
-	
+	/**
+	 * The case sensitive string rep for the zone
+	 */
 	private String 	tag;
+	
+	/**
+	 * The world this zone exists in
+	 */
 	private String 	worldName;
 	
+	/**
+	 * Last time a reset was done... what method was used
+	 */
+	public ZRMethod lastRestMethod = ZRMethod.NONE;
+	
+	/**
+	 * Time stamps
+	 */
+	public Long 	lastReset;
+	public Long 	lastTimedReset;
+	public Long 	nextTimedReset;
+	
+	/**
+	 * Area that this zone covers
+	 */
 	private Area 	area = new Area();
 	
+	/**
+	 * Scope for rule. Only reset blocks if
+	 * scope is cuboid?
+	 */
+	private ZRAREA	scope = ZRAREA.NONE;
+	
+	/**
+	 * List of shit to spawn on reset, categorised by type
+	 */
 	private Map< ZRSPAWNTYPE, List<SpawnInterface>> spawns = new HashMap< ZRSPAWNTYPE, List<SpawnInterface>>();
 	
+	/**
+	 * Require: zone to not have players
+	 */
 	private boolean requireNoPlayers = false;
-	private boolean removeSpawnPoints = false;
 	
-	private String resetSpawnPointsWorldName;
-	private int resetSpawnPointsX;
-	private int resetSpawnPointsY;
-	private int resetSpawnPointsZ;
+	/**
+	 * Pre: noSpawns = remove spawn points before reset
+	 */
+	private boolean preNoSpawns = false;
 	
-	private String transportPlayersWorldName;
-	private int transportPlayersX;
-	private int transportPlayersY;
-	private int transportPlayersZ;
+	/**
+	 * Pre: setSpawns = set new spawn point
+	 */
+	private String 	preNewSpawnWorldName;
+	private int 	preNewSpawnX;
+	private int 	preNewSpawnY;
+	private int 	preNewSpawnZ;
 	
-	private boolean killEntities = false;
-	private List<EntityType> killEntityExceptions = new ArrayList<EntityType>(); 
-	private List<SpawnInterface> spawnEntities = new ArrayList<SpawnInterface>();
-	private List<ItemSpawn> playerInventory = new ArrayList<ItemSpawn>();
-	private List<MobSpawner> mobs = new ArrayList<MobSpawner>();
-	private List<ItemSpawn> drops = new ArrayList<ItemSpawn>();
+	/**
+	 * Pre: newLocation = move players to position
+	 */
+	private String 	preNewLocation;
+	private int 	preNewLocationX;
+	private int 	preNewLocationY;
+	private int 	preNewLocationZ;
 	
-	private String snapShotName = null;
-	private Map< String, String > schedule = new HashMap<String, String>();
-	private boolean onPlayerJoin = false;
-	private List<String> onPlayerJoinList = new ArrayList<String>();
+	/**
+	 * Pre: noMobs = remove entities ( can't remove peeps)
+	 */
+	private boolean preNoMobs = false;
+	private List<EntityType> preNoMobsExceptionList = new ArrayList<EntityType>(); 
+	
+
+	/**
+	 * Triggers when player joins. trigOnPlayerJoin (true ) = any player joining
+	 * otherwise it sees if the player is in the list
+	 * trigOnFirstPlayerJoin = won't trigger if others are on
+	 */
+	private boolean trigOnPlayerJoin = false;
+	private boolean trigOnFirstPlayerJoin = false;
+	private List<String> trigOnPlayerJoinList = new ArrayList<String>();
+	
+	/**
+	 * Trigger when a player leaves
+	 */
 	private boolean onPlayerQuit = false;
 	private List<String> onPlayerQuitList = new ArrayList<String>();
 	private Long onMinutes = (long) 0;
@@ -88,8 +137,8 @@ public class Zone {
 		
 		this.tag = newTag;
 		this.area = clone.area;
-		this.killEntities = clone.killEntities;
-		this.killEntityExceptions = clone.killEntityExceptions;
+		this.preNoMobs = clone.preNoMobs;
+		this.preNoMobsExceptionList = clone.preNoMobsExceptionList;
 		this.onInteractMaterialId = clone.onInteractMaterialId;
 		this.onInteractLocation = clone.onInteractLocation;
 		this.onInteractLocationWorld = clone.onInteractLocationWorld;
@@ -98,24 +147,21 @@ public class Zone {
 		this.onInteractLocationZ = clone.onInteractLocationZ;
 		this.onMinutesFormat = clone.onMinutesFormat;
 		this.onMinutes = clone.onMinutes;
-		this.onPlayerJoin = clone.onPlayerJoin;
-		this.onPlayerJoinList = clone.onPlayerJoinList;
+		this.trigOnPlayerJoin = clone.trigOnPlayerJoin;
+		this.trigOnPlayerJoinList = clone.trigOnPlayerJoinList;
 		this.onPlayerQuit = clone.onPlayerQuit;
 		this.onPlayerQuitList = clone.onPlayerQuitList;
-		this.removeSpawnPoints = clone.removeSpawnPoints;
+		this.preNoSpawns = clone.preNoSpawns;
 		this.requireNoPlayers = clone.requireNoPlayers;
-		this.resetSpawnPointsWorldName = clone.resetSpawnPointsWorldName;
-		this.resetSpawnPointsX = clone.resetSpawnPointsX;
-		this.resetSpawnPointsY = clone.resetSpawnPointsY;
-		this.resetSpawnPointsZ = clone.resetSpawnPointsZ;
-		this.schedule = clone.schedule;
-		this.transportPlayersWorldName = clone.transportPlayersWorldName;
-		this.transportPlayersX = clone.transportPlayersX;
-		this.transportPlayersY = clone.transportPlayersY;
-		this.transportPlayersZ = clone.transportPlayersZ;
+		this.preNewSpawnWorldName = clone.preNewSpawnWorldName;
+		this.preNewSpawnX = clone.preNewSpawnX;
+		this.preNewSpawnY = clone.preNewSpawnY;
+		this.preNewSpawnZ = clone.preNewSpawnZ;
+		this.preNewLocation = clone.preNewLocation;
+		this.preNewLocationX = clone.preNewLocationX;
+		this.preNewLocationY = clone.preNewLocationY;
+		this.preNewLocationZ = clone.preNewLocationZ;
 		this.worldName = clone.worldName;
-		this.playerInventory = clone.playerInventory;
-		this.mobs = clone.mobs;
 		this.lastRestMethod = clone.lastRestMethod;
 		this.lastReset = clone.lastReset;
 		this.lastTimedReset = clone.lastTimedReset;
@@ -153,6 +199,7 @@ public class Zone {
 	 */
 	public void setWorldName(String worldName) {
 		this.worldName = worldName;
+		this.getArea().worldName = worldName;
 	}
 
 
@@ -198,7 +245,7 @@ public class Zone {
 	 * @return the removeSpawnPoints
 	 */
 	public boolean isRemoveSpawnPoints() {
-		return removeSpawnPoints;
+		return preNoSpawns;
 	}
 
 
@@ -238,7 +285,7 @@ public class Zone {
 	 * @param removeSpawnPoints the removeSpawnPoints to set
 	 */
 	public void setRemoveSpawnPoints(boolean removeSpawnPoints) {
-		this.removeSpawnPoints = removeSpawnPoints;
+		this.preNoSpawns = removeSpawnPoints;
 	}
 
 	/**
@@ -248,11 +295,11 @@ public class Zone {
 		
 		Location r = null;
 		
-		if ( this.resetSpawnPointsWorldName != null ) {
-			World world = Bukkit.getWorld( this.resetSpawnPointsWorldName );
+		if ( this.preNewSpawnWorldName != null ) {
+			World world = Bukkit.getWorld( this.preNewSpawnWorldName );
 			
 			if ( world != null ) {
-				r = new Location( world, this.resetSpawnPointsX, this.resetSpawnPointsY, this.resetSpawnPointsZ );
+				r = new Location( world, this.preNewSpawnX, this.preNewSpawnY, this.preNewSpawnZ );
 			}
 		}
 		
@@ -266,10 +313,10 @@ public class Zone {
 	 */
 	public void setResetSpawnPoints(String worldName, int x, int y, int z ) {
 
-		this.resetSpawnPointsWorldName = worldName;
-		this.resetSpawnPointsX = x;
-		this.resetSpawnPointsY = y;
-		this.resetSpawnPointsZ = z;
+		this.preNewSpawnWorldName = worldName;
+		this.preNewSpawnX = x;
+		this.preNewSpawnY = y;
+		this.preNewSpawnZ = z;
 		
 	}
 
@@ -279,11 +326,11 @@ public class Zone {
 	public Location getTransportPlayers() {
 		Location r = null;
 		
-		if ( this.transportPlayersWorldName != null ) {
-			World world = Bukkit.getWorld( this.transportPlayersWorldName );
+		if ( this.preNewLocation != null ) {
+			World world = Bukkit.getWorld( this.preNewLocation );
 			
 			if ( world != null ) {
-				r = new Location( world, this.transportPlayersX, this.transportPlayersY, this.transportPlayersZ );
+				r = new Location( world, this.preNewLocationX, this.preNewLocationY, this.preNewLocationZ );
 			}
 		}
 		
@@ -294,59 +341,10 @@ public class Zone {
 	 * @param transportPlayers the transportPlayers to set
 	 */
 	public void setTransportPlayers( String worldName, int x, int y, int z) {
-		this.transportPlayersWorldName = worldName;
-		this.transportPlayersX = x;
-		this.transportPlayersY = y;
-		this.transportPlayersZ = z;
-	}
-
-	public List<ItemSpawn> getPlayerInventory() {
-		return this.playerInventory;
-	}
-	
-	public void setPlayerInventory( List<ItemSpawn> list ) {
-		this.playerInventory = list;
-	}
-	
-	public void clearPlayerInventory() {
-		this.playerInventory.clear();
-	}
-	
-	public void addPlayerInventoryItem( ItemSpawn item ) {
-		this.playerInventory.add( item );
-	}
-	
-	
-	public List<MobSpawner> getMobList() {
-		return this.mobs;
-	}
-	
-	public void setMobList( List<MobSpawner> list ) {
-		this.mobs = list;
-	}
-	
-	public void clearMobList() {
-		this.mobs.clear();
-	}
-	
-	public void addMobItem( MobSpawner mob ) {
-		this.mobs.add( mob );
-	}
-	
-	public List<ItemSpawn> getDropList() {
-		return this.drops;
-	}
-	
-	public void setDropList( List<ItemSpawn> list ) {
-		this.drops = list;
-	}
-	
-	public void clearDropList() {
-		this.drops.clear();
-	}
-	
-	public void addDropItem( ItemSpawn item ) {
-		this.drops.add( item );
+		this.preNewLocation = worldName;
+		this.preNewLocationX = x;
+		this.preNewLocationY = y;
+		this.preNewLocationZ = z;
 	}
 	
 	public Map<ZRSPAWNTYPE, List<SpawnInterface>> getSpawns() {
@@ -384,80 +382,29 @@ public class Zone {
 	 * @return the killEntities
 	 */
 	public boolean isKillEntities() {
-		return killEntities;
+		return preNoMobs;
 	}
 
 	/**
 	 * @param killEntities the killEntities to set
 	 */
 	public void setKillEntities(boolean killEntities) {
-		this.killEntities = killEntities;
+		this.preNoMobs = killEntities;
 	}
 
 	/**
 	 * @return the killEntityExceptions
 	 */
 	public List<EntityType> getKillEntityExceptions() {
-		return killEntityExceptions;
+		return preNoMobsExceptionList;
 	}
-
-	/**
-	 * @return the spawnEntities
-	 */
-	public List<SpawnInterface> getSpawnEntities() {
-		return spawnEntities;
-	}
-
-	/**
-	 * @param spawnEntities the spawnEntities to set
-	 */
-	public void setSpawnEntities(List<SpawnInterface> spawnEntities) {
-		this.spawnEntities = spawnEntities;
-	}
-
-
-	/**
-	 * @return the snapShotName
-	 */
-	public String getSnapShotName() {
-		return snapShotName;
-	}
-
-
-	/**
-	 * @param snapShotName the snapShotName to set
-	 */
-	public void setSnapShotName(String snapShotName) {
-		this.snapShotName = snapShotName;
-	}
-
-
-
-	/**
-	 * @return the schedule
-	 */
-	public Map<String, String> getSchedule() {
-		return schedule;
-	}
-
-
-
-
-	/**
-	 * @param schedule the schedule to set
-	 */
-	public void setSchedule(Map<String, String> schedule) {
-		this.schedule = schedule;
-	}
-
-
 
 
 	/**
 	 * @return the onPlayerJoin
 	 */
 	public boolean isOnPlayerJoin() {
-		return onPlayerJoin;
+		return trigOnPlayerJoin;
 	}
 
 
@@ -467,7 +414,7 @@ public class Zone {
 	 * @param onPlayerJoin the onPlayerJoin to set
 	 */
 	public void setOnPlayerJoin(boolean onPlayerJoin) {
-		this.onPlayerJoin = onPlayerJoin;
+		this.trigOnPlayerJoin = onPlayerJoin;
 	}
 
 
@@ -477,7 +424,7 @@ public class Zone {
 	 * @return the onPlayerJoinList
 	 */
 	public List<String> getOnPlayerJoinList() {
-		return onPlayerJoinList;
+		return trigOnPlayerJoinList;
 	}
 
 
@@ -487,7 +434,7 @@ public class Zone {
 	 * @param onPlayerJoinList the onPlayerJoinList to set
 	 */
 	public void setOnPlayerJoinList(List<String> onPlayerJoinList) {
-		this.onPlayerJoinList = onPlayerJoinList;
+		this.trigOnPlayerJoinList = onPlayerJoinList;
 	}
 
 
@@ -651,7 +598,7 @@ public class Zone {
 			
 		}
 		
-		if ( killEntities ) Utilities.clearZoneOfEntities( this );
+		if ( preNoMobs ) Utilities.clearZoneOfEntities( this );
 		
 		
 		this.loadBlocks();
@@ -672,10 +619,10 @@ public class Zone {
 	
 	public boolean isPlayerJoin( String playerName ) {
 		
-		if ( this.onPlayerJoin ) {
+		if ( this.trigOnPlayerJoin ) {
 			
-			if ( this.onPlayerJoinList.isEmpty() ) return true;			
-			return this.onPlayerJoinList.contains( playerName );
+			if ( this.trigOnPlayerJoinList.isEmpty() ) return true;			
+			return this.trigOnPlayerJoinList.contains( playerName );
 			
 		}
 		
@@ -700,12 +647,12 @@ public class Zone {
 	
 	public void setKillEntityExceptions( List<String> list ) {
 		
-		this.killEntityExceptions.clear();
+		this.preNoMobsExceptionList.clear();
 		
 		if ( list != null && list.size() > 0 ) {
 			
 			for ( String x : list ) {
-				this.killEntityExceptions.add( EntityType.fromName( x ) );
+				this.preNoMobsExceptionList.add( EntityType.fromName( x ) );
 			}
 			
 		}
@@ -763,7 +710,7 @@ public class Zone {
 	public boolean loadBlocks() {
 				
 		try {
-			FileInputStream fileIn = new FileInputStream( Config.snapShotFolder + File.separator + this.getTag() + ".ser" );
+			FileInputStream fileIn = new FileInputStream( Config.folderSnapshots + File.separator + this.getTag() + ".ser" );
 			ObjectInputStream in = new ObjectInputStream( fileIn );
 			ZRBlocks z = ( ZRBlocks ) in.readObject();
 			in.close();
@@ -790,7 +737,7 @@ public class Zone {
         
 		try {
 
-			fileOut = new FileOutputStream( Config.snapShotFolder + File.separator + this.tag + ".ser");
+			fileOut = new FileOutputStream( Config.folderSnapshots + File.separator + this.tag + ".ser");
 	        ObjectOutputStream out =  new ObjectOutputStream(fileOut);
 	        out.writeObject( z );
 	        out.close();
@@ -806,10 +753,8 @@ public class Zone {
 	}
 	
 	public void close() {
-		this.killEntityExceptions.clear();
-		this.spawnEntities.clear();
-		this.schedule.clear();
-		this.onPlayerJoinList.clear();
+		this.preNoMobsExceptionList.clear();
+		this.trigOnPlayerJoinList.clear();
 		this.onPlayerQuitList.clear();
 		this.onInteractLocation = null;
 	}	

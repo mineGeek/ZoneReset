@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Player.Markers;
+import com.github.mineGeek.ZoneReset.Utilities.Zone;
 
 public class Cancel extends CommandBase {
 
@@ -20,23 +21,19 @@ public class Cancel extends CommandBase {
 		}
 		
 		Player p = (Player)sender;
-		
-		if ( !p.hasMetadata("ZREditMode") ) {
-			mess = "You are not currently editing a zone! Cancelling edit.";
-			return true;
-		}
-		
-		String tag = p.getMetadata("ZREditMode").get(0).asString();
-		
-		if ( tag == null ) {
-			mess = "You do not have a zone name! Cancelling edit.";
-		}
-		
 		Markers.hideZoneBoundaries(p);
-		p.removeMetadata("ZREditMode", this.plugin );
-		p.removeMetadata("ZR_1", this.plugin );
-		p.removeMetadata("ZR_2", this.plugin );
-		mess = "Edit mode cancelled.";
+		Zone z = this.getEditZone(p);
+		if ( z == null ) {
+			
+			mess = "You are not currently editing a zone! Cancelling edit.";
+			return true;			
+			
+		}
+		
+		String t = z.getTag();
+		this.cancelEdit( p );
+		mess = "you are no longer editing '" + t + "'";
+		
 		return true;
 		
 	}

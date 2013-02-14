@@ -19,8 +19,6 @@ import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
  */
 public class Config {
 
-
-	
 	/**
 	 * The actual config file from getConfig()
 	 */
@@ -31,15 +29,12 @@ public class Config {
 	 */
 	public static String txtPlayersStillInArea = "There are still players in the area";
 	
-
-	public static String snapShotFolder;
-	
 	/**
-	 * Timeout of restriction messages to prevent flooding player
+	 * Timeout of messages to prevent flooding player
+	 * TODO: I don't think this is used here anymore.
 	 */
 	public static int spamPlayerMessageTimeout = 1500;
 	
-	public static int wandId = 294;
 	/**
 	 * Debugging parameters
 	 */
@@ -47,11 +42,26 @@ public class Config {
 	public static boolean debug_area_chunkExit = false;
 	public static boolean debug_area_chunkChange = false;
 	
-	
+	public static String folderPlayers;
+	public static String folderPlugin;
+	public static String folderSnapshots;
 	
 	
 	/**
-	 * Load all rules from the config
+	 * Main load from config
+	 */
+	public static void loadConfig() {
+		
+		Config.spamPlayerMessageTimeout		= c.getInt( "playerMessageTimeout", 1500 );		
+		Config.debug_area_chunkEntrance		= c.getBoolean("debug.area.chunkEntrance", false);
+		Config.debug_area_chunkExit			= c.getBoolean("debug.area.chunkExit", false);
+		Config.debug_area_chunkChange		= c.getBoolean("debug.area.chunkChange", false);
+
+		Config.loadZonesFromConfig( c );
+	}	
+	
+	/**
+	 * Load all zones from the config
 	 * @param c
 	 */
 	public static void loadZonesFromConfig( MemorySection c) {
@@ -69,61 +79,72 @@ public class Config {
 			
 		}
 		
+		/**
+		 * Pre-Load any interaction triggers for zones.
+		 */
 		Zones.loadInteractKeys();
-		Bukkit.getServer().getLogger().info("ZoneRest loaded " + Zones.count() + " rules total.");
 		
-	}
-	
-	
-	
-	
-	/**
-	 * Load other variables from config
-	 */
-	public static void loadConfig() {
+		/**
+		 * Let 'em know we are loaded and good to go.
+		 */
+		Bukkit.getServer().getLogger().info("ZoneRest loaded " + Zones.count() + " zones total.");
 		
-		Config.spamPlayerMessageTimeout		= c.getInt( "playerMessageTimeout", 1500 );
-		
-		Config.debug_area_chunkEntrance		= c.getBoolean("debug.area.chunkEntrance", false);
-		Config.debug_area_chunkExit			= c.getBoolean("debug.area.chunkExit", false);
-		Config.debug_area_chunkChange		= c.getBoolean("debug.area.chunkChange", false);
-		
-		Config.wandId						= c.getInt("wand", 294 );
-		
-		Config.loadZonesFromConfig( c );
 	}
 	
 	/**
-	 * Good guy brings closure
+	 * Save a zone to the config file. Note that this will overwrite any values
+	 * that have been changed in the config.yml since it was last loaded.
+	 * 
+	 * @param Zone z
 	 */
-	public static void close() {
-		Config.c = null;
-		
-	}
-
 	public static void saveZoneConfig( Zone z ) {
 		
+		/**
+		 * Who you trying to fool?
+		 */
 		if ( z == null ) return;
 		
+		/**
+		 * Root path
+		 */
 		String path = "zones." + z.getTag() + ".";
 		
+		/**
+		 * Set world
+		 */
+		if ( z.getWorldName() != null ) c.set( path + "world", z.getWorldName() );
+		
+		/**
+		 * If NE is set, record it
+		 */
 		if ( z.getArea().ne() != null ) {		
 			List<Integer> ne = new ArrayList<Integer>(Arrays.asList(z.getArea().ne().getBlockX(), z.getArea().ne().getBlockY(), z.getArea().ne().getBlockZ()));
 			c.set(path + "ne", ne );
-			c.set(path + "world", z.getArea().ne().getWorld().getName());
+			if ( z.getWorldName() == null ) {
+				c.set(path + "world", z.getArea().ne().getWorld().getName());
+			}
 		}
 		
+		/**
+		 * If SW is set, record it
+		 */
 		if ( z.getArea().sw() != null ) {
 			List<Integer> sw = new ArrayList<Integer>(Arrays.asList(z.getArea().sw().getBlockX(), z.getArea().sw().getBlockY(), z.getArea().sw().getBlockZ()));
 			c.set(path + "sw", sw );
-			c.set(path + "world", z.getArea().sw().getWorld().getName());
+			if ( z.getWorldName() == null ) {
+				c.set(path + "world", z.getArea().sw().getWorld().getName());
+			}
 		}
 		
-		//Requirements
+		/**
+		 * Any Requirements for reset?
+		 */
 		c.set( path + "requirements.noPlayers", z.isRequireNoPlayers() );
 		
 		
-		//Pre
+		/**
+		 * Pre-Reset processing.
+		 */
 		String ppath = path + "pre.";
 		c.set(ppath + "removeEntities", z.isKillEntities() );
 		c.set(ppath + "keepEntities", z.getKillEntityExceptions() );
@@ -141,7 +162,9 @@ public class Config {
 		}
 		
 		
-		//Post
+		/**
+		 * Post-Reset processing
+		 */
 		if ( !z.getSpawns().isEmpty() ) {
 			
 			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.INVENTORY ) ) {
@@ -179,8 +202,10 @@ public class Config {
 			
 		}
 		
-		//Triggers
 		
+		/**
+		 * Triggers that may cause resetting
+		 */
 		ppath = path + "trigger.";
 		
 		if ( z.isOnPlayerJoin() ) c.set(ppath + "onPlayerJoin", z.isOnPlayerJoin() );
@@ -195,14 +220,25 @@ public class Config {
 		}
 		
 		
-		
+		/**
+		 * Refresh any interaction triggers
+		 */
 		Zones.loadInteractKeys();
+		
+		/**
+		 * Save it.
+		 */
 		Bukkit.getPluginManager().getPlugin("ZoneReset").saveConfig();
 		
 		
 		
 	}
 
+	/**
+	 * Transform a zone spawn type to a basic list for storage in config.
+	 * @param spawn
+	 * @return
+	 */
 	public static List< Map<String, Object>> formatSpawnForConfig( List<SpawnInterface> spawn ) {
 		
 		List< Map<String, Object>> result = new ArrayList< Map<String, Object>>();
@@ -219,5 +255,12 @@ public class Config {
 		
 	}
 	
+	/**
+	 * Good guy brings closure
+	 */
+	public static void close() {
+		Config.c = null;
+		
+	}	
 	
 }

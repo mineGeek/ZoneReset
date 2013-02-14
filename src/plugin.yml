@@ -8,7 +8,7 @@ commands:
         aliases: [restoreme]
         usage: /restoreit [full]
         permission-message: You don't have permission fool
-    zr:
+    edit:
         description: Enters edit mode for a zone. Type /save or /cancel when complete.
         aliases: [zredit]
         usage: /edit zonetag
@@ -26,4 +26,16 @@ commands:
         usage: /save
         permission: ZoneReset.edit
         permission-message: You lack the skillz
+    set:
+        description: Save an active Zone
+        aliases: [savezone]
+        usage: /save
+        permission: ZoneReset.edit
+        permission-message: You lack the skillz
+    create:
+        description: Save an active Zone
+        aliases: [savezone]
+        usage: /save
+        permission: ZoneReset.edit
+        permission-message: You lack the skillz                
     

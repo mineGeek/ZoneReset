@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRTrigger;
 import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 

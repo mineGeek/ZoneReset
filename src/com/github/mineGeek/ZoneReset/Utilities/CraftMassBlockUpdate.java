@@ -149,7 +149,9 @@ public class CraftMassBlockUpdate implements MassBlockUpdate {
 
 
 	private class DeferredBlock {
+		@SuppressWarnings("unused")
 		public final int x, y, z;
+		@SuppressWarnings("unused")
 		public final int blockId;
 
 

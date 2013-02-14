@@ -10,9 +10,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.github.mineGeek.ZoneReset.Commands.Cancel;
+import com.github.mineGeek.ZoneReset.Commands.Create;
 import com.github.mineGeek.ZoneReset.Commands.Edit;
 import com.github.mineGeek.ZoneReset.Commands.Reset;
 import com.github.mineGeek.ZoneReset.Commands.Save;
+import com.github.mineGeek.ZoneReset.Commands.Set;
 import com.github.mineGeek.ZoneReset.Events.Listeners;
 import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
@@ -95,8 +97,11 @@ public class ZoneReset extends JavaPlugin {
 		 */
     	getCommand("reset").setExecutor( new Reset( this ) );
     	getCommand("save").setExecutor( new Save( this ) );
-    	getCommand("zr").setExecutor( new Edit( this ) );
+    	getCommand("set").setExecutor( new Set( this ) );
     	getCommand("cancel").setExecutor( new Cancel( this ) );
+    	getCommand("create").setExecutor( new Create(this) );
+    	getCommand("edit").setExecutor( new Edit( this ) );
+    	
     	
     	/**
     	 * Listeners
@@ -130,7 +135,13 @@ public class ZoneReset extends JavaPlugin {
     	/**
     	 * Load zone saved data
     	 */
+    	Zones.setDataFolder( this.getDataFolder().toString() );
     	Zones.loadDataZones();
+    	
+    	/**
+    	 * Force loads the class for shits and giggles.
+    	 */
+    	Markers.enabled = true;
     	
     	/**
     	 * Tell console we are ready to go.

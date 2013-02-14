@@ -139,6 +139,130 @@ public class Set extends CommandBase {
 					
 				}
 				
+			} else if ( key.equals("trigger" ) ) {
+				
+				if ( args.length < 3 ) {
+					
+					mess = "Invalid number of arguments";
+					return false;
+				}
+				
+				String type = args[2].toLowerCase();
+				
+				if ( type.equals("join") ) {
+					
+					if ( args.length == 2 ) {
+						
+						z.setOnPlayerJoin( !z.isOnPlayerJoin() );
+						mess = z.getTag() + " will " + ( z.isOnPlayerJoin() ? "now" : "no longer") + " auto reset when a player joins.";
+						
+					} else if ( args.length > 2 ) {
+						
+						if ( args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("on") ) {
+							z.setOnPlayerJoin( true );
+							mess = z.getTag() + " will now auto reset when a player joins.";
+						} else if ( args[2].equalsIgnoreCase( "false" ) || args[2].equalsIgnoreCase("off" ) ) {
+							z.setOnPlayerJoin( false );
+							mess = z.getTag() + " will no longer auto reset when a player joins.";
+						} else if ( args[2].equalsIgnoreCase("add" ) && args.length > 3) {
+							
+							for ( int x = 3; x < args.length; x++ ) {
+								z.getOnPlayerJoinList().remove( args[x] );
+								z.getOnPlayerJoinList().add( args[x] );
+								p.sendMessage( "Player " + args[x] + " will now reset zone '" + z.getTag() + "' when they join." );
+							}								
+							
+							
+						} else if ( args[2].equalsIgnoreCase("remove") && args.length > 2 ) {
+							
+							for ( int x = 3; x < args.length; x++ ) {
+								z.getOnPlayerJoinList().remove( args[x] );
+								p.sendMessage( "Player " + args[x] + " will no longer reset zone '" + z.getTag() + "' when they join." );
+							}							
+							
+						} else if ( args[2].equalsIgnoreCase( "clear") ) {
+							
+							z.getOnPlayerJoinList().clear();
+							mess = z.getTag() + " player reset onJoin list cleared.";
+							
+						}
+						
+					} else if ( type.equals("quit") ) {
+						
+						if ( args.length == 2 ) {
+							
+							z.setOnPlayerQuit( !z.isOnPlayerQuit() );
+							mess = z.getTag() + " will " + ( z.isOnPlayerQuit() ? "now" : "no longer") + " auto reset when a player leaves.";
+							
+						} else if ( args.length > 2 ) {
+							
+							if ( args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("on") ) {
+								z.setOnPlayerQuit( true );
+								mess = z.getTag() + " will now auto reset when a player quits.";
+							} else if ( args[2].equalsIgnoreCase( "false" ) || args[2].equalsIgnoreCase("off" ) ) {
+								z.setOnPlayerQuit( false );
+								mess = z.getTag() + " will no longer auto reset when a player quits.";
+							} else if ( args[2].equalsIgnoreCase("add" ) && args.length > 3) {
+								
+								for ( int x = 3; x < args.length; x++ ) {
+									z.getOnPlayerQuitList().remove( args[x] );
+									z.getOnPlayerQuitList().add( args[x] );
+									p.sendMessage( "Player " + args[x] + " will now reset zone '" + z.getTag() + "' when they quit." );
+								}								
+								
+								
+							} else if ( args[2].equalsIgnoreCase("remove") && args.length > 2 ) {
+								
+								for ( int x = 3; x < args.length; x++ ) {
+									z.getOnPlayerQuitList().remove( args[x] );
+									p.sendMessage( "Player " + args[x] + " will no longer reset zone '" + z.getTag() + "' when they quit." );
+								}							
+								
+							} else if ( args[2].equalsIgnoreCase( "clear") ) {
+								
+								z.getOnPlayerQuitList().clear();
+								mess = z.getTag() + " player reset onQuit list cleared.";
+								
+							}
+							
+						}
+						
+					} else if ( key.equals( "time" ) ) {
+						
+						if ( args.length == 2 ) {
+							mess = "Invalid option. Expect a format of #d#h#m#s (e.g. 2d3m for every 48 hours and 3 minutes)";
+							return true;
+						}
+						
+						z.setOnMinutesFormat( args[2] );
+						
+						if ( z.getOnMinutes() == 0 ) {
+							mess = "Failure reading time argument. format should be in days, hours, minutes, seconds #[d|h|m|s]. Example for 24 hours: 1d or 24h. You can combined them all together, eg : /zr set time 1d3h5m0s";
+						} else {
+							mess = "Set Zone '" + z.getTag() + "' to automatically reset evey " + z.getOnMinutesFormat();
+						}
+						
+						return true;
+						
+					} else if ( key.equals( "interact") ) {
+						
+						if ( args.length == 3 ) {
+							if ( args[2].equalsIgnoreCase("off") ) {
+								this.setInteractEditOff(p);
+								mess = "Interaction trigger editing off.";
+								return true;
+							}
+						}
+						
+						this.setInteractEditOn(p);
+						mess = "Right click object to set trigger.";
+						return true;
+						
+					}
+					
+				}
+				
+				
 			}
 			
 		}

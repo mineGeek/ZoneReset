@@ -16,7 +16,8 @@ import com.github.mineGeek.ZoneReset.Utilities.Zone;
 public class Markers {
 
 	private static Map<String, List<Marker> > markers = new HashMap<String, List<Marker>>();
-
+	public static boolean enabled;
+	
 	public static void showZoneBoundaries( Player p, Location ne, Location sw ) {
 		
 		

@@ -112,61 +112,93 @@ public class Zone {
 	 * otherwise it sees if the player is in the list
 	 * trigOnFirstPlayerJoin = won't trigger if others are on
 	 */
-	private boolean trigOnPlayerJoin = false;
-	private boolean trigOnFirstPlayerJoin = false;
-	private List<String> trigOnPlayerJoinList = new ArrayList<String>();
+	private boolean 	trigOnPlayerJoin = false;
+	private boolean 	trigOnFirstPlayerJoin = false;
+	private List<String>trigOnPlayerJoinList = new ArrayList<String>();
 	
 	/**
 	 * Trigger when a player leaves
 	 */
-	private boolean onPlayerQuit = false;
-	private List<String> onPlayerQuitList = new ArrayList<String>();
-	private Long onMinutes = (long) 0;
-	private String onMinutesFormat = null;
-	private int onInteractMaterialId = 0;
+	private boolean 	trigOnPlayerQuit = false;
+	private boolean 	trigOnLastPlayerQuit = false;
+	private List<String>trigOnPlayerQuitList = new ArrayList<String>();
+	
+	/**
+	 * Trigger on a timer
+	 */
+	private Long 	trigTimer = (long) 0;
+	private String 	trigTimerText = null;
+	
+	/**
+	 * Trigger on interact
+	 */
+	private int 	onInteractMaterialId = 0;
 	private Location onInteractLocation = null;
-	private String onInteractLocationWorld;
+	private String 	onInteractLocationWorld;
 	private int onInteractLocationX;
 	private int onInteractLocationY;
 	private int onInteractLocationZ;
 	
-	
+	/**
+	 * Plain old constructor
+	 */
 	public Zone() {}
 	
+	
+	/**
+	 * Constructor clone
+	 * @param clone
+	 * @param newTag
+	 */
 	public Zone( Zone clone, String newTag ) {
 		
-		this.tag = newTag;
-		this.area = clone.area;
-		this.preNoMobs = clone.preNoMobs;
-		this.preNoMobsExceptionList = clone.preNoMobsExceptionList;
-		this.onInteractMaterialId = clone.onInteractMaterialId;
-		this.onInteractLocation = clone.onInteractLocation;
-		this.onInteractLocationWorld = clone.onInteractLocationWorld;
-		this.onInteractLocationX = clone.onInteractLocationX;
-		this.onInteractLocationY = clone.onInteractLocationY;
-		this.onInteractLocationZ = clone.onInteractLocationZ;
-		this.onMinutesFormat = clone.onMinutesFormat;
-		this.onMinutes = clone.onMinutes;
-		this.trigOnPlayerJoin = clone.trigOnPlayerJoin;
-		this.trigOnPlayerJoinList = clone.trigOnPlayerJoinList;
-		this.onPlayerQuit = clone.onPlayerQuit;
-		this.onPlayerQuitList = clone.onPlayerQuitList;
-		this.preNoSpawns = clone.preNoSpawns;
-		this.requireNoPlayers = clone.requireNoPlayers;
-		this.preNewSpawnWorldName = clone.preNewSpawnWorldName;
-		this.preNewSpawnX = clone.preNewSpawnX;
-		this.preNewSpawnY = clone.preNewSpawnY;
-		this.preNewSpawnZ = clone.preNewSpawnZ;
-		this.preNewLocation = clone.preNewLocation;
-		this.preNewLocationX = clone.preNewLocationX;
-		this.preNewLocationY = clone.preNewLocationY;
-		this.preNewLocationZ = clone.preNewLocationZ;
-		this.worldName = clone.worldName;
-		this.lastRestMethod = clone.lastRestMethod;
-		this.lastReset = clone.lastReset;
-		this.lastTimedReset = clone.lastTimedReset;
-		this.nextTimedReset = clone.nextTimedReset;
+		this.tag 					= newTag;
+		this.worldName				= clone.worldName;
 		
+		this.scope					= clone.scope;
+		
+		this.area 					= clone.area;
+		
+		this.lastRestMethod 		= clone.lastRestMethod;
+		this.lastReset 				= clone.lastReset;
+		this.lastTimedReset 		= clone.lastTimedReset;
+		this.nextTimedReset 		= clone.nextTimedReset;		
+		
+		this.spawns					= clone.spawns;
+	
+		this.requireNoPlayers 		= clone.requireNoPlayers;
+		this.preNoSpawns 			= clone.preNoSpawns;		
+	
+		this.preNewSpawnWorldName 	= clone.preNewSpawnWorldName;
+		this.preNewSpawnX 			= clone.preNewSpawnX;
+		this.preNewSpawnY 			= clone.preNewSpawnY;
+		this.preNewSpawnZ 			= clone.preNewSpawnZ;
+		
+		this.preNewLocation 		= clone.preNewLocation;
+		this.preNewLocationX 		= clone.preNewLocationX;
+		this.preNewLocationY 		= clone.preNewLocationY;
+		this.preNewLocationZ 		= clone.preNewLocationZ;		
+		
+		this.onInteractMaterialId 	= clone.onInteractMaterialId;
+		this.onInteractLocation 	= clone.onInteractLocation;
+		this.onInteractLocationWorld= clone.onInteractLocationWorld;
+		this.onInteractLocationX 	= clone.onInteractLocationX;
+		this.onInteractLocationY 	= clone.onInteractLocationY;
+		this.onInteractLocationZ 	= clone.onInteractLocationZ;		
+		
+		this.preNoMobs 				= clone.preNoMobs;
+		this.preNoMobsExceptionList = clone.preNoMobsExceptionList;
+		
+		this.trigOnPlayerJoin 		= clone.trigOnPlayerJoin;
+		this.trigOnFirstPlayerJoin	= clone.trigOnFirstPlayerJoin;
+		this.trigOnPlayerJoinList 	= clone.trigOnPlayerJoinList;
+		
+		this.trigOnPlayerQuit 		= clone.trigOnPlayerQuit;
+		this.trigOnLastPlayerQuit	= clone.trigOnLastPlayerQuit;
+		this.trigOnPlayerQuitList 	= clone.trigOnPlayerQuitList;
+		
+		this.trigTimer 				= clone.trigTimer;
+		this.trigTimerText 			= clone.trigTimerText;
 		
 	}
 	
@@ -220,16 +252,12 @@ public class Zone {
 		this.area = area;
 	}
 
-
 	/**
 	 * @return the requireNoPlayers
 	 */
 	public boolean isRequireNoPlayers() {
 		return requireNoPlayers;
 	}
-
-
-
 
 	/**
 	 * @param requireNoPlayers the requireNoPlayers to set
@@ -238,33 +266,46 @@ public class Zone {
 		this.requireNoPlayers = requireNoPlayers;
 	}
 
-
-
-
 	/**
 	 * @return the removeSpawnPoints
 	 */
-	public boolean isRemoveSpawnPoints() {
+	public boolean isPreNoSpawns() {
 		return preNoSpawns;
 	}
 
-
+	/**
+	 * Retirn last Reset method used
+	 * @return
+	 */
 	public ZRMethod getLastResetMethod() {
 		return this.lastRestMethod;
 	}
 	
+	/**
+	 * Set the last Reset method
+	 * @param method
+	 */
 	public void setLastResetMethod( ZRMethod method ) {
 		this.lastRestMethod = method;
 	}
 
+	/**
+	 * @return the last reset time
+	 */
 	public Long getLastReset() {
 		return this.lastReset;
 	}
 	
+	/**
+	 * @param Long - sets the lastReset time
+	 */
 	public void setLastReset( Long value ) {
 		this.lastReset = value;
 	}
 	
+	/**
+	 * @return Long the last time reset occured via a timed method
+	 */
 	public Long getLastTimedReset() {
 		return this.lastTimedReset;
 	}
@@ -444,7 +485,7 @@ public class Zone {
 	 * @return the onPlayerQuit
 	 */
 	public boolean isOnPlayerQuit() {
-		return onPlayerQuit;
+		return trigOnPlayerQuit;
 	}
 
 
@@ -454,7 +495,7 @@ public class Zone {
 	 * @param onPlayerQuit the onPlayerQuit to set
 	 */
 	public void setOnPlayerQuit(boolean onPlayerQuit) {
-		this.onPlayerQuit = onPlayerQuit;
+		this.trigOnPlayerQuit = onPlayerQuit;
 	}
 
 
@@ -464,7 +505,7 @@ public class Zone {
 	 * @return the onPlayerQuitList
 	 */
 	public List<String> getOnPlayerQuitList() {
-		return onPlayerQuitList;
+		return trigOnPlayerQuitList;
 	}
 
 
@@ -474,18 +515,18 @@ public class Zone {
 	 * @param onPlayerQuitList the onPlayerQuitList to set
 	 */
 	public void setOnPlayerQuitList(List<String> onPlayerQuitList) {
-		this.onPlayerQuitList = onPlayerQuitList;
+		this.trigOnPlayerQuitList = onPlayerQuitList;
 	}
 
 
 
 	public String getOnMinutesFormat() {
-		return this.onMinutesFormat;
+		return this.trigTimerText;
 	}
 	
 	public void setOnMinutesFormat( String value ) {
 		
-		this.onMinutesFormat = value;
+		this.trigTimerText = value;
 		
 		if ( value == null ) return;
 		
@@ -512,7 +553,7 @@ public class Zone {
 	 * @return the onMinutes
 	 */
 	public Long getOnMinutes() {
-		return onMinutes;
+		return trigTimer;
 	}
 
 
@@ -522,7 +563,7 @@ public class Zone {
 	 * @param onMinutes the onMinutes to set
 	 */
 	public void setOnMinutes(Long onMinutes) {
-		this.onMinutes = onMinutes;
+		this.trigTimer = onMinutes;
 	}
 
 
@@ -632,10 +673,10 @@ public class Zone {
 	
 	public boolean isPlayerQuit( String playerName ) {
 		
-		if ( this.onPlayerQuit ) {
+		if ( this.trigOnPlayerQuit ) {
 			
-			if ( this.onPlayerQuitList.isEmpty() ) return true;			
-			return this.onPlayerQuitList.contains( playerName );
+			if ( this.trigOnPlayerQuitList.isEmpty() ) return true;			
+			return this.trigOnPlayerQuitList.contains( playerName );
 			
 		}
 		
@@ -755,7 +796,7 @@ public class Zone {
 	public void close() {
 		this.preNoMobsExceptionList.clear();
 		this.trigOnPlayerJoinList.clear();
-		this.onPlayerQuitList.clear();
+		this.trigOnPlayerQuitList.clear();
 		this.onInteractLocation = null;
 	}	
 	

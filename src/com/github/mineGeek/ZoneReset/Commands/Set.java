@@ -103,14 +103,14 @@ public class Set extends CommandBase {
 			} else if ( noun.equals("spawns") ) {
 				
 				if ( args.length == 2 ) {
-					z.setRemoveSpawnPoints( !z.isRemoveSpawnPoints() );
+					z.setRemoveSpawnPoints( !z.isPreNoSpawns() );
 				} else if ( args[2].equalsIgnoreCase( "on" ) || args[2].equalsIgnoreCase("true") ) {
 					z.setRemoveSpawnPoints( true );
 				} else {
 					z.setRemoveSpawnPoints( false );
 				}
 				
-				mess = z.getTag() + ( z.isRemoveSpawnPoints() ? " will remove " : " will NOT remove " ) + "any online player spawn points in zone.";
+				mess = z.getTag() + ( z.isPreNoSpawns() ? " will remove " : " will NOT remove " ) + "any online player spawn points in zone.";
 				
 			}
 			

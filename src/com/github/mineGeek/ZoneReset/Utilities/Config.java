@@ -149,7 +149,7 @@ public class Config {
 		c.set(ppath + "removeEntities", z.isKillEntities() );
 		c.set(ppath + "keepEntities", z.getKillEntityExceptions() );
 		
-		c.set( ppath + "removeSpawnPoints", z.isRemoveSpawnPoints() );
+		c.set( ppath + "removeSpawnPoints", z.isPreNoSpawns() );
 		
 		if ( z.getResetSpawnLocation() != null ) {
 			c.set( ppath + "setSpawn.world", z.getResetSpawnLocation().getWorld().getName() );

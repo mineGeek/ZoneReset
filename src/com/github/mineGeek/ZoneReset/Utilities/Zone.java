@@ -27,6 +27,7 @@ import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
 import com.github.mineGeek.ZoneReset.nms.NMSHelper;
+import com.github.mineGeek.ZoneReset.Messaging.Message;
 
 public class Zone {
 
@@ -40,7 +41,6 @@ public class Zone {
 	 * The case sensitive string rep for the zone
 	 */
 	private String 	tag;
-	
 	
 	/**
 	 * false if user is editing or such.
@@ -159,6 +159,7 @@ public class Zone {
 	public Zone( Zone clone, String newTag ) {
 		
 		this.tag 					= newTag;
+
 		this.enabled				= clone.enabled;
 		this.worldName				= clone.worldName;
 		

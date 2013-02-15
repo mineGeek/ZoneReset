@@ -201,7 +201,7 @@ public class ZoneReset extends JavaPlugin {
     			final Long repeatRun = z.getTrigTimer() * 20;
     			final String tag = z.getTag();
     			
-    			BukkitTask task = this.getServer().getScheduler().runTaskTimerAsynchronously( this, new Runnable() {
+    			BukkitTask task = this.getServer().getScheduler().runTaskTimer( this, new Runnable() {
     	    	    @Override  
     	    	    public void run() {
     	    	    	try {

@@ -23,7 +23,7 @@ public class Create extends CommandBase {
 		if ( args.length == 1 ) {
 			
 			this.createZone( (Player)sender, args[0]);
-			mess = args[0] + " created (but is unsaved. type /edit [option] to change settings or type /save or /cancel to complete.";
+			//mess = args[0] + " created (but is unsaved. type /edit [option] to change settings or type /save or /cancel to complete.";
 			
 		} else {
 			

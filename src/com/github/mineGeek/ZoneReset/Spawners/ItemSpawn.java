@@ -85,7 +85,9 @@ public class ItemSpawn extends SpawnBase {
 	@Override
 	public void setList( Map<String, Object> list ) {
 		
+		
 		super.setList( list );
+		this.setType( ZRSPAWNTYPE.ITEM );
 		if ( list.containsKey("item") ) this.setMaterial( Material.getMaterial( ( Integer) list.get("item") ) );
 		if ( list.containsKey("durability") )  this.setDurability( (Short) list.get("durability") );
 		

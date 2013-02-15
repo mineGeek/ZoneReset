@@ -41,6 +41,12 @@ public class Zone {
 	 */
 	private String 	tag;
 	
+	
+	/**
+	 * false if user is editing or such.
+	 */
+	private boolean enabled = true;
+	
 	/**
 	 * The world this zone exists in
 	 */
@@ -153,6 +159,7 @@ public class Zone {
 	public Zone( Zone clone, String newTag ) {
 		
 		this.tag 					= newTag;
+		this.enabled				= clone.enabled;
 		this.worldName				= clone.worldName;
 		
 		this.scope					= clone.scope;
@@ -200,6 +207,7 @@ public class Zone {
 		this.trigTimer 				= clone.trigTimer;
 		this.trigTimerText 			= clone.trigTimerText;
 		
+		
 	}
 	
 	/**
@@ -218,6 +226,14 @@ public class Zone {
 	}
 
 
+	public boolean getEnabled() {
+		return this.enabled;
+	}
+	
+	public void setEnabled( boolean value ) {
+		this.enabled = value;
+	}
+	
 	/**
 	 * @return the worldName
 	 */
@@ -304,17 +320,25 @@ public class Zone {
 	}
 	
 	/**
-	 * @return Long the last time reset occured via a timed method
+	 * @return Long the last time reset occurred via a timed method
 	 */
 	public Long getLastTimedReset() {
 		return this.lastTimedReset;
 	}
 	
+	/**
+	 * Set the last time reset occurred from a timed method 
+	 * @param value
+	 */
 	public void setLastTimedReset( Long value ) {
 		this.lastTimedReset = value;
 	}
 	
 	public Long getNextTimedReset() {
+		
+		if ( this.nextTimedReset == null ) {
+			this.setNextTimedRest( this.getTrigTimer() );
+		}
 		return this.nextTimedReset;
 	}
 	
@@ -323,16 +347,16 @@ public class Zone {
 	}
 	
 	/**
-	 * @param removeSpawnPoints the removeSpawnPoints to set
+	 * @param noSpawns the removeSpawnPoints to set
 	 */
-	public void setRemoveSpawnPoints(boolean removeSpawnPoints) {
-		this.preNoSpawns = removeSpawnPoints;
+	public void setPreNoSpawns(boolean noSpawns) {
+		this.preNoSpawns = noSpawns;
 	}
 
 	/**
 	 * @return the resetSpawnPoints
 	 */
-	public Location getResetSpawnLocation() {
+	public Location getPreSpawnLocation() {
 		
 		Location r = null;
 		
@@ -352,7 +376,7 @@ public class Zone {
 	/**
 	 * @param resetSpawnPoints the resetSpawnPoints to set
 	 */
-	public void setResetSpawnPoints(String worldName, int x, int y, int z ) {
+	public void setPreSpawnLocation(String worldName, int x, int y, int z ) {
 
 		this.preNewSpawnWorldName = worldName;
 		this.preNewSpawnX = x;
@@ -364,7 +388,7 @@ public class Zone {
 	/**
 	 * @return the transportPlayers
 	 */
-	public Location getTransportPlayers() {
+	public Location getPreNewLocation() {
 		Location r = null;
 		
 		if ( this.preNewLocation != null ) {
@@ -381,7 +405,7 @@ public class Zone {
 	/**
 	 * @param transportPlayers the transportPlayers to set
 	 */
-	public void setTransportPlayers( String worldName, int x, int y, int z) {
+	public void setPreNewLocation( String worldName, int x, int y, int z) {
 		this.preNewLocation = worldName;
 		this.preNewLocationX = x;
 		this.preNewLocationY = y;
@@ -399,6 +423,7 @@ public class Zone {
 	public void clearSpawnList() {
 		this.spawns.clear();
 	}
+	
 	
 	public void setSpawns( ZRSPAWNTYPE z, List<SpawnInterface> list ) {
 		
@@ -422,21 +447,21 @@ public class Zone {
 	/**
 	 * @return the killEntities
 	 */
-	public boolean isKillEntities() {
+	public boolean isPreNoMobs() {
 		return preNoMobs;
 	}
 
 	/**
-	 * @param killEntities the killEntities to set
+	 * @param preNoMobs the killEntities to set
 	 */
-	public void setKillEntities(boolean killEntities) {
-		this.preNoMobs = killEntities;
+	public void setPreNoMobs(boolean preNoMobs) {
+		this.preNoMobs = preNoMobs;
 	}
 
 	/**
 	 * @return the killEntityExceptions
 	 */
-	public List<EntityType> getKillEntityExceptions() {
+	public List<EntityType> getPreNoMobsExceptionList() {
 		return preNoMobsExceptionList;
 	}
 
@@ -444,87 +469,64 @@ public class Zone {
 	/**
 	 * @return the onPlayerJoin
 	 */
-	public boolean isOnPlayerJoin() {
+	public boolean isTrigOnPlayerJoin() {
 		return trigOnPlayerJoin;
 	}
-
-
-
 
 	/**
 	 * @param onPlayerJoin the onPlayerJoin to set
 	 */
-	public void setOnPlayerJoin(boolean onPlayerJoin) {
+	public void setTrigOnPlayerJoin(boolean onPlayerJoin) {
 		this.trigOnPlayerJoin = onPlayerJoin;
 	}
-
-
-
 
 	/**
 	 * @return the onPlayerJoinList
 	 */
-	public List<String> getOnPlayerJoinList() {
+	public List<String> getTrigOnPlayerJoinList() {
 		return trigOnPlayerJoinList;
 	}
-
-
-
 
 	/**
 	 * @param onPlayerJoinList the onPlayerJoinList to set
 	 */
-	public void setOnPlayerJoinList(List<String> onPlayerJoinList) {
+	public void setTrigOnPlayerJoinList(List<String> onPlayerJoinList) {
 		this.trigOnPlayerJoinList = onPlayerJoinList;
 	}
-
-
-
 
 	/**
 	 * @return the onPlayerQuit
 	 */
-	public boolean isOnPlayerQuit() {
+	public boolean isTrigOnPlayerQuit() {
 		return trigOnPlayerQuit;
 	}
-
-
-
 
 	/**
 	 * @param onPlayerQuit the onPlayerQuit to set
 	 */
-	public void setOnPlayerQuit(boolean onPlayerQuit) {
+	public void setTrigOnPlayerQuit(boolean onPlayerQuit) {
 		this.trigOnPlayerQuit = onPlayerQuit;
 	}
-
-
-
 
 	/**
 	 * @return the onPlayerQuitList
 	 */
-	public List<String> getOnPlayerQuitList() {
+	public List<String> getTrigOnPlayerQuitList() {
 		return trigOnPlayerQuitList;
 	}
-
-
-
 
 	/**
 	 * @param onPlayerQuitList the onPlayerQuitList to set
 	 */
-	public void setOnPlayerQuitList(List<String> onPlayerQuitList) {
+	public void setTrigOnPlayerQuitList(List<String> onPlayerQuitList) {
 		this.trigOnPlayerQuitList = onPlayerQuitList;
 	}
 
-
-
-	public String getOnMinutesFormat() {
+	public String getTrigTimerText() {
 		return this.trigTimerText;
 	}
 	
-	public void setOnMinutesFormat( String value ) {
+	public void setTrigTimerText( String value ) {
 		
 		this.trigTimerText = value;
 		
@@ -543,29 +545,24 @@ public class Zone {
 				
 			}
 			
-			this.setOnMinutes( secs );
+			this.setTrigTimer( secs );
 		} catch ( Exception e ) {}
 		
 	}
 	
-
 	/**
-	 * @return the onMinutes
+	 * @return the timer
 	 */
-	public Long getOnMinutes() {
+	public Long getTrigTimer() {
 		return trigTimer;
 	}
 
-
-
-
 	/**
-	 * @param onMinutes the onMinutes to set
+	 * @param seconds the onMinutes to set
 	 */
-	public void setOnMinutes(Long onMinutes) {
-		this.trigTimer = onMinutes;
+	public void setTrigTimer(Long seconds) {
+		this.trigTimer = seconds;
 	}
-
 
 	public int getOnInteractMaterialId() {
 		return this.onInteractMaterialId;
@@ -609,12 +606,14 @@ public class Zone {
 
 
 	
-	public boolean restore() {
+	public boolean reset( ZRMethod method ) {
+		
+		if ( ! this.enabled ) return false;
 		
 		/**
 		 * Reset spawn points
 		 */
-		Location l = this.getResetSpawnLocation();
+		Location l = this.getPreSpawnLocation();
 		if ( l != null ) {
 
 			Utilities.resetZoneSpawnPoints( this );
@@ -624,7 +623,7 @@ public class Zone {
 		/**
 		 * Move players out of zone
 		 */
-		l = this.getTransportPlayers();
+		l = this.getPreNewLocation();
 		if ( l != null ) {
 			
 			Utilities.movePlayersInZone( this );
@@ -641,9 +640,13 @@ public class Zone {
 		
 		if ( preNoMobs ) Utilities.clearZoneOfEntities( this );
 		
+		if ( this.getArea().ne() != null && this.getArea().sw() != null ) {
+			this.loadBlocks();
+		}
 		
-		this.loadBlocks();
-		
+		this.setLastReset( System.currentTimeMillis() );
+		this.setLastResetMethod(method);
+		Bukkit.getLogger().info( this.getTag() + " reset");
 		Utilities.spawnEntities( this.getSpawns() );
 		
 		
@@ -658,7 +661,7 @@ public class Zone {
 		
 	}
 	
-	public boolean isPlayerJoin( String playerName ) {
+	public boolean isTrigOnPlayerJoining( String playerName ) {
 		
 		if ( this.trigOnPlayerJoin ) {
 			
@@ -671,7 +674,7 @@ public class Zone {
 		
 	}
 	
-	public boolean isPlayerQuit( String playerName ) {
+	public boolean isTrigOnPlayerQuiting( String playerName ) {
 		
 		if ( this.trigOnPlayerQuit ) {
 			
@@ -686,7 +689,7 @@ public class Zone {
 	
 
 	
-	public void setKillEntityExceptions( List<String> list ) {
+	public void setPreNoMobsExceptionList( List<String> list ) {
 		
 		this.preNoMobsExceptionList.clear();
 		
@@ -798,6 +801,7 @@ public class Zone {
 		this.trigOnPlayerJoinList.clear();
 		this.trigOnPlayerQuitList.clear();
 		this.onInteractLocation = null;
+		this.spawns = null;
 	}	
 	
 }

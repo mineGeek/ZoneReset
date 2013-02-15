@@ -146,32 +146,33 @@ public class Config {
 		 * Pre-Reset processing.
 		 */
 		String ppath = path + "pre.";
-		c.set(ppath + "removeEntities", z.isKillEntities() );
-		c.set(ppath + "keepEntities", z.getKillEntityExceptions() );
+		c.set(ppath + "removeEntities", z.isPreNoMobs() );
+		c.set(ppath + "keepEntities", z.getPreNoMobsExceptionList() );
 		
 		c.set( ppath + "removeSpawnPoints", z.isPreNoSpawns() );
 		
-		if ( z.getResetSpawnLocation() != null ) {
-			c.set( ppath + "setSpawn.world", z.getResetSpawnLocation().getWorld().getName() );
-			c.set( ppath + "setSpawn.location", new ArrayList<Integer>(Arrays.asList( z.getResetSpawnLocation().getBlockX(), z.getResetSpawnLocation().getBlockY(), z.getResetSpawnLocation().getBlockZ() ) ) );
+		if ( z.getPreSpawnLocation() != null ) {
+			c.set( ppath + "setSpawn.world", z.getPreSpawnLocation().getWorld().getName() );
+			c.set( ppath + "setSpawn.location", new ArrayList<Integer>(Arrays.asList( z.getPreSpawnLocation().getBlockX(), z.getPreSpawnLocation().getBlockY(), z.getPreSpawnLocation().getBlockZ() ) ) );
 		}
 		
-		if ( z.getTransportPlayers() != null ) {
-			c.set( ppath + "movePlayers.world", z.getTransportPlayers().getWorld().getName() );
-			c.set( ppath + "movePlayers.location", new ArrayList<Integer>(Arrays.asList( z.getTransportPlayers().getBlockX(), z.getTransportPlayers().getBlockY(), z.getTransportPlayers().getBlockZ() ) ) );		
+		if ( z.getPreNewLocation() != null ) {
+			c.set( ppath + "movePlayers.world", z.getPreNewLocation().getWorld().getName() );
+			c.set( ppath + "movePlayers.location", new ArrayList<Integer>(Arrays.asList( z.getPreNewLocation().getBlockX(), z.getPreNewLocation().getBlockY(), z.getPreNewLocation().getBlockZ() ) ) );		
 		}
 		
 		
 		/**
 		 * Post-Reset processing
 		 */
+		ppath = path + "post.";
 		if ( !z.getSpawns().isEmpty() ) {
 			
 			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.INVENTORY ) ) {
 				
 				//set players inventory
 				
-				c.set( path + "post.setInventory", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.INVENTORY) ) );
+				c.set( ppath + "setInventory", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.INVENTORY) ) );
 			}	
 			
 			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.ITEM ) || z.getSpawns().containsKey( ZRSPAWNTYPE.CONTAINER) ) {
@@ -187,14 +188,14 @@ public class Config {
 				}
 				
 				if ( !items.isEmpty() ) {
-					c.set( path + "post.spawnItems", items );
+					c.set( ppath + "spawnItems", items );
 				}
 			}
 					
 			
 			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.MOB ) ) {
 				
-				c.set( "post.spawnMobs", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.MOB ) ) );
+				c.set( ppath + "spawnMobs", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.MOB ) ) );
 				
 				
 			}
@@ -208,22 +209,17 @@ public class Config {
 		 */
 		ppath = path + "trigger.";
 		
-		if ( z.isOnPlayerJoin() ) c.set(ppath + "onPlayerJoin", z.isOnPlayerJoin() );
-		if ( z.getOnPlayerJoinList().size() > 0 ) c.set(ppath + "whenPlayersJoin", z.getOnPlayerJoinList() ); 
-		if ( z.isOnPlayerQuit() ) c.set(ppath + "onPlayerQuit", z.isOnPlayerQuit() );
-		if ( z.getOnPlayerQuitList().size() > 0 ) c.set(ppath + "whenPlayersQuit", z.getOnPlayerQuitList() );
-		if ( z.getOnMinutes() > 0 ) c.set( ppath + "onTimer", z.getOnMinutesFormat() );
+		if ( z.isTrigOnPlayerJoin() ) c.set(ppath + "onPlayerJoin", z.isTrigOnPlayerJoin() );
+		if ( z.getTrigOnPlayerJoinList().size() > 0 ) c.set(ppath + "whenPlayersJoin", z.getTrigOnPlayerJoinList() ); 
+		if ( z.isTrigOnPlayerQuit() ) c.set(ppath + "onPlayerQuit", z.isTrigOnPlayerQuit() );
+		if ( z.getTrigOnPlayerQuitList().size() > 0 ) c.set(ppath + "whenPlayersQuit", z.getTrigOnPlayerQuitList() );
+		if ( z.getTrigTimer() > 0 ) c.set( ppath + "onTimer", z.getTrigTimerText() );
 		if ( z.getOnInteractLocation() != null ) {
 			c.set(ppath + "onInteract.item", z.getOnInteractMaterialId() );
 			c.set( ppath + "onInteract.world", z.getOnInteractLocation().getWorld().getName() );
 			c.set( ppath + "onInteract.location", new ArrayList<Integer>(Arrays.asList( z.getOnInteractLocation().getBlockX(), z.getOnInteractLocation().getBlockY(), z.getOnInteractLocation().getBlockZ() ) ) );
 		}
 		
-		
-		/**
-		 * Refresh any interaction triggers
-		 */
-		Zones.loadInteractKeys();
 		
 		/**
 		 * Save it.

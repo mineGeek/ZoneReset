@@ -20,6 +20,7 @@ import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.Utilities.Zone;
+import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
 import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 /**
@@ -139,6 +140,7 @@ public class ZoneReset extends JavaPlugin {
     	 */
     	Zones.setDataFolder( this.getDataFolder().toString() );
     	Zones.loadDataZones();
+    	this.queueResets();
     	
     	/**
     	 * Force loads the class for shits and giggles.
@@ -180,13 +182,13 @@ public class ZoneReset extends JavaPlugin {
     	
     	for ( Zone z : zones.values() ) {
     		
-    		if ( z.getOnMinutes() > 0 ) {
+    		if ( z.getTrigTimer() > 0 ) {
     			
     			Long next = z.getNextTimedReset();
     			
     			if ( next != null && next != 0 ) {
     				
-    				if ( next <= System.currentTimeMillis() ) {
+    				if ( next < System.currentTimeMillis() ) {
     					//overdue. Run now.
     					next = 0L;
     				} else {
@@ -195,14 +197,16 @@ public class ZoneReset extends JavaPlugin {
     				
     			}
     			
-    			final Long nextRun = next * 2;
-    			final Long repeatRun = z.getOnMinutes() * 2;
+    			final Long nextRun = next * 20 + 1;
+    			final Long repeatRun = z.getTrigTimer() * 20;
+    			final String tag = z.getTag();
     			
     			BukkitTask task = this.getServer().getScheduler().runTaskTimerAsynchronously( this, new Runnable() {
     	    	    @Override  
     	    	    public void run() {
     	    	    	try {
-    	    	    		
+    	    	    		Zones.getZone(tag).reset( ZRMethod.TIMED );
+    	    	    		Zones.getZone(tag).setNextTimedRest( Zones.getZone(tag).getTrigTimer() + System.currentTimeMillis() );
     	    	    	} catch (Exception e ) {}
     	    	    }
     	    	}, nextRun , repeatRun );

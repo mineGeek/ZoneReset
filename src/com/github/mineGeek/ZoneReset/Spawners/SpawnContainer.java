@@ -118,6 +118,7 @@ public class SpawnContainer extends SpawnBase {
 	@Override
 	public Map<String, Object> getList() {
 		
+		
 		Map<String, Object> r = (Map<String, Object>) super.getList( this );
 		if ( this.getMaterial() != null ) r.put("item", this.getMaterial().getId() );
 

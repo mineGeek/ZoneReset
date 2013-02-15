@@ -40,6 +40,7 @@ public class MobSpawner extends SpawnBase {
 	@Override
 	public void setList( Map<String, Object> list ) {
 		
+		this.setType( ZRSPAWNTYPE.MOB );
 		super.setList( list );
 		if ( list.containsKey("mob") )this.setEntityType( EntityType.fromName( list.get("mob").toString().toUpperCase() ) );
 		

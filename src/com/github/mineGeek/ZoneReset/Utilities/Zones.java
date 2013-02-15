@@ -100,10 +100,10 @@ public class Zones {
 		
 		for ( Zone z : zones.values() ) {
 			
-			if ( z.isOnPlayerJoin() ) {
-				z.restore();
-			} else if ( z.getOnPlayerJoinList().contains( p.getName() ) ) {
-				z.restore();
+			if ( z.isTrigOnPlayerJoin() ) {
+				z.reset( ZRMethod.ONJOIN );
+			} else if ( z.getTrigOnPlayerJoinList().contains( p.getName() ) ) {
+				z.reset( ZRMethod.ONJOIN );
 			}
 			
 		}
@@ -114,10 +114,10 @@ public class Zones {
 		
 		for ( Zone z : zones.values() ) {
 			
-			if ( z.isOnPlayerQuit() ) {
-				z.restore();
-			} else if ( z.getOnPlayerQuitList().contains( p.getName() ) ) {
-				z.restore();
+			if ( z.isTrigOnPlayerQuit() ) {
+				z.reset( ZRMethod.ONQUIT );
+			} else if ( z.getTrigOnPlayerQuitList().contains( p.getName() ) ) {
+				z.reset( ZRMethod.ONQUIT );
 			}
 			
 		}
@@ -137,7 +137,7 @@ public class Zones {
 		if ( interactKeys.containsKey(i) ) {
 		
 			Zone z = zones.get( interactKeys.get(i) );
-			if ( z != null ) z.restore();
+			if ( z != null ) z.reset( ZRMethod.ONINTERACT );
 			
 		}
 		
@@ -173,13 +173,13 @@ public class Zones {
 		/**
 		 * Remove all entities before reset?
 		 */
-		r.setKillEntities( c.getBoolean("pre.removeEntities", false ) );
-		r.setKillEntityExceptions( c.getStringList( "pre.keepEntities") ) ;
+		r.setPreNoMobs( c.getBoolean("pre.removeEntities", false ) );
+		r.setPreNoMobsExceptionList( c.getStringList( "pre.keepEntities") ) ;
 		
 		/**
 		 * Remove any spawnPoints?
 		 */
-		r.setRemoveSpawnPoints( c.getBoolean("pre.removeSpawnPoints", false ) );
+		r.setPreNoSpawns( c.getBoolean("pre.removeSpawnPoints", false ) );
 		
 		
 		/**
@@ -194,7 +194,7 @@ public class Zones {
 		if ( c.isSet( "pre.setSpawn" ) ) {
 			List<Integer> l = c.getIntegerList( "pre.setSpawn.location" );
 			String spawnWorldName = c.getString("pre.setSpawn.world", worldName );
-			r.setResetSpawnPoints( spawnWorldName, l.get(0), l.get(1), l.get(2) );				
+			r.setPreSpawnLocation( spawnWorldName, l.get(0), l.get(1), l.get(2) );				
 			
 		}
 		
@@ -276,7 +276,7 @@ public class Zones {
 		 */
 		if ( c.isSet( "pre.movePlayers") ) {
 			List<Integer> l = c.getIntegerList( "pre.movePlayers.location" );
-			r.setTransportPlayers( c.getString("pre.movePlayers.world", worldName ), l.get(0), l.get(1), l.get(2) );
+			r.setPreNewLocation( c.getString("pre.movePlayers.world", worldName ), l.get(0), l.get(1), l.get(2) );
 		}
 		
 		
@@ -287,26 +287,26 @@ public class Zones {
 			
 			if ( c.isSet( "trigger.onPlayerJoin") ) {
 				
-				r.setOnPlayerJoin( c.getBoolean("trigger.onPlayerJoin", false ) );
+				r.setTrigOnPlayerJoin( c.getBoolean("trigger.onPlayerJoin", false ) );
 				
 			}
 			
 			if ( c.isSet( "trigger.whenPlayersJoin" ) ) {
-				r.setOnPlayerJoinList( c.getStringList("trigger.whenPlayersJoin") );
+				r.setTrigOnPlayerJoinList( c.getStringList("trigger.whenPlayersJoin") );
 			}
 			
 			if ( c.isSet( "trigger.onPlayerQuit") ) {
 				
-				r.setOnPlayerQuit( c.getBoolean("trigger.onPlayerQuit", false ) );
+				r.setTrigOnPlayerQuit( c.getBoolean("trigger.onPlayerQuit", false ) );
 				
 			}
 			
 			if ( c.isSet( "trigger.whenPlayersQuit" ) ) {
-				r.setOnPlayerQuitList( c.getStringList("trigger.whenPlayersQuit") );
+				r.setTrigOnPlayerQuitList( c.getStringList("trigger.whenPlayersQuit") );
 			}			
 			
 			if ( c.isSet( "trigger.onTimer") ) {
-				r.setOnMinutesFormat( c.getString( "trigger.onTimer") );
+				r.setTrigTimerText( c.getString( "trigger.onTimer") );
 			}
 			
 			if ( c.isSet("trigger.onInteract.location") ) {

@@ -74,7 +74,7 @@ public class Utilities {
 	}
 	
 	public static void resetZoneSpawnPoints( Zone zone ) {
-		resetZoneSpawnPoints( zone.getArea(), zone.getResetSpawnLocation() );
+		resetZoneSpawnPoints( zone.getArea(), zone.getPreSpawnLocation() );
 	}
 	
 	public static void resetZoneSpawnPoints( Area area, Location location ) {
@@ -96,7 +96,7 @@ public class Utilities {
 	}
 	
 	public static void movePlayersInZone( Zone zone ) {
-		movePlayersInZoneTo( zone.getArea(), zone.getTransportPlayers() );
+		movePlayersInZoneTo( zone.getArea(), zone.getPreNewLocation() );
 	}
 	
 	public static void movePlayersInZoneTo( Area area, Location destination ) {
@@ -119,10 +119,18 @@ public class Utilities {
 	
 	
 	public static void clearZoneOfEntities( Zone zone ) {
-		clearLocationOfEntities( zone.getArea(), zone.getKillEntityExceptions() );
+		clearLocationOfEntities( zone.getArea(), zone.getPreNoMobsExceptionList() );
 	}
 	
 	public static Map<ZRSPAWNTYPE, List<SpawnInterface>> getEntitiesInZone( Zone zone ) {
+		List<ZRSPAWNTYPE> l = new ArrayList<ZRSPAWNTYPE>();
+		l.add( ZRSPAWNTYPE.CONTAINER );
+		l.add( ZRSPAWNTYPE.ITEM );
+		l.add( ZRSPAWNTYPE.MOB );
+		return getEntitiesInZone( zone, l );
+	}
+	
+	public static Map<ZRSPAWNTYPE, List<SpawnInterface>> getEntitiesInZone( Zone zone, List<ZRSPAWNTYPE> types  ) {
 		
 		List<Chunk> chunks = new ArrayList<Chunk>();
 	    Area area = zone.getArea();
@@ -140,6 +148,7 @@ public class Utilities {
 		
 		int fromZ = Math.min( ne.getChunk().getZ(), sw.getChunk().getZ() );
 		int toZ = Math.max( ne.getChunk().getZ(), sw.getChunk().getZ() );
+				
 		
 		
 		for( int x = fromX; x <= toX; x++ ) {
@@ -164,17 +173,17 @@ public class Utilities {
 							
 							//Do nothing!
 							
-						} else if ( e instanceof Creature ) {
+						} else if ( e instanceof Creature && types.contains( ZRSPAWNTYPE.MOB ) ) {
 							
 							spawn = new MobSpawner( e );
 							mobs.add( spawn );
 							
-						} else if ( e instanceof Monster ) {
+						} else if ( e instanceof Monster  && types.contains( ZRSPAWNTYPE.MOB ) ) {
 							
 							spawn = new MobSpawner( e );
 							mobs.add( spawn );
 							
-						} else if ( e instanceof Item ) {
+						} else if ( e instanceof Item  && types.contains( ZRSPAWNTYPE.ITEM ) ) {
 							
 							ItemStack i = ((Item)e).getItemStack();
 							spawn = new ItemSpawn( i );
@@ -193,7 +202,7 @@ public class Utilities {
 				
 				for ( BlockState bs : chunk.getTileEntities() ) {
 					
-					if ( area.intersectsWith( bs.getLocation() ) ) {
+					if ( area.intersectsWith( bs.getLocation() )  && types.contains( ZRSPAWNTYPE.CONTAINER ) ) {
 						
 						SpawnContainer s = new SpawnContainer( bs.getBlock() );
 						l.add( s );

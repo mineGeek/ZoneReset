@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Zone;
+import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 public class Cancel extends CommandBase {
 
@@ -32,6 +33,7 @@ public class Cancel extends CommandBase {
 		
 		String t = z.getTag();
 		this.cancelEdit( p );
+		Zones.getZone( t ).setEnabled( true );
 		mess = "you are no longer editing '" + t + "'";
 		
 		return true;

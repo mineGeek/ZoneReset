@@ -58,8 +58,11 @@ abstract class CommandBase  implements CommandExecutor {
 		Config.saveZoneConfig(z);
 		z.saveBlocks();
 		Zones.addZone( z.getTag(), Config.c.getConfigurationSection("zones." + z.getTag() ) );
+		Zones.loadInteractKeys();
 		Markers.hideZoneBoundaries( p );
 		Utilities.clearPlayerMetaData( p );
+
+		this.plugin.queueResets();
 		this.mess = z.getTag() + " has been saved.";		
 		
 		

@@ -16,10 +16,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import com.github.mineGeek.ZoneReset.Player.Markers;
+import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zones;
+import com.github.mineGeek.ZoneReset.Markers.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 
 

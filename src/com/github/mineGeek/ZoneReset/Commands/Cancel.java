@@ -3,9 +3,9 @@ package com.github.mineGeek.ZoneReset.Commands;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
-import com.github.mineGeek.ZoneReset.Player.Markers;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zones;
+import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zones;
+import com.github.mineGeek.ZoneReset.Markers.Markers;
 
 public class Cancel extends CommandBase {
 

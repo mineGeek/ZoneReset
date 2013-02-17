@@ -1,17 +1,12 @@
 package com.github.mineGeek.ZoneReset.Commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+
 
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
-import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zone;
+
 
 public class Set extends CommandBase {
 
@@ -94,38 +89,52 @@ public class Set extends CommandBase {
 			
 		} else if ( key.equals( "spawn") ) {
 			
-			if ( args.length == 1 ) {
-				z.setSpawns( Utilities.getEntitiesInZone( z ) );
-				mess = "Ok, all entities in area are set";
-				return true;
-				
-			}
 			
 			if ( z.getArea().ne() == null || z.getArea().ne() == null ) {
 				mess = "You must have the zone set before running this command.";
 				return true;
 			}
 			
+			if ( args.length == 1 ) {
+				z.setSpawnBlocks( !z.getSpawnBlocks() );
+				z.setSpawnMobs( !z.getSpawnMobs() );
+				
+				mess = "Ok, resets will " + ( z.getSpawnMobs() ? "" : "not") + "spawn mobs and resets will " + ( z.getSpawnBlocks() ? "" : "not" ) + " spawn blocks";
+				return true;
+				
+			}
 			
 			String noun = args[1].toLowerCase();
-			Map<ZRSPAWNTYPE, List<SpawnInterface>> m;
+
 			if ( noun.equals( "mobs") ) {
-				 m = Utilities.getEntitiesInZone( z, new ArrayList<ZRSPAWNTYPE>( Arrays.asList( ZRSPAWNTYPE.MOB) ) );
-				 z.setSpawns( ZRSPAWNTYPE.MOB, m.get(ZRSPAWNTYPE.MOB ) );
+
+				if ( args.length == 2 ) {
+					if ( args[2].equalsIgnoreCase( "off" ) || args[2].equalsIgnoreCase( "false") ) {
+						z.setSpawnMobs( false );
+					} else {
+						z.setSpawnMobs( true );
+					}
+				} else {
+					z.setSpawnMobs( !z.getSpawnMobs() );
+				}
 				
-			} else if ( noun.equals( "items") ) {
-				 m = Utilities.getEntitiesInZone( z, new ArrayList<ZRSPAWNTYPE>( Arrays.asList( ZRSPAWNTYPE.ITEM) ) );
-				 z.setSpawns( ZRSPAWNTYPE.ITEM, m.get(ZRSPAWNTYPE.ITEM ) );				
-			} else if ( noun.equals( "containers") ) {
-				 m = Utilities.getEntitiesInZone( z, new ArrayList<ZRSPAWNTYPE>( Arrays.asList( ZRSPAWNTYPE.CONTAINER) ) );
-				 z.setSpawns( ZRSPAWNTYPE.CONTAINER, m.get(ZRSPAWNTYPE.CONTAINER ) );
-			} else if ( noun.equals( "sign") || noun.equals("signs") ) {
-				 m = Utilities.getEntitiesInZone(z, new ArrayList<ZRSPAWNTYPE> ( Arrays.asList( ZRSPAWNTYPE.SIGN ) ) );
-				 z.setSpawns( ZRSPAWNTYPE.SIGN, m.get( ZRSPAWNTYPE.SIGN ) );
-			} else if ( noun.equals("all" ) ) {
-				z.setSpawns( Utilities.getEntitiesInZone( z ) );
+				mess = z.getTag() + " will " + ( z.getSpawnMobs() ? "no longer " : "now ") + "spawn mobs on reset";
 			}
-			mess = "Ok. They are set";
+			
+			if ( noun.equals( "blocks") ) {
+
+				if ( args.length == 2 ) {
+					if ( args[2].equalsIgnoreCase( "off" ) || args[2].equalsIgnoreCase( "false") ) {
+						z.setSpawnBlocks( false );
+					} else {
+						z.setSpawnBlocks( true );
+					}
+				} else {
+					z.setSpawnBlocks( !z.getSpawnBlocks() );
+				}
+				
+				mess = z.getTag() + " will " + ( z.getSpawnBlocks() ? "no longer " : "now ") + "spawn blocks on reset";
+			}			
 			
 		} else if ( key.equals("no") ) {
 			

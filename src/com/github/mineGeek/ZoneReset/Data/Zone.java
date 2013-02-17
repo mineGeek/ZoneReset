@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Utilities;
+package com.github.mineGeek.ZoneReset.Data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,9 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,24 +17,17 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
-import com.github.mineGeek.ZoneReset.Data.Area;
-import com.github.mineGeek.ZoneReset.Data.ItemSerializable;
-import com.github.mineGeek.ZoneReset.Data.MobSerializable;
-import com.github.mineGeek.ZoneReset.Data.ZRBlock;
-import com.github.mineGeek.ZoneReset.Data.ZRBlocks;
-import com.github.mineGeek.ZoneReset.Data.ZRItem;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
+import com.github.mineGeek.ZoneReset.nms.CraftMassBlockUpdate;
+import com.github.mineGeek.ZoneReset.nms.MassBlockUpdate;
 import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
 import com.github.mineGeek.ZoneReset.nms.NMSHelper;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
+import com.github.mineGeek.ZoneReset.Utilities.Config;
+import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 
 
 public class Zone {
@@ -74,6 +65,11 @@ public class Zone {
 	public Long 	lastTimedReset;
 	public Long 	nextTimedReset;
 	
+	
+	public boolean spawnBlocks = true;
+	public boolean spawnMobs = true;
+	
+	
 	/**
 	 * Area that this zone covers
 	 */
@@ -85,10 +81,6 @@ public class Zone {
 	 */
 	private ZRAREA	scope = ZRAREA.NONE;
 	
-	/**
-	 * List of shit to spawn on reset, categorised by type
-	 */
-	private Map< ZRSPAWNTYPE, List<SpawnInterface>> spawns = new HashMap< ZRSPAWNTYPE, List<SpawnInterface>>();
 	
 	/**
 	 * Require: zone to not have players
@@ -185,8 +177,6 @@ public class Zone {
 		this.lastReset 				= clone.lastReset;
 		this.lastTimedReset 		= clone.lastTimedReset;
 		this.nextTimedReset 		= clone.nextTimedReset;		
-		
-		this.spawns					= clone.spawns;
 	
 		this.requireNoPlayers 		= clone.requireNoPlayers;
 		this.preNoSpawns 			= clone.preNoSpawns;		
@@ -225,6 +215,8 @@ public class Zone {
 		this.messageOnRestart		= clone.messageOnRestart;
 		this.timedMessages			= clone.timedMessages;
 		
+		this.spawnBlocks 			= clone.spawnBlocks;
+		this.spawnMobs				= clone.spawnMobs;
 		
 	}
 	
@@ -430,37 +422,6 @@ public class Zone {
 		this.preNewLocationZ = z;
 	}
 	
-	public Map<ZRSPAWNTYPE, List<SpawnInterface>> getSpawns() {
-		return this.spawns;
-	}
-	
-	public void setSpawns( Map<ZRSPAWNTYPE, List<SpawnInterface>> list ) {
-		this.spawns = list;
-	}
-	
-	public void clearSpawnList() {
-		this.spawns.clear();
-	}
-	
-	
-	public void setSpawns( ZRSPAWNTYPE z, List<SpawnInterface> list ) {
-		
-		this.spawns.put( z, list );
-
-	}
-	
-	public void addSpawn( ZRSPAWNTYPE z, SpawnInterface s ) {
-		
-		if ( this.spawns.containsKey( z ) ) {
-			this.spawns.get(z).add( s );
-		} else {
-			
-			List<SpawnInterface> list = new ArrayList<SpawnInterface>();
-			list.add( s );
-			this.spawns.put( z, list );
-			
-		}
-	}
 	
 	/**
 	 * @return the killEntities
@@ -646,6 +607,21 @@ public class Zone {
 		this.timedMessages.add( m );
 	}
 	
+	public boolean getSpawnMobs() {
+		return this.spawnMobs;
+	}
+	
+	public void setSpawnMobs( boolean value ) {
+		this.spawnMobs = value;
+	}
+	
+	public boolean getSpawnBlocks() {
+		return this.spawnBlocks;
+	}
+	
+	public void setSpawnBlocks( boolean value ) {
+		this.spawnBlocks = value;
+	}
 	
 
 	
@@ -685,20 +661,15 @@ public class Zone {
 		if ( this.getArea().ne() != null && this.getArea().sw() != null ) {
 			this.loadBlocks();
 		}
-		/*
+		
 		this.setLastReset( System.currentTimeMillis() );
 		this.setLastResetMethod(method);
 		Bukkit.getLogger().info( this.getTag() + " reset");
-		Utilities.spawnEntities( this.getSpawns() );
 		
 		if ( !method.equals( ZRMethod.TIMED ) ) {
-			//reset timer
 			Utilities.queue( this );
-		}
+		}		
 		
-		//Messages.reset( this.getTag() );
-		
-		*/
 		return true;
 		
 	}
@@ -753,142 +724,128 @@ public class Zone {
 	}
 	
 	
-	public void restoreBlocks( ZRBlocks z ) {
+	public void restoreBlocks( ZArea z ) {
 		
-		List<ZRBlock> deferred = new ArrayList<ZRBlock>();
-		List<MobSerializable> mobs = z.getMobs();
-		try {
-			NMSAbstraction nms = NMSHelper.init( Bukkit.getPluginManager().getPlugin("ZoneReset") );
-			
-			List<ZRBlock> b = z.getBlocks();
-			
-			World w = Bukkit.getWorld( this.worldName );			
-			
-			if ( nms == null || Config.noNMS ) {
+		List<ZBlock> deferred = new ArrayList<ZBlock>();
+		List<ZMob> mobs = z.getMobs();
+		
+		if ( this.getSpawnBlocks() ) {
+		
+			try {
+				NMSAbstraction nms = NMSHelper.init( Bukkit.getPluginManager().getPlugin("ZoneReset") );
 				
-				if ( !b.isEmpty() ) {
+				List<ZBlock> b = z.getBlocks();
+				
+				World w = Bukkit.getWorld( this.worldName );			
+				
+				if ( nms == null || Config.noNMS ) {
 					
-					for ( ZRBlock zb : b ) {
+					if ( !b.isEmpty() ) {
 						
-						Block block = w.getBlockAt( zb.x, zb.y, zb.z );
-						block.setType( Material.getMaterial( zb.materialId ) );
-						block.setData( zb.data );
-						block.getState().update( true );
+						for ( ZBlock zb : b ) {
+							
+							Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+							block.setType( Material.getMaterial( zb.materialId ) );
+							block.setData( zb.data );
+							block.getState().update( true );
+						}
+						
 					}
 					
-				}
-				
-				
-			} else {
-				
-
-				MassBlockUpdate mbu = CraftMassBlockUpdate.createMassBlockUpdater( w );
-				
-				
-				if ( !b.isEmpty() ) {
-					boolean r = false;
-					for ( ZRBlock zb : b ) {
-						
-						//if ( zb.deferred ) {
-						//	deferred.add( zb );
-						//} else {
-							r = mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);
-						//}
-						
-
-						
-							//String str = "setting " + Material.getMaterial( zb.materialId).toString() + " = " + ( r ? " true " : "false");
-							//Bukkit.getLogger().info( str );
+					
+				} else {
+					
+	
+					MassBlockUpdate mbu = CraftMassBlockUpdate.createMassBlockUpdater( w );
+					
+					
+					if ( !b.isEmpty() ) {
+	
+						for ( ZBlock zb : b ) {
 							
-							if ( zb.hasInventory ) {
-								Block block  = w.getBlockAt( zb.x, zb.y, zb.z);
-								InventoryHolder ih = (InventoryHolder)block.getState();
-								ih.getInventory().clear();
+	
+								mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);
+	
 								
-								for ( ItemSerializable i : zb.items ) {
-									ih.getInventory().addItem( i.getItemStack() );
+								if ( zb.hasInventory ) {
+									Block block  = w.getBlockAt( zb.x, zb.y, zb.z);
+									InventoryHolder ih = (InventoryHolder)block.getState();
+									ih.getInventory().clear();
+									
+									for ( ZItem i : zb.items ) {
+										ih.getInventory().addItem( i.getItemStack() );
+									}
 								}
-							}
-							
-							//if ( zb.materialId == Material.WALL_SIGN.getId() ) {
-							//	
-							//	Block block = w.getBlockAt( zb.x, zb.y, zb.z );
-							//	org.bukkit.material.Sign signData = (org.bukkit.material.Sign) block.getState().getData();
-							//	BlockFace face = signData.getFacing();
-							//	boolean brr = false;
-							//}							
-							
-						
-							
-							
-							if ( zb.lines != null ) {
-								
-								Block block = w.getBlockAt( zb.x, zb.y, zb.z );
-								if ( block.getState() instanceof Sign ) {
+	
+								if ( zb.lines != null ) {
 									
-									Sign s = (Sign)block.getState();
-									
-									for ( int y=0; y < zb.lines.size(); y++) {
-										s.setLine(y, zb.lines.get(y) );
+									Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+									if ( block.getState() instanceof Sign ) {
+										
+										Sign s = (Sign)block.getState();
+										
+										for ( int y=0; y < zb.lines.size(); y++) {
+											s.setLine(y, zb.lines.get(y) );
+										}
+										
+										s.update( true );
 									}
 									
-									s.update( true );
 								}
-								
-							}
+							
+							
+						}
 						
+						mbu.notifyClients();
 						
 					}
 					
-					mbu.notifyClients();
+				}			
+				
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+			
+	
+			if ( !deferred.isEmpty() ) {
+				
+				World w = Bukkit.getWorld( this.worldName );
+				
+				for ( ZBlock zb : deferred ) {			
+					
+					Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+					block.setType( Material.getMaterial( zb.materialId ) );
+					block.setData( zb.data );
+					block.getState().update( true );				
 					
 				}
 				
-			}			
-			
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			}
 		}
 		
-
-		if ( !deferred.isEmpty() ) {
-			
-			World w = Bukkit.getWorld( this.worldName );
-			
-			for ( ZRBlock zb : deferred ) {
-				
-				String str = "setting " + Material.getMaterial( zb.materialId).toString() + " " + zb.x + ", " + zb.y + " " + zb.z;
-				Bukkit.getLogger().info( str );				
-				
-				Block block = w.getBlockAt( zb.x, zb.y, zb.z );
-				block.setType( Material.getMaterial( zb.materialId ) );
-				block.setData( zb.data );
-				block.getState().update( true );				
-				
-			}
-			
-		}
 		
-		if ( !mobs.isEmpty() ) {
-			
-			for ( MobSerializable mob : mobs ) {
+		if ( this.getSpawnMobs() ) {
+			if ( !mobs.isEmpty() ) {
 				
-				mob.spawnEntity();
+				for ( ZMob mob : mobs ) {
+					
+					mob.spawnEntity();
+					
+				}
 				
 			}
-			
 		}
 		
 		
@@ -899,7 +856,7 @@ public class Zone {
 		try {
 			FileInputStream fileIn = new FileInputStream( Config.folderSnapshots + File.separator + this.tag + ".ser" );
 			ObjectInputStream in = new ObjectInputStream( fileIn );
-			ZRBlocks z = ( ZRBlocks ) in.readObject();
+			ZArea z = ( ZArea ) in.readObject();
 			in.close();
 			fileIn.close();
 			this.restoreBlocks(z);
@@ -920,7 +877,7 @@ public class Zone {
 	public boolean saveBlocks() {
 		
         FileOutputStream fileOut;
-        ZRBlocks z = this.area.getBlocks();
+        ZArea z = this.area.getBlocks();
         
         if ( z.getBlocks().size() == 0 ) {
         	z = null;
@@ -949,7 +906,6 @@ public class Zone {
 		this.trigOnPlayerQuitList.clear();
 		this.clearTimedMessages();
 		this.onInteractLocation = null;
-		this.spawns = null;
 	}	
 	
 }

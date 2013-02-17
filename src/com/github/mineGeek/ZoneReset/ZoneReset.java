@@ -1,7 +1,6 @@
 package com.github.mineGeek.ZoneReset;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +15,11 @@ import com.github.mineGeek.ZoneReset.Commands.Edit;
 import com.github.mineGeek.ZoneReset.Commands.Reset;
 import com.github.mineGeek.ZoneReset.Commands.Save;
 import com.github.mineGeek.ZoneReset.Commands.Set;
+import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Events.Listeners;
-import com.github.mineGeek.ZoneReset.Player.Markers;
+import com.github.mineGeek.ZoneReset.Markers.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 /**
  * Main
@@ -118,7 +117,7 @@ public class ZoneReset extends JavaPlugin {
     	Config.folderZones = this.getDataFolder().toString() + File.separator + "zonedata";
     	
     	/**
-    	 * Zone serialize directory
+    	 * Zone serialise directory
     	 */
     	File file = new File( Config.folderSnapshots );
     	

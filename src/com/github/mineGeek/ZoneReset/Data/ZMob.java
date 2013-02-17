@@ -14,7 +14,7 @@ import org.bukkit.entity.LivingEntity;
 
 
 
-public class MobSerializable implements Serializable {
+public class ZMob implements Serializable {
 
 	private static final long serialVersionUID = 1543092309859360391L;
 	public String worldName;
@@ -30,10 +30,10 @@ public class MobSerializable implements Serializable {
 	public double vy;
 	public double vz;
 	
-	Map<String, ItemSerializable> items;
+	Map<String, ZItem> items;
 	
 	
-	public MobSerializable( Entity e ) {
+	public ZMob( Entity e ) {
 		
 		
 		Location l = e.getLocation();
@@ -54,12 +54,12 @@ public class MobSerializable implements Serializable {
 			LivingEntity le = (LivingEntity) e;
 
 			if ( le.getEquipment().getArmorContents().length > 0 ) {
-				this.items = new HashMap<String, ItemSerializable>();
-				this.items.put( "boots", new ItemSerializable( le.getEquipment().getBoots() ) );
-				this.items.put( "chest", new ItemSerializable( le.getEquipment().getChestplate() ) );
-				this.items.put( "helmet", new ItemSerializable( le.getEquipment().getHelmet() ) );
-				this.items.put( "hand", new ItemSerializable( le.getEquipment().getItemInHand() ) );
-				this.items.put( "leg", new ItemSerializable( le.getEquipment().getLeggings() ) );
+				this.items = new HashMap<String, ZItem>();
+				this.items.put( "boots", new ZItem( le.getEquipment().getBoots() ) );
+				this.items.put( "chest", new ZItem( le.getEquipment().getChestplate() ) );
+				this.items.put( "helmet", new ZItem( le.getEquipment().getHelmet() ) );
+				this.items.put( "hand", new ZItem( le.getEquipment().getItemInHand() ) );
+				this.items.put( "leg", new ZItem( le.getEquipment().getLeggings() ) );
 				
 			}			
 			

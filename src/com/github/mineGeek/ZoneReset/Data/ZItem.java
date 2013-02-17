@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
-public class ItemSerializable implements Serializable {
+public class ZItem implements Serializable {
 
 
 	private static final long serialVersionUID = 9218747208794761041L;
@@ -20,7 +20,7 @@ public class ItemSerializable implements Serializable {
 	private int amount;
 	private Map<String, Object> meta;
 	
-	public ItemSerializable( ItemStack i ) {
+	public ZItem( ItemStack i ) {
 		
 		this.materialId = i.getTypeId();
 		this.data	= i.getData().getData();

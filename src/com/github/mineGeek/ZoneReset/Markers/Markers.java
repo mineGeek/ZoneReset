@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Player;
+package com.github.mineGeek.ZoneReset.Markers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zone;
 
 /**
  * Static class for managing Markers which highlight cuboid regions

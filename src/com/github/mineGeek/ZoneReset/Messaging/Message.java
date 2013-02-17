@@ -8,9 +8,9 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 public class Message implements Runnable {
 	

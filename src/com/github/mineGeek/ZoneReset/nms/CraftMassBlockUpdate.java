@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Utilities;
+package com.github.mineGeek.ZoneReset.nms;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
-import com.github.mineGeek.ZoneReset.nms.NMSHelper;
+
 
 public class CraftMassBlockUpdate implements MassBlockUpdate {
 	private final World world;

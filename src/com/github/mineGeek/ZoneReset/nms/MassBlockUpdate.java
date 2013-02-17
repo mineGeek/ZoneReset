@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Utilities;
+package com.github.mineGeek.ZoneReset.nms;
 
 public interface MassBlockUpdate {
 	

@@ -1,9 +1,9 @@
 package com.github.mineGeek.ZoneReset.Commands;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
-import com.github.mineGeek.ZoneReset.Utilities.Zones;
+import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zones;
+import com.github.mineGeek.ZoneReset.Data.Zone.ZRMethod;
 
 
 

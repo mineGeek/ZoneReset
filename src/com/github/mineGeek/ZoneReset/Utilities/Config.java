@@ -9,9 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
+
 
 
 /**
@@ -165,51 +166,6 @@ public class Config {
 		}
 		
 		
-		/**
-		 * Post-Reset processing
-		 */
-		ppath = path + "post.";
-		if ( !z.getSpawns().isEmpty() ) {
-			
-			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.INVENTORY ) ) {
-				
-				//set players inventory
-				
-				c.set( ppath + "setInventory", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.INVENTORY) ) );
-			}	
-			
-			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.ITEM ) || z.getSpawns().containsKey( ZRSPAWNTYPE.CONTAINER) ) {
-			
-				//set items
-				List< Map<String, Object>> items = new ArrayList< Map<String, Object>>();
-				if ( z.getSpawns().containsKey( ZRSPAWNTYPE.ITEM ) ) {
-					items.addAll( formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.ITEM ) ) );
-				}
-				
-				if ( z.getSpawns().containsKey( ZRSPAWNTYPE.CONTAINER ) ) {
-					items.addAll( formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.CONTAINER ) ) );
-				}
-				
-				if ( !items.isEmpty() ) {
-					c.set( ppath + "spawnItems", items );
-				}
-			}
-					
-			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.SIGN ) ) {
-			
-				c.set( ppath + "spawnSigns" , formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.SIGN) ) );
-				
-			}
-			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.MOB ) ) {
-				
-				c.set( ppath + "spawnMobs", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.MOB ) ) );
-				
-				
-			}
-				
-			
-		}
-		
 		ppath = path + "messages";
 		
 		if ( !z.getTimedMessages().isEmpty() ) {
@@ -217,6 +173,10 @@ public class Config {
 			c.set(ppath + "messages.timed", formatMessageForConfig( z.getTimedMessages() ) );
 			
 		}
+		
+		ppath = path + "spawn.";
+		if ( !z.getSpawnBlocks() ) c.set("blocks", z.getSpawnBlocks() );
+		if ( !z.getSpawnBlocks() ) c.set("mobs", z.getSpawnMobs() );
 		
 		
 		/**
@@ -245,26 +205,6 @@ public class Config {
 		
 	}
 
-	/**
-	 * Transform a zone spawn type to a basic list for storage in config.
-	 * @param spawn
-	 * @return
-	 */
-	public static List< Map<String, Object>> formatSpawnForConfig( List<SpawnInterface> spawn ) {
-		
-		List< Map<String, Object>> result = new ArrayList< Map<String, Object>>();
-		
-		if ( spawn != null && !spawn.isEmpty() ) {
-			
-			for( SpawnInterface s : spawn ) {
-				result.add( s.getList() );
-			}
-			
-		}
-		
-		return result;
-		
-	}
 	
 	public static List< Map<String, Object>> formatMessageForConfig( List<Message> message ) {
 		

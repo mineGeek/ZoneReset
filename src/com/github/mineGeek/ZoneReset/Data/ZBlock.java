@@ -14,7 +14,7 @@ import org.bukkit.inventory.InventoryHolder;
  * @author moí
  *
  */
-public class ZRBlock implements Serializable {
+public class ZBlock implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	public int x;
@@ -26,16 +26,16 @@ public class ZRBlock implements Serializable {
 	public boolean deferred = false;
 	
 	public ArrayList<String> lines = null;
-	public ArrayList<ItemSerializable> items = null;
+	public ArrayList<ZItem> items = null;
 	
-	public ZRBlock( Block block, boolean deferred ) {
+	public ZBlock( Block block, boolean deferred ) {
 		
 		this(block);
 		this.deferred = deferred;
 		
 	}
 	
-	public ZRBlock ( Block block ) {
+	public ZBlock ( Block block ) {
 		
 		this.x = block.getX();
 		this.y = block.getY();
@@ -63,9 +63,9 @@ public class ZRBlock implements Serializable {
 			
 			if ( inv.getContents().length > 0 ) {
 				this.hasInventory = true;
-				this.items = new ArrayList< ItemSerializable >();
+				this.items = new ArrayList< ZItem >();
 				for ( int i = 0; i < inv.getContents().length; i++ ) {
-					if ( inv.getItem(i) != null ) items.add( new ItemSerializable( inv.getItem(i)));
+					if ( inv.getItem(i) != null ) items.add( new ZItem( inv.getItem(i)));
 				}
 			
 			}

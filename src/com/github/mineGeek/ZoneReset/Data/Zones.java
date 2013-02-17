@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Utilities;
+package com.github.mineGeek.ZoneReset.Data;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,17 +10,11 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.github.mineGeek.ZoneReset.Data.Area;
-import com.github.mineGeek.ZoneReset.Data.DataStore;
+import com.github.mineGeek.ZoneReset.Data.Zone.ZRMethod;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 import com.github.mineGeek.ZoneReset.Messaging.Message.ZRMessageType;
-import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
-import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
-import com.github.mineGeek.ZoneReset.Spawners.SignSpawn;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
-import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
+
+import com.github.mineGeek.ZoneReset.Utilities.Config;
 
 public class Zones {
 
@@ -127,11 +121,6 @@ public class Zones {
 
 		
 		String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + m.getId();
-		//Bukkit.getLogger().info( i );
-		
-		//for ( String x : interactKeys.keySet() ) {
-			//Bukkit.getLogger().info( x );
-		//}
 		
 		if ( interactKeys.containsKey(i) ) {
 		
@@ -142,7 +131,6 @@ public class Zones {
 		
 	}	
 	
-	@SuppressWarnings("unchecked")
 	public static void addZone( String tag, ConfigurationSection c ) {
 		
 		Zone r = new Zone();
@@ -221,93 +209,16 @@ public class Zones {
 		}
 		
 		
+		r.setSpawnBlocks( c.getBoolean( "spawn.blocks", true ) );
+		r.setSpawnMobs( c.getBoolean( "spawn.mobs", true ) );
+		
+		
 		/**
 		 * Set players inventory
 		 */
-		//r.clearPlayerInventory();
-		if ( c.isSet( "post.setInventory") ) {
-			
-			List<Map<?, ?>> items = c.getMapList("post.playerInventory");
-			
-			if ( !items.isEmpty() ) {
 				
-				for ( Map<?, ?> item : items ) {
-					ItemSpawn i = new ItemSpawn();
-					i.setWorldName( worldName );
-					i.setList( (Map<String, Object>) item );
-					r.addSpawn( ZRSPAWNTYPE.INVENTORY, i );
-				}
-				
-			}
-			
-		}
 		
-		if ( c.isSet("post.spawnMobs") ) {
-			
-			List<Map<?, ?>> mobs = c.getMapList("post.spawnMobs");
-			
-			if ( !mobs.isEmpty() ) {
-				
-				for ( Map<?, ?> mob : mobs ) {
-					MobSpawner mobItem = new MobSpawner();
-					mobItem.setWorldName( worldName );
-					mobItem.setList( (Map<String, Object>) mob );
-					r.addSpawn( ZRSPAWNTYPE.MOB, mobItem );
-				}
-				
-			}
-			
-		}
-		
-		if ( c.isSet("post.spawnSigns") ) {
-			
-			List<Map<?, ?>> signs = c.getMapList("post.spawnSigns");
-			
-			if ( !signs.isEmpty() ) {
-				
-				for ( Map<?, ?> sign : signs ) {
-					SignSpawn s = new SignSpawn();
-					s.setWorldName( worldName );
-					s.setList( (Map<String, Object>) sign );
-					r.addSpawn( ZRSPAWNTYPE.SIGN, s );
-				}
-				
-			}
-			
-		}		
-		
-		
-		if ( c.isSet( "post.spawnItems") ) {
-			
-			List< Map<?, ?> > spawns = c.getMapList( "post.spawnItems");
-			
-			if ( !spawns.isEmpty() ) {
-				
-				for ( Map<?, ?> spawn : spawns ) {
-					
-					SpawnInterface si = null;
-					
-					if ( spawn.containsKey( "type") ) {
-						
-						if ( ZRSPAWNTYPE.valueOf( spawn.get("type").toString().toUpperCase() ).equals( ZRSPAWNTYPE.ITEM ) ) {
-							si = new ItemSpawn();
-						} else if ( ZRSPAWNTYPE.valueOf( spawn.get("type").toString().toUpperCase() ).equals( ZRSPAWNTYPE.CONTAINER ) ) {
-							si = new SpawnContainer();
-						}
-						
-					}
-					
-					if ( si != null ) {
-						si.setWorldName( worldName );
-						si.setList( (Map<String, Object>) spawn );
-						r.addSpawn( ZRSPAWNTYPE.valueOf( spawn.get("type").toString().toUpperCase() ), si);
-					}
-
-				}
-				
-			}
-			
-		}
+	
 		
 		
 		/**

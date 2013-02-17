@@ -14,33 +14,21 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Area;
+import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zones;
+import com.github.mineGeek.ZoneReset.Data.Zone.ZRMethod;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
-import com.github.mineGeek.ZoneReset.Spawners.BookSpawn;
-import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
-import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
-import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
-import com.github.mineGeek.ZoneReset.Spawners.SignSpawn;
-import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
 
 
 
@@ -384,7 +372,7 @@ public class Utilities {
 	public static void clearPlayerMetaData( Player p ) {
 		
 		Plugin plug = Bukkit.getPluginManager().getPlugin("ZoneReset");
-		String[] keys = {"ZREditMode", "ZR_1", "ZR_2", "zr", "zra", "zrinteract" };
+		String[] keys = {"zra", "zrinteract" };
 		
 		for ( String x : keys ) {
 			p.removeMetadata( x , plug );
@@ -441,207 +429,6 @@ public class Utilities {
 	
 	public static void clearZoneOfEntities( Zone zone ) {
 		clearLocationOfEntities( zone.getArea(), zone.getPreNoMobsExceptionList() );
-	}
-	
-	public static Map<ZRSPAWNTYPE, List<SpawnInterface>> getEntitiesInZone( Zone zone ) {
-		List<ZRSPAWNTYPE> l = new ArrayList<ZRSPAWNTYPE>();
-		l.add( ZRSPAWNTYPE.CONTAINER );
-		l.add( ZRSPAWNTYPE.ITEM );
-		l.add( ZRSPAWNTYPE.MOB );
-		l.add( ZRSPAWNTYPE.SIGN );
-		return getEntitiesInZone( zone, l );
-	}
-	
-	public static Map<ZRSPAWNTYPE, List<SpawnInterface>> getEntitiesInZone( Zone zone, List<ZRSPAWNTYPE> types  ) {
-		
-		List<Chunk> chunks = new ArrayList<Chunk>();
-	    Area area = zone.getArea();
-	    List<SpawnInterface> l = new ArrayList<SpawnInterface>();
-	    
-	    List<SpawnInterface> mobs = new ArrayList<SpawnInterface>();
-	    List<SpawnInterface> items = new ArrayList<SpawnInterface>();
-	    List<SpawnInterface> containers = new ArrayList<SpawnInterface>();
-	    List<SpawnInterface> signs 	= new ArrayList<SpawnInterface>();
-	    
-		Location ne = area.ne();
-		Location sw = area.sw();
-		
-		int fromX = Math.min( ne.getChunk().getX(), sw.getChunk().getX() );
-		int toX = Math.max( ne.getChunk().getX(), sw.getChunk().getX() );
-		
-		int fromZ = Math.min( ne.getChunk().getZ(), sw.getChunk().getZ() );
-		int toZ = Math.max( ne.getChunk().getZ(), sw.getChunk().getZ() );
-				
-		
-		
-		for( int x = fromX; x <= toX; x++ ) {
-			
-			for ( int z = fromZ; z <= toZ; z++) {
-				chunks.add( ne.getWorld().getChunkAt(x, z) );
-			}
-			
-		}		
-		
-		if ( chunks.size() > 0 ) {
-
-			for ( Chunk chunk : chunks ) {
-				
-				for( Entity e : chunk.getEntities()) {
- 
-					if ( area.intersectsWith( e.getLocation() ) ) {
-						
-						SpawnInterface spawn = null;
-						
-						if ( e instanceof Player ) {
-							
-							//Do nothing!
-							
-						} else if ( e instanceof Creature && types.contains( ZRSPAWNTYPE.MOB ) ) {
-							
-							spawn = new MobSpawner( e );
-							mobs.add( spawn );
-							
-						} else if ( e instanceof Monster  && types.contains( ZRSPAWNTYPE.MOB ) ) {
-							
-							spawn = new MobSpawner( e );
-							mobs.add( spawn );
-							
-						} else if ( e instanceof Item  && types.contains( ZRSPAWNTYPE.ITEM ) ) {
-							
-							ItemStack i = ((Item)e).getItemStack();
-							
-							if ( i.getType() == Material.WRITTEN_BOOK || i.getType() == Material.BOOK || i.getType() == Material.BOOK_AND_QUILL ) {
-								//spawn = new BookSpawn( i );
-								spawn = new ItemSpawn( i ); 
-							} else {
-								spawn = new ItemSpawn( i );
-							}
-							items.add( spawn );
-							
-						}
-						
-						if ( spawn != null ) {
-							
-							
-							l.add( spawn );
-								//l.add( new EntityLocation( e.getType().name(), e.getType().getTypeId(), e.getWorld().getName(), e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()) ); 
-						}
-					}
-				}
-				
-				for ( BlockState bs : chunk.getTileEntities() ) {
-					
-					if ( area.intersectsWith( bs.getLocation() )  && types.contains( ZRSPAWNTYPE.CONTAINER ) ) {
-						
-						
-						if ( bs instanceof Sign && types.contains( ZRSPAWNTYPE.SIGN )) {
-							
-							SignSpawn s = new SignSpawn( (Sign)bs );
-							signs.add( s );
-							l.add( s );
-						} else {
-						
-							 SpawnContainer s = new SpawnContainer( bs.getBlock() );
-							
-							 Inventory ih = null;
-							 if ( bs instanceof Chest ) {
-								 ih = ((Chest) bs).getBlockInventory();
-							 } else {
-								 ih = ((InventoryHolder) bs).getInventory();
-							 }
-							 s.clearItems();
-							 for( ItemStack it : ih ) {
-								 
-								 if ( it != null ) {
-									 if ( it.getType() == Material.WRITTEN_BOOK || it.getType() == Material.BOOK || it.getType() == Material.BOOK_AND_QUILL ) {
-										//s.addItem( new BookSpawn( it ) );
-										 s.addItem( new ItemSpawn( it ) );
-									 } else {
-										 s.addItem( new ItemSpawn( it ) );
-									 }
-									
-								 }
-								 
-								 
-							 }						
-												
-							containers.add( s );
-							l.add( s );
-						}
-						
-
-						/*
-						 ItemSpawnOld item = new ItemSpawnOld( bs.getBlock().getType(), bs.getBlock().getData(), (short)0, 1, bs.getLocation().getWorld().getName(), bs.getLocation().getBlockX(), bs.getLocation().getBlockY(), bs.getLocation().getBlockZ());
-
-						 Inventory ih = null;
-								 
-						 if ( bs instanceof Chest ) {
-							 ih = ((Chest) bs).getBlockInventory();
-						 } else {
-							 ih = ((InventoryHolder) bs).getInventory();
-						 }
-						 
-						 for( ItemStack it : ih ) {
-							 
-							 if ( it != null ) {
-					
-								 
-								 ItemSpawnOld invItem = new ItemSpawnOld( it.getType(), it.getData().getData(), it.getDurability(), it.getAmount() );
-								 item.contains.add( invItem );
-							 }
-							 
-							 
-						 }
-						 
-						 l.add( item );
-						 //Material m, byte data, short durability, int qty, String worldName, int x, int y, int z
-						*/
-						
-					}
-					
-				}
-				
-
-			}
-			
-		}
-		
-		Map<ZRSPAWNTYPE, List<SpawnInterface>> result = new HashMap<ZRSPAWNTYPE, List<SpawnInterface>>();
-		
-		if ( types.contains( ZRSPAWNTYPE.MOB ) ) {
-			result.put( ZRSPAWNTYPE.MOB, mobs );
-		}
-		
-		if ( types.contains( ZRSPAWNTYPE.ITEM ) ) {
-			result.put( ZRSPAWNTYPE.ITEM, items );
-		}
-		
-		if ( types.contains( ZRSPAWNTYPE.CONTAINER ) ) {
-			result.put( ZRSPAWNTYPE.CONTAINER, containers );
-		}
-		
-		if ( types.contains( ZRSPAWNTYPE.SIGN ) ) {
-			result.put( ZRSPAWNTYPE.SIGN, signs );
-		}
-		
-		return result;
-		
-		
-	}
-	
-
-	
-	public static Material getMaterialFromEntity( Entity entity ) {
-		
-		Class<?>[] interfaces = entity.getClass().getInterfaces();
-		if ( interfaces.length == 1 ) {
-			String s = interfaces[0].getSimpleName();
-			Material mat = Material.matchMaterial(s);
-			if ( mat != null ) return mat;
-		}
-		
-		return null;
-		
 	}	
 	
 	public static void clearLocationOfEntities( Area area, List<EntityType> exclusions ) {
@@ -708,49 +495,6 @@ public class Utilities {
 			
 		}
 		
-		
 	}
-	
-	
-	public static void spawnEntities( Map<ZRSPAWNTYPE, List< SpawnInterface>> spawns ) {
-		
-		if ( !spawns.isEmpty()  ) {
-			
-			if ( spawns.containsKey( ZRSPAWNTYPE.MOB ) ) {
-				spawnList( spawns.get( ZRSPAWNTYPE.MOB) );
-			}
-			
-			if ( spawns.containsKey( ZRSPAWNTYPE.ITEM ) ) {
-				spawnList( spawns.get( ZRSPAWNTYPE.ITEM) );
-			}
-			
-			if ( spawns.containsKey( ZRSPAWNTYPE.CONTAINER ) ) {
-				spawnList( spawns.get( ZRSPAWNTYPE.CONTAINER) );
-			}
-			
-			if ( spawns.containsKey( ZRSPAWNTYPE.SIGN ) ) {
-				spawnList( spawns.get( ZRSPAWNTYPE.SIGN ) );
-			}
-			
-		}
-		
-		
-	}
-	
-	public static void spawnList( List< SpawnInterface> spawn ) {
-		
-		if ( !spawn.isEmpty() ) {
-			for ( SpawnInterface s : spawn ) {
-				s.spawn();
-			}
-		}
-		
-	}
-	
-	
-
-	
-	
-	
 	
 }

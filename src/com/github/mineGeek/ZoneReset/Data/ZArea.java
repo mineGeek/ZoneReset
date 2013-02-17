@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
  * @author moí
  *
  */
-public class ZRBlocks implements Serializable {
+public class ZArea implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private int neX;
@@ -32,10 +32,10 @@ public class ZRBlocks implements Serializable {
 	
 	private String worldName;
 	
-	private ArrayList<ZRBlock> blocks = new ArrayList<ZRBlock>();
-	private ArrayList<MobSerializable> mobs = new ArrayList<MobSerializable>();
+	private ArrayList<ZBlock> blocks = new ArrayList<ZBlock>();
+	private ArrayList<ZMob> mobs = new ArrayList<ZMob>();
 	
-	public ZRBlocks( Location ne, Location sw ) {
+	public ZArea( Location ne, Location sw ) {
 		
 		this.neX = ne.getBlockX();
 		this.neY = ne.getBlockY();
@@ -49,11 +49,11 @@ public class ZRBlocks implements Serializable {
 		
 	}
 	
-	public ArrayList<ZRBlock> getBlocks() {
+	public ArrayList<ZBlock> getBlocks() {
 		return this.blocks;
 	}
 	
-	public ArrayList<MobSerializable> getMobs() {
+	public ArrayList<ZMob> getMobs() {
 		return this.mobs;
 	}
 	
@@ -69,7 +69,7 @@ public class ZRBlocks implements Serializable {
 		int toZ = Math.max( this.neZ, this.swZ );		
 		
 		World world = Bukkit.getWorld( this.worldName );
-		List<ZRBlock> deferred = new ArrayList<ZRBlock>();
+		List<ZBlock> deferred = new ArrayList<ZBlock>();
 		for ( int x = fromX; x <= toX; x++ ) {
 			for ( int z=fromZ; z <= toZ; z++ ) {
 				for (int y=fromY; y<=toY; y++ ) {
@@ -77,9 +77,9 @@ public class ZRBlocks implements Serializable {
 					Block b = world.getBlockAt( x, y, z );
 					
 					if ( b.getState() instanceof Sign ) {
-						deferred.add( new ZRBlock( b, true ) );
+						deferred.add( new ZBlock( b, true ) );
 					} else {
-						blocks.add( new ZRBlock( b ));
+						blocks.add( new ZBlock( b ));
 					}
 					
 				}
@@ -121,7 +121,7 @@ public class ZRBlocks implements Serializable {
 						
 						if ( e instanceof LivingEntity && !(e instanceof Player ) ) {
 							
-							mobs.add( new MobSerializable( e ) );
+							mobs.add( new ZMob( e ) );
 							
 						} else {
 							Bukkit.getLogger().info("Skipping entity: " + e.getType().getName() );

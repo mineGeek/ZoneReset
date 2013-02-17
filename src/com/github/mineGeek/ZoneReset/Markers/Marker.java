@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneReset.Player;
+package com.github.mineGeek.ZoneReset.Markers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

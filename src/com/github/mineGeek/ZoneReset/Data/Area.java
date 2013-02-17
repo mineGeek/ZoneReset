@@ -213,9 +213,9 @@ public class Area {
 	 * TODO: Won't this fart out if only 1 location object is set?
 	 * @return
 	 */
-	public ZRBlocks getBlocks() {
+	public ZArea getBlocks() {
 		
-		ZRBlocks z = new ZRBlocks( this.ne(), this.sw() );
+		ZArea z = new ZArea( this.ne(), this.sw() );
 		z.copyBlocks();
 		z.copyEntities();
 		return z;

@@ -95,8 +95,10 @@ public class Set extends CommandBase {
 		} else if ( key.equals( "spawn") ) {
 			
 			if ( args.length == 1 ) {
-				mess = "Insufficient arguments.";
-				return false;
+				z.setSpawns( Utilities.getEntitiesInZone( z ) );
+				mess = "Ok, all entities in area are set";
+				return true;
+				
 			}
 			
 			if ( z.getArea().ne() == null || z.getArea().ne() == null ) {
@@ -116,7 +118,10 @@ public class Set extends CommandBase {
 				 z.setSpawns( ZRSPAWNTYPE.ITEM, m.get(ZRSPAWNTYPE.ITEM ) );				
 			} else if ( noun.equals( "containers") ) {
 				 m = Utilities.getEntitiesInZone( z, new ArrayList<ZRSPAWNTYPE>( Arrays.asList( ZRSPAWNTYPE.CONTAINER) ) );
-				 z.setSpawns( ZRSPAWNTYPE.CONTAINER, m.get(ZRSPAWNTYPE.CONTAINER ) );				
+				 z.setSpawns( ZRSPAWNTYPE.CONTAINER, m.get(ZRSPAWNTYPE.CONTAINER ) );
+			} else if ( noun.equals( "sign") || noun.equals("signs") ) {
+				 m = Utilities.getEntitiesInZone(z, new ArrayList<ZRSPAWNTYPE> ( Arrays.asList( ZRSPAWNTYPE.SIGN ) ) );
+				 z.setSpawns( ZRSPAWNTYPE.SIGN, m.get( ZRSPAWNTYPE.SIGN ) );
 			} else if ( noun.equals("all" ) ) {
 				z.setSpawns( Utilities.getEntitiesInZone( z ) );
 			}
@@ -219,7 +224,7 @@ public class Set extends CommandBase {
 				
 		} else if ( key.equals("trigger" ) ) {
 				
-			if ( args.length < 3 ) {
+			if ( args.length < 2 ) {
 				
 				mess = "Invalid number of arguments";
 				return false;

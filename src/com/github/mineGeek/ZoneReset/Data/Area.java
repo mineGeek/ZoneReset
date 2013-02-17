@@ -194,11 +194,12 @@ public class Area {
 
 		Location ne = ne();
 		Location sw = sw();
+
 		
 		if ( l.getWorld().getName().equals( ne.getWorld().getName() ) ) {
-			if ( ( Math.max( ne.getX(), sw.getX() ) < l.getX() - 1 ) || ( Math.min( ne.getX(), sw.getX() ) >= l.getX() ) ) return false;
-			if ( ( Math.max( ne.getZ(), sw.getZ() ) < l.getZ() - 1 ) || ( Math.min( ne.getZ(), sw.getZ() ) >= l.getZ() ) ) return false;
-			if ( ( Math.max( ne.getY(), sw.getY() ) < l.getY() - 1 ) || ( Math.min( ne.getY(), sw.getY() ) >= l.getY() ) ) return false;	
+			if ( ( Math.max( ne.getX(), sw.getX() ) < l.getX() ) || ( Math.min( ne.getX(), sw.getX() ) > l.getX() ) ) return false;
+			if ( ( Math.max( ne.getZ(), sw.getZ() ) < l.getZ() ) || ( Math.min( ne.getZ(), sw.getZ() ) > l.getZ() ) ) return false;
+			if ( ( Math.max( ne.getY(), sw.getY() ) < l.getY() ) || ( Math.min( ne.getY(), sw.getY() ) > l.getY() ) ) return false;	
 			return true;
 		} else {
 			return false;
@@ -216,6 +217,7 @@ public class Area {
 		
 		ZRBlocks z = new ZRBlocks( this.ne(), this.sw() );
 		z.copyBlocks();
+		z.copyEntities();
 		return z;
 		
 	}

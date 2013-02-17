@@ -31,7 +31,7 @@ public class SpawnContainer extends SpawnBase {
 	/**
 	 * List of items to fill container with
 	 */
-	private List<ItemSpawn> items = new ArrayList<ItemSpawn>();
+	private List<SpawnInterface> items = new ArrayList<SpawnInterface>();
 	
 	/**
 	 * Returns container material
@@ -53,7 +53,7 @@ public class SpawnContainer extends SpawnBase {
 	 * Returns list of items to spawn in container
 	 * @return
 	 */
-	public List<ItemSpawn> getItems() {
+	public List<SpawnInterface> getItems() {
 		return this.items;
 	}
 	
@@ -61,7 +61,7 @@ public class SpawnContainer extends SpawnBase {
 	 * Sets the items to fill the container with
 	 * @param items
 	 */
-	public void setItems( List<ItemSpawn> items ) {
+	public void setItems( List<SpawnInterface> items ) {
 		this.items = items;
 	}
 	
@@ -76,7 +76,7 @@ public class SpawnContainer extends SpawnBase {
 	 * Add an item to add to the spawn queue
 	 * @param item
 	 */
-	public void addItem( ItemSpawn item ) {
+	public void addItem( SpawnInterface item ) {
 		this.items.add( item );
 	}
 	
@@ -126,7 +126,7 @@ public class SpawnContainer extends SpawnBase {
 		if ( !this.getItems().isEmpty() ) {
 			List<Object> items = new ArrayList<Object>();
 			
-			for ( ItemSpawn x : this.getItems() ) {
+			for ( SpawnInterface x : this.getItems() ) {
 				//remove redundant tags
 				Map<String, Object> m = x.getList();
 				m.remove("type");
@@ -151,12 +151,24 @@ public class SpawnContainer extends SpawnBase {
 		if ( list.containsKey("contains") ) {
 			
 			@SuppressWarnings("unchecked")
-			List< Map<String, Object>> items = (List<Map<String, Object>>) list.get("items");
+			List< Map<String, Object>> items = (List<Map<String, Object>>) list.get("contains");
 			
 			if ( items != null ) {
 				for ( Map<String, Object> i : items ) {
 					
-					ItemSpawn spawn = new ItemSpawn();
+					SpawnInterface spawn = null;
+					
+					if ( i.containsKey("item") ) {
+						int id = (Integer) i.get("item");
+						
+						if ( (id == Material.BOOK.getId()) || (id == Material.BOOK_AND_QUILL.getId()) || ( id == Material.WRITTEN_BOOK.getId()) ) {
+							spawn = new BookSpawn();
+						} else {
+							spawn = new ItemSpawn();
+						}
+						
+					}
+					
 					spawn.setList( i );
 					this.addItem( spawn );
 					
@@ -182,11 +194,11 @@ public class SpawnContainer extends SpawnBase {
 			BlockState bs = b.getState();
 			bs.setData( new MaterialData( this.getMaterial(), this.getData() ) );
 			Inventory inv = ((InventoryHolder)bs).getInventory();
-			
+			inv.clear();
 			if ( !this.getItems().isEmpty() ) {
 				
-				for ( ItemSpawn i : this.getItems() ) {
-					inv.addItem( i.getAsItemStack() );
+				for ( SpawnInterface i : this.getItems() ) {
+					inv.addItem( ((ItemInterface) i).getAsItemStack() );
 				}
 				
 			}

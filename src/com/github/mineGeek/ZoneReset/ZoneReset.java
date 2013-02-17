@@ -2,6 +2,7 @@ package com.github.mineGeek.ZoneReset;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +20,6 @@ import com.github.mineGeek.ZoneReset.Events.Listeners;
 import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneReset.Utilities.Zone;
-import com.github.mineGeek.ZoneReset.Utilities.Zone.ZRMethod;
 import com.github.mineGeek.ZoneReset.Utilities.Zones;
 
 /**
@@ -33,8 +32,8 @@ public class ZoneReset extends JavaPlugin {
 	/**
 	 * List of tasks that control automatic resets.
 	 */
-	private List<BukkitTask> tasks = new ArrayList<BukkitTask>();
-	
+	public Map<String, List<BukkitTask>> tasks = new HashMap<String, List<BukkitTask>>();
+	public Map<String,List<BukkitTask>> messages = new HashMap<String, List<BukkitTask>>();
 	/**
 	 * Process shut down or disable
 	 */
@@ -45,17 +44,17 @@ public class ZoneReset extends JavaPlugin {
     	/**
     	 * Empty task queue
     	 */
-    	if ( !this.tasks.isEmpty() ) {
-	    	for ( BukkitTask task : this.tasks ) {
-	    		task.cancel();
-	    	}
-	    	this.tasks.clear();
-    	}
+    	this.clearAllResets();
+    	this.clearAllMessages();
     	
+    	Utilities.plugin = null;
     	/**
     	 * Shut down and dispose of any markers currently set
     	 */
     	Markers.close();
+    	
+    	
+    	//Messages.clear();
     	
     	/**
     	 * Dispose of any related player data (for the hell of it)
@@ -116,6 +115,7 @@ public class ZoneReset extends JavaPlugin {
     	Config.folderPlugin = this.getDataFolder().toString();
     	Config.folderPlayers = this.getDataFolder().toString() + File.separator + "players";
     	Config.folderSnapshots = this.getDataFolder().toString() + File.separator + "snapshots";
+    	Config.folderZones = this.getDataFolder().toString() + File.separator + "zonedata";
     	
     	/**
     	 * Zone serialize directory
@@ -130,6 +130,16 @@ public class ZoneReset extends JavaPlugin {
     		}
     	}
     	
+    	file = new File( Config.folderZones );
+    	
+    	if ( !file.isDirectory() ) {
+    		try {
+    			file.mkdir();
+    		} catch (Exception e ) {
+    			this.getLogger().info("Failed making plugins/ZoneReset/zonedata");
+    		}
+    	}    	
+    	
     	/**
     	 * Load config.yml
     	 */
@@ -138,14 +148,19 @@ public class ZoneReset extends JavaPlugin {
     	/**
     	 * Load zone saved data
     	 */
-    	Zones.setDataFolder( this.getDataFolder().toString() );
     	Zones.loadDataZones();
-    	this.queueResets();
+    	
+    	
+    	
+    	Utilities.plugin = this;
+    	Utilities.checkAllPlayerChunks();
+    	Utilities.queue();
     	
     	/**
     	 * Force loads the class for shits and giggles.
     	 */
     	Markers.enabled = true;
+    	
     	
     	/**
     	 * Tell console we are ready to go.
@@ -158,64 +173,66 @@ public class ZoneReset extends JavaPlugin {
     /**
      * Clear reset queue
      */
-    public void clearResets() {
+    public void clearResets( String zoneTag ) {
     	
     	if ( !this.tasks.isEmpty() ) {
-	    	for ( BukkitTask task : this.tasks ) {
-	    		task.cancel();
-	    	}
-	    	this.tasks.clear();
-    	}
-    	
-    }
-    
-    
-    /**
-     * Scans through zones and queues up tasks to 
-     * run timed resets.
-     */
-    public void queueResets() {
-    	
-    	this.clearResets();
-    	
-    	Map<String, Zone > zones = Zones.getZones();
-    	
-    	for ( Zone z : zones.values() ) {
     		
-    		if ( z.getTrigTimer() > 0 ) {
+    		if ( this.tasks.containsKey(zoneTag) ) {
     			
-    			Long next = z.getNextTimedReset();
-    			
-    			if ( next != null && next != 0 ) {
-    				
-    				if ( next < System.currentTimeMillis() ) {
-    					//overdue. Run now.
-    					next = 0L;
-    				} else {
-    					next = next - System.currentTimeMillis();
-    				}
-    				
-    			}
-    			
-    			final Long nextRun = next * 20 + 1;
-    			final Long repeatRun = z.getTrigTimer() * 20;
-    			final String tag = z.getTag();
-    			
-    			BukkitTask task = this.getServer().getScheduler().runTaskTimer( this, new Runnable() {
-    	    	    @Override  
-    	    	    public void run() {
-    	    	    	try {
-    	    	    		Zones.getZone(tag).reset( ZRMethod.TIMED );
-    	    	    		Zones.getZone(tag).setNextTimedRest( Zones.getZone(tag).getTrigTimer() + System.currentTimeMillis() );
-    	    	    	} catch (Exception e ) {}
-    	    	    }
-    	    	}, nextRun , repeatRun );
-    			
-    			this.tasks.add( task );
+	    		for ( BukkitTask t : this.tasks.get(zoneTag) ) {
+	    			t.cancel();
+	    		} 
+	    		
+	    		this.tasks.get(zoneTag).clear();
     			
     		}
     		
     	}
     	
     }
+    
+    public void clearAllResets() {
+    	
+    	if ( !this.tasks.isEmpty() ) {
+	    	for ( List<BukkitTask> task : this.tasks.values() ) {
+	    		for ( BukkitTask t : task ) {
+	    			t.cancel();
+	    		}
+	    	}
+	    	this.tasks.clear();
+    	}
+    	
+    }
+    
+    public void clearMessages( String zoneTag ) {
+    	
+    	if ( !this.messages.isEmpty() ) {
+    		
+    		if ( this.messages.containsKey(zoneTag) ) {
+    			
+	    		for ( BukkitTask t : this.messages.get(zoneTag) ) {
+	    			t.cancel();
+	    		}    			
+    		
+	    		this.messages.get(zoneTag).clear();
+    		}
+    		
+    	}
+    	
+    }    
+    
+    public void clearAllMessages() {
+    	
+    	if ( !this.messages.isEmpty() ) {
+    		for ( List<BukkitTask> task : this.messages.values() ) {
+	    		for ( BukkitTask t : task ) {
+	    			t.cancel();
+	    		}
+    		}
+    		this.tasks.clear();
+    	}
+    }
+    
+    
+
 }

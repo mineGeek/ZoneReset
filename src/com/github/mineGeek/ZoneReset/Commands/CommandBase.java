@@ -62,7 +62,8 @@ abstract class CommandBase  implements CommandExecutor {
 		Markers.hideZoneBoundaries( p );
 		Utilities.clearPlayerMetaData( p );
 
-		this.plugin.queueResets();
+		Utilities.queueResets(z);
+		Utilities.queueMessages(z);
 		this.mess = z.getTag() + " has been saved.";		
 		
 		

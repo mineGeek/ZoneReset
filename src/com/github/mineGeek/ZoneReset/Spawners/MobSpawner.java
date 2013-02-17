@@ -3,18 +3,23 @@ package com.github.mineGeek.ZoneReset.Spawners;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.metadata.MetadataValue;
 
 public class MobSpawner extends SpawnBase {
 
 	private EntityType entityType;
+	private MetadataValue meta;
 	
 	public MobSpawner( Entity e ) {
 		
 		this.setType( ZRSPAWNTYPE.MOB );
 		this.setEntityType( e.getType() );
 		this.setLocation( e.getLocation() );
+		e.getMetadata("ted");
+		
 	}
 	
 	public MobSpawner() {}

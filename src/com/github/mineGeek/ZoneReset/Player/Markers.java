@@ -149,15 +149,15 @@ public class Markers {
 			int maxZ = Math.max( ne.getBlockZ(),  sw.getBlockZ() );
 			
 			
-			l.add( getMarker( worldName, minX, minY+1, minZ, minX+1, minZ+1 ) );
-			l.add( getMarker( worldName, maxX, minY+1, minZ, maxX-1, minZ+1 ) );
-			l.add( getMarker( worldName, minX, minY+1, maxZ, minX+1, maxZ-1 ) );
-			l.add( getMarker( worldName, maxX, minY+1, maxZ, maxX-1, maxZ-1 ) );			
+			l.add( getMarker( worldName, minX, minY, minZ, minX+1, minZ+1 ) );
+			l.add( getMarker( worldName, maxX, minY, minZ, maxX-1, minZ+1 ) );
+			l.add( getMarker( worldName, minX, minY, maxZ, minX+1, maxZ-1 ) );
+			l.add( getMarker( worldName, maxX, minY, maxZ, maxX-1, maxZ-1 ) );			
 
-			l.add( getMarker( worldName, minX, maxY-1, minZ, minX+1, minZ+1 ) );
-			l.add( getMarker( worldName, maxX, maxY-1, minZ, maxX-1, minZ+1 ) );
-			l.add( getMarker( worldName, minX, maxY-1, maxZ, minX+1, maxZ-1 ) );
-			l.add( getMarker( worldName, maxX, maxY-1, maxZ, maxX-1, maxZ-1 ) );
+			l.add( getMarker( worldName, minX, maxY, minZ, minX+1, minZ+1 ) );
+			l.add( getMarker( worldName, maxX, maxY, minZ, maxX-1, minZ+1 ) );
+			l.add( getMarker( worldName, minX, maxY, maxZ, minX+1, maxZ-1 ) );
+			l.add( getMarker( worldName, maxX, maxY, maxZ, maxX-1, maxZ-1 ) );
 			
 		} else if ( ne != null && sw==null ) {
 			l.add( getMarker(  ne ) );

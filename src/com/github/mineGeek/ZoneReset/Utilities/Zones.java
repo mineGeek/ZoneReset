@@ -12,8 +12,11 @@ import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.Data.Area;
 import com.github.mineGeek.ZoneReset.Data.DataStore;
+import com.github.mineGeek.ZoneReset.Messaging.Message;
+import com.github.mineGeek.ZoneReset.Messaging.Message.ZRMessageType;
 import com.github.mineGeek.ZoneReset.Spawners.ItemSpawn;
 import com.github.mineGeek.ZoneReset.Spawners.MobSpawner;
+import com.github.mineGeek.ZoneReset.Spawners.SignSpawn;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnContainer;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
@@ -23,15 +26,11 @@ public class Zones {
 
 	private static Map<String, Zone> zones = new HashMap<String, Zone>();
 	private static Map<String, String> interactKeys = new HashMap<String, String>();
-	private static String dataFolder;
+
 	
 	
 	public static Zone getZone( String tag ) {
 		return zones.get( tag );
-	}
-	
-	public static void setDataFolder( String folder ) {
-		Zones.dataFolder = folder;
 	}
 	
 	
@@ -46,7 +45,7 @@ public class Zones {
 	}
 	public static void loadDataZone( Zone zone ) {
 		
-		DataStore o = new DataStore( Zones.dataFolder );
+		DataStore o = new DataStore( Config.folderZones );
 		o.setFileName( zone.getTag() );
 		o.load();
 		zone.setLastResetMethod( ZRMethod.valueOf( o.getAsString( "lastResetMethod", "NONE") ) );
@@ -67,7 +66,7 @@ public class Zones {
 	}	
 	public static void saveZoneData( Zone zone ) {
 		
-		DataStore o = new DataStore( Zones.dataFolder );
+		DataStore o = new DataStore( Config.folderZones );
 		o.setFileName( zone.getTag() );
 		o.set("lastResetMethod", zone.getLastResetMethod().toString() );
 		o.set("lastReset", zone.getLastReset() );
@@ -128,11 +127,11 @@ public class Zones {
 
 		
 		String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + m.getId();
-		Bukkit.getLogger().info( i );
+		//Bukkit.getLogger().info( i );
 		
-		for ( String x : interactKeys.keySet() ) {
-			Bukkit.getLogger().info( x );
-		}
+		//for ( String x : interactKeys.keySet() ) {
+			//Bukkit.getLogger().info( x );
+		//}
 		
 		if ( interactKeys.containsKey(i) ) {
 		
@@ -168,6 +167,29 @@ public class Zones {
 			Area a = new Area( worldName, ne, sw );
 			r.setArea( a );
 		}
+		
+		
+		if ( c.isSet( "messages") ) {
+			
+			List<Map<?, ?>> messages = c.getMapList("messages.timed");
+			
+			for ( Map<?, ?> message : messages ) {
+				
+				ZRMessageType scope = ZRMessageType.SERVER;
+				String timeText = null;				
+				if ( message.containsKey( "scope") ) scope = ZRMessageType.valueOf( message.get( "scope").toString().toUpperCase() );
+				if ( message.containsKey("time") ) timeText = (String) message.get("time");
+				
+				
+				Message m = new Message( scope, (String) message.get("message"));
+				m.timeText = timeText;
+				m.zoneTag = tag;
+				r.addTimedMessages( m );
+				
+			}
+			
+		}
+		
 		
 
 		/**
@@ -236,6 +258,23 @@ public class Zones {
 			}
 			
 		}
+		
+		if ( c.isSet("post.spawnSigns") ) {
+			
+			List<Map<?, ?>> signs = c.getMapList("post.spawnSigns");
+			
+			if ( !signs.isEmpty() ) {
+				
+				for ( Map<?, ?> sign : signs ) {
+					SignSpawn s = new SignSpawn();
+					s.setWorldName( worldName );
+					s.setList( (Map<String, Object>) sign );
+					r.addSpawn( ZRSPAWNTYPE.SIGN, s );
+				}
+				
+			}
+			
+		}		
 		
 		
 		if ( c.isSet( "post.spawnItems") ) {

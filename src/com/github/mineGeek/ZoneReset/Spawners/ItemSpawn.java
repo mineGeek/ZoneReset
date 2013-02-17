@@ -1,20 +1,25 @@
 package com.github.mineGeek.ZoneReset.Spawners;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+import org.bukkit.metadata.MetadataValue;
 
 
-public class ItemSpawn extends SpawnBase {
+public class ItemSpawn extends SpawnBase implements ItemInterface {
 	
 	private Material material;
 	private short durability;
-	private Map<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
+	private Map<Integer, Integer> enchantments = new HashMap<Integer, Integer>();
+	private ItemMeta meta;
 	
 	public Material getMaterial() {
 		return this.material;
@@ -32,11 +37,11 @@ public class ItemSpawn extends SpawnBase {
 		this.durability = value;
 	}
 	
-	public Map<Enchantment, Integer> getEnchantments() {
+	public Map<Integer, Integer> getEnchantments() {
 		return this.enchantments;
 	}
 	
-	public void setEnchantments( Map<Enchantment, Integer> enchants ) {
+	public void setEnchantments( Map<Integer, Integer> enchants ) {
 		this.enchantments = enchants;
 	}
 	
@@ -44,7 +49,7 @@ public class ItemSpawn extends SpawnBase {
 		this.enchantments.clear();
 	}
 	
-	public void addEnchantment( Enchantment e, Integer i ) {
+	public void addEnchantment( Integer e, Integer i ) {
 		this.getEnchantments().put(e, i);
 	}
 	
@@ -55,7 +60,16 @@ public class ItemSpawn extends SpawnBase {
 		this.setQty( item.getAmount() );
 		this.setData( item.getData().getData() );
 		this.setDurability( item.getDurability() );
-		this.setEnchantments( item.getEnchantments() );
+		//this.setEnchantments( item.getEnchantments() );
+		if ( !item.getEnchantments().isEmpty() ) {
+			for ( Enchantment e : item.getEnchantments().keySet() ) {
+				this.addEnchantment( e.getId(), item.getEnchantmentLevel( e ) );
+			}
+		}
+				
+		if ( item.hasItemMeta() ) {
+			this.meta = item.getItemMeta();
+		}
 		
 	}
 
@@ -70,13 +84,17 @@ public class ItemSpawn extends SpawnBase {
 		
 		r.put("item", this.getMaterial().getId() );
 		if ( this.getDurability() != 0 ) r.put("durability", this.getDurability() );
-		
+		/*
 		if ( !this.getEnchantments().isEmpty() ) {
-			Map<String, Integer> emap = new HashMap<String, Integer>();
-			for ( Enchantment e : this.getEnchantments().keySet() ) {
-				emap.put( e.toString().toLowerCase(), this.getEnchantments().get(e) );
+			Map<Integer, Integer> emap = new HashMap<Integer, Integer>();
+			for ( Integer e : this.getEnchantments().keySet() ) {
+				emap.put( e, this.getEnchantments().get(e) );
 			}
 			r.put("enchantments", emap );
+		}
+		*/
+		if ( this.meta != null ) {
+			r.put( "meta", this.meta );
 		}
 		
 		return r;
@@ -89,21 +107,25 @@ public class ItemSpawn extends SpawnBase {
 		super.setList( list );
 		this.setType( ZRSPAWNTYPE.ITEM );
 		if ( list.containsKey("item") ) this.setMaterial( Material.getMaterial( ( Integer) list.get("item") ) );
-		if ( list.containsKey("durability") )  this.setDurability( (Short) list.get("durability") );
-		
+		if ( list.containsKey("durability") )  this.setDurability( (Short.parseShort( list.get("durability").toString() ) ) );
+		/*
 		if ( list.containsKey( "enchantments") ) {
 			
 			@SuppressWarnings("unchecked")
-			Map<String, Integer> emap = (Map<String, Integer>) list.get("enchantments");
+			Map<Integer, Integer> emap = (Map<Integer, Integer>) list.get("enchantments");
 			
 			if ( !emap.isEmpty() ) {
 				
-				for ( String x : emap.keySet() ) {
-					this.addEnchantment( Enchantment.getByName( x.toUpperCase() ), emap.get(x) );
+				for ( Integer x : emap.keySet() ) {
+					this.addEnchantment( x, emap.get(x) );
 				}
 				
 			}
 			
+		}
+		*/
+		if ( list.containsKey( "meta" ) ) {
+			this.meta = (ItemMeta) list.get("meta");
 		}
 		
 		
@@ -115,17 +137,21 @@ public class ItemSpawn extends SpawnBase {
 		i.setAmount( this.getQty() );
 		i.setData( new MaterialData( this.getData() ) );
 		i.setDurability( this.getDurability() );
-		
+		/*
 		if ( !this.getEnchantments().isEmpty() ) {
 			
-			for ( Enchantment e : this.getEnchantments().keySet() ) {
-				
-				i.addEnchantment( e, this.getEnchantments().get(e) );
+			for ( Integer e : this.getEnchantments().keySet() ) {
+				try {
+					i.addEnchantment( new EnchantmentWrapper( e ), this.getEnchantments().get(e) );
+				} catch ( Exception ex ) {}
 				
 			}
 			
 		}
-		
+		*/
+		if ( this.meta != null ) {
+			i.setItemMeta( this.meta );
+		}
 		return i;
 		
 	}

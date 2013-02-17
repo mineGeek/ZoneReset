@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public interface SpawnInterface {
 
-	public enum ZRSPAWNTYPE {NONE, ITEM, CONTAINER, MOB, INVENTORY};
+	public enum ZRSPAWNTYPE {NONE, ITEM, CONTAINER, MOB, INVENTORY, SIGN};
 	public Map<String, Object> getList();
 	public void setWorldName( String worldName );
 	public void setList( Map<String, Object> list );

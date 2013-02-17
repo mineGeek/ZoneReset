@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import com.github.mineGeek.ZoneReset.Messaging.Message;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 
@@ -43,9 +44,11 @@ public class Config {
 	public static boolean debug_area_chunkChange = false;
 	
 	public static String folderPlayers;
+	public static String folderZones;
 	public static String folderPlugin;
 	public static String folderSnapshots;
 	
+	public static boolean noNMS = false;
 	
 	/**
 	 * Main load from config
@@ -56,7 +59,7 @@ public class Config {
 		Config.debug_area_chunkEntrance		= c.getBoolean("debug.area.chunkEntrance", false);
 		Config.debug_area_chunkExit			= c.getBoolean("debug.area.chunkExit", false);
 		Config.debug_area_chunkChange		= c.getBoolean("debug.area.chunkChange", false);
-
+		Config.noNMS						= c.getBoolean("no-nms", false);
 		Config.loadZonesFromConfig( c );
 	}	
 	
@@ -192,7 +195,11 @@ public class Config {
 				}
 			}
 					
+			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.SIGN ) ) {
 			
+				c.set( ppath + "spawnSigns" , formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.SIGN) ) );
+				
+			}
 			if ( z.getSpawns().containsKey( ZRSPAWNTYPE.MOB ) ) {
 				
 				c.set( ppath + "spawnMobs", formatSpawnForConfig( z.getSpawns().get( ZRSPAWNTYPE.MOB ) ) );
@@ -200,6 +207,14 @@ public class Config {
 				
 			}
 				
+			
+		}
+		
+		ppath = path + "messages";
+		
+		if ( !z.getTimedMessages().isEmpty() ) {
+			
+			c.set(ppath + "messages.timed", formatMessageForConfig( z.getTimedMessages() ) );
 			
 		}
 		
@@ -239,7 +254,7 @@ public class Config {
 		
 		List< Map<String, Object>> result = new ArrayList< Map<String, Object>>();
 		
-		if ( !spawn.isEmpty() ) {
+		if ( spawn != null && !spawn.isEmpty() ) {
 			
 			for( SpawnInterface s : spawn ) {
 				result.add( s.getList() );
@@ -250,6 +265,22 @@ public class Config {
 		return result;
 		
 	}
+	
+	public static List< Map<String, Object>> formatMessageForConfig( List<Message> message ) {
+		
+		List< Map<String, Object>> result = new ArrayList< Map<String, Object>>();
+		
+		if ( message != null && !message.isEmpty() ) {
+			
+			for( Message m : message ) {
+				result.add( m.getList() );
+			}
+			
+		}
+		
+		return result;
+		
+	}	
 	
 	/**
 	 * Good guy brings closure

@@ -18,16 +18,26 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.mineGeek.ZoneReset.Data.Area;
+import com.github.mineGeek.ZoneReset.Data.ItemSerializable;
+import com.github.mineGeek.ZoneReset.Data.MobSerializable;
 import com.github.mineGeek.ZoneReset.Data.ZRBlock;
 import com.github.mineGeek.ZoneReset.Data.ZRBlocks;
+import com.github.mineGeek.ZoneReset.Data.ZRItem;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface;
 import com.github.mineGeek.ZoneReset.Spawners.SpawnInterface.ZRSPAWNTYPE;
 import com.github.mineGeek.ZoneReset.nms.NMSAbstraction;
 import com.github.mineGeek.ZoneReset.nms.NMSHelper;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
+
 
 public class Zone {
 
@@ -145,6 +155,10 @@ public class Zone {
 	private int onInteractLocationY;
 	private int onInteractLocationZ;
 	
+	
+	private String messageOnRestart = null;
+	private List< Message > timedMessages = new ArrayList< Message >(); 
+	
 	/**
 	 * Plain old constructor
 	 */
@@ -207,6 +221,9 @@ public class Zone {
 		
 		this.trigTimer 				= clone.trigTimer;
 		this.trigTimerText 			= clone.trigTimerText;
+		
+		this.messageOnRestart		= clone.messageOnRestart;
+		this.timedMessages			= clone.timedMessages;
 		
 		
 	}
@@ -605,6 +622,31 @@ public class Zone {
 		
 	}
 
+	public void setMessageOnRestart( String value ) {
+		this.messageOnRestart = value;
+	}
+	
+	public String getMessageOnResetart() {
+		return this.messageOnRestart;
+	}
+	
+	public List<Message> getTimedMessages() {
+		return this.timedMessages;
+	}
+	
+	public void setTimedMessages( List<Message> list ) {
+		this.timedMessages = list;
+	}
+	
+	public void clearTimedMessages() {
+		this.timedMessages.clear();
+	}
+	
+	public void addTimedMessages( Message m ) {
+		this.timedMessages.add( m );
+	}
+	
+	
 
 	
 	public boolean reset( ZRMethod method ) {
@@ -632,7 +674,6 @@ public class Zone {
 		}
 		
 		
-		
 		if ( requireNoPlayers && Utilities.zoneHasPlayers( this )  ) {
 
 			return false;
@@ -644,13 +685,20 @@ public class Zone {
 		if ( this.getArea().ne() != null && this.getArea().sw() != null ) {
 			this.loadBlocks();
 		}
-		
+		/*
 		this.setLastReset( System.currentTimeMillis() );
 		this.setLastResetMethod(method);
 		Bukkit.getLogger().info( this.getTag() + " reset");
 		Utilities.spawnEntities( this.getSpawns() );
 		
+		if ( !method.equals( ZRMethod.TIMED ) ) {
+			//reset timer
+			Utilities.queue( this );
+		}
 		
+		//Messages.reset( this.getTag() );
+		
+		*/
 		return true;
 		
 	}
@@ -707,23 +755,89 @@ public class Zone {
 	
 	public void restoreBlocks( ZRBlocks z ) {
 		
+		List<ZRBlock> deferred = new ArrayList<ZRBlock>();
+		List<MobSerializable> mobs = z.getMobs();
 		try {
 			NMSAbstraction nms = NMSHelper.init( Bukkit.getPluginManager().getPlugin("ZoneReset") );
 			
-			if ( nms == null ) {
-				//bah./ use bukkit
-			} else {
+			List<ZRBlock> b = z.getBlocks();
+			
+			World w = Bukkit.getWorld( this.worldName );			
+			
+			if ( nms == null || Config.noNMS ) {
 				
-				List<ZRBlock> b = z.getBlocks();
-				World w = Bukkit.getWorld( this.worldName );
-				MassBlockUpdate mbu = CraftMassBlockUpdate.createMassBlockUpdater( w );
 				if ( !b.isEmpty() ) {
 					
 					for ( ZRBlock zb : b ) {
-						mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);
-						if ( zb.materialId == Material.CHEST.getId() ) {
-							w.getBlockAt( zb.x, zb.y, zb.z).getState().update( true );
-						}
+						
+						Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+						block.setType( Material.getMaterial( zb.materialId ) );
+						block.setData( zb.data );
+						block.getState().update( true );
+					}
+					
+				}
+				
+				
+			} else {
+				
+
+				MassBlockUpdate mbu = CraftMassBlockUpdate.createMassBlockUpdater( w );
+				
+				
+				if ( !b.isEmpty() ) {
+					boolean r = false;
+					for ( ZRBlock zb : b ) {
+						
+						//if ( zb.deferred ) {
+						//	deferred.add( zb );
+						//} else {
+							r = mbu.setBlock(zb.x, zb.y, zb.z, zb.materialId, zb.data);
+						//}
+						
+
+						
+							//String str = "setting " + Material.getMaterial( zb.materialId).toString() + " = " + ( r ? " true " : "false");
+							//Bukkit.getLogger().info( str );
+							
+							if ( zb.hasInventory ) {
+								Block block  = w.getBlockAt( zb.x, zb.y, zb.z);
+								InventoryHolder ih = (InventoryHolder)block.getState();
+								ih.getInventory().clear();
+								
+								for ( ItemSerializable i : zb.items ) {
+									ih.getInventory().addItem( i.getItemStack() );
+								}
+							}
+							
+							//if ( zb.materialId == Material.WALL_SIGN.getId() ) {
+							//	
+							//	Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+							//	org.bukkit.material.Sign signData = (org.bukkit.material.Sign) block.getState().getData();
+							//	BlockFace face = signData.getFacing();
+							//	boolean brr = false;
+							//}							
+							
+						
+							
+							
+							if ( zb.lines != null ) {
+								
+								Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+								if ( block.getState() instanceof Sign ) {
+									
+									Sign s = (Sign)block.getState();
+									
+									for ( int y=0; y < zb.lines.size(); y++) {
+										s.setLine(y, zb.lines.get(y) );
+									}
+									
+									s.update( true );
+								}
+								
+							}
+						
+						
 					}
 					
 					mbu.notifyClients();
@@ -749,13 +863,41 @@ public class Zone {
 		}
 		
 
+		if ( !deferred.isEmpty() ) {
+			
+			World w = Bukkit.getWorld( this.worldName );
+			
+			for ( ZRBlock zb : deferred ) {
+				
+				String str = "setting " + Material.getMaterial( zb.materialId).toString() + " " + zb.x + ", " + zb.y + " " + zb.z;
+				Bukkit.getLogger().info( str );				
+				
+				Block block = w.getBlockAt( zb.x, zb.y, zb.z );
+				block.setType( Material.getMaterial( zb.materialId ) );
+				block.setData( zb.data );
+				block.getState().update( true );				
+				
+			}
+			
+		}
+		
+		if ( !mobs.isEmpty() ) {
+			
+			for ( MobSerializable mob : mobs ) {
+				
+				mob.spawnEntity();
+				
+			}
+			
+		}
+		
 		
 	}
 	
 	public boolean loadBlocks() {
 				
 		try {
-			FileInputStream fileIn = new FileInputStream( Config.folderSnapshots + File.separator + this.getTag() + ".ser" );
+			FileInputStream fileIn = new FileInputStream( Config.folderSnapshots + File.separator + this.tag + ".ser" );
 			ObjectInputStream in = new ObjectInputStream( fileIn );
 			ZRBlocks z = ( ZRBlocks ) in.readObject();
 			in.close();
@@ -780,6 +922,10 @@ public class Zone {
         FileOutputStream fileOut;
         ZRBlocks z = this.area.getBlocks();
         
+        if ( z.getBlocks().size() == 0 ) {
+        	z = null;
+        }
+        
 		try {
 
 			fileOut = new FileOutputStream( Config.folderSnapshots + File.separator + this.tag + ".ser");
@@ -801,6 +947,7 @@ public class Zone {
 		this.preNoMobsExceptionList.clear();
 		this.trigOnPlayerJoinList.clear();
 		this.trigOnPlayerQuitList.clear();
+		this.clearTimedMessages();
 		this.onInteractLocation = null;
 		this.spawns = null;
 	}	

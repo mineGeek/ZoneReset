@@ -8,9 +8,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.github.mineGeek.ZoneReset.Player.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
@@ -31,6 +35,7 @@ public class Listeners implements Listener {
 
 		Utilities.clearPlayerMetaData( evt.getPlayer() );
 		Zones.triggerPlayerJoin( evt.getPlayer() );
+		Utilities.checkPlayerChunk( evt.getPlayer() );
 	}
 	
 	
@@ -41,10 +46,39 @@ public class Listeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLeave(PlayerQuitEvent evt )
     {
+    	
+    	Utilities.removePlayerFromChunks( evt.getPlayer() );
     	Utilities.clearPlayerMetaData( evt.getPlayer() );
     	Zones.triggerPlayerQuit( evt.getPlayer() );
     	
     }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void PlayerMove( PlayerMoveEvent evt ) {
+    	
+    	
+    	if ( evt.getFrom().getBlock().equals( evt.getTo().getBlock() ) ) return;
+    	Utilities.checkPlayerChunk( evt.getPlayer() );
+    }
+    
+    @EventHandler( priority = EventPriority.LOWEST )
+    public void PlayerPort( PlayerTeleportEvent evt ) {
+    	Utilities.checkPlayerChunk( evt.getPlayer(), evt.getTo() );
+    }
+    
+    /**
+     * When the player changes worlds, we reload their rules
+     * @param evt
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent evt) {
+    	Utilities.checkPlayerChunk( evt.getPlayer() );
+    }
+    
+	@EventHandler(priority = EventPriority.LOWEST )
+    public void onRespawn(PlayerRespawnEvent evt) {
+		Utilities.checkPlayerChunk( evt.getPlayer() );
+	}
     
 	/**
 	 * When a player interacts with a block/entity
@@ -112,7 +146,9 @@ public class Listeners implements Listener {
 						evt.getPlayer().sendMessage("You set " + m );
 					}
 					
-				}			
+				}
+				
+				evt.setCancelled( true );
 				
 				/**
 				 * Set task to reposition any markers

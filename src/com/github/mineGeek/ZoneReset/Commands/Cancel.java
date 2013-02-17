@@ -33,7 +33,10 @@ public class Cancel extends CommandBase {
 		
 		String t = z.getTag();
 		this.cancelEdit( p );
-		Zones.getZone( t ).setEnabled( true );
+		
+		if ( Zones.getZone( t ) != null ) {
+			Zones.getZone( t ).setEnabled( true );
+		}
 		mess = "you are no longer editing '" + t + "'";
 		
 		return true;

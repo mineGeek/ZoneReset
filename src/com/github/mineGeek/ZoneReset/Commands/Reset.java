@@ -3,7 +3,6 @@ package com.github.mineGeek.ZoneReset.Commands;
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
-import com.github.mineGeek.ZoneReset.Data.Zone.ZRMethod;
 
 
 
@@ -37,7 +36,7 @@ public class Reset extends CommandBase {
 				
 			} else {
 				
-				z.reset( ZRMethod.MANUAL );
+				z.reset();
 				return true;
 				
 			}

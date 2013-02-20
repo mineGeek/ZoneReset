@@ -2,16 +2,28 @@ package com.github.mineGeek.ZoneReset.Utilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
+import com.github.mineGeek.ZoneReset.Tasks.ITask;
+import com.github.mineGeek.ZoneReset.Tasks.MessageTask;
+import com.github.mineGeek.ZoneRest.Actions.ActionEmptyPlayerInventory;
+import com.github.mineGeek.ZoneRest.Actions.ActionFillPlayerInventory;
+import com.github.mineGeek.ZoneRest.Actions.ActionMovePlayers;
+import com.github.mineGeek.ZoneRest.Actions.ActionRemoveEntities;
+import com.github.mineGeek.ZoneRest.Actions.ActionSetSpawnPoints;
+import com.github.mineGeek.ZoneRest.Actions.IAction;
+import com.github.mineGeek.ZoneRest.Actions.ResetAction;
 
 
 
@@ -50,6 +62,8 @@ public class Config {
 	public static String folderSnapshots;
 	
 	public static boolean noNMS = false;
+	
+	public static boolean trackMovement = false;
 	
 	/**
 	 * Main load from config
@@ -143,58 +157,103 @@ public class Config {
 		/**
 		 * Any Requirements for reset?
 		 */
-		c.set( path + "requirements.noPlayers", z.isRequireNoPlayers() );
+		//TODO: Reimpliment c.set( path + "requirements.noPlayers", z.isRequireNoPlayers() );
 		
 		
-		/**
-		 * Pre-Reset processing.
-		 */
-		String ppath = path + "pre.";
-		c.set(ppath + "removeEntities", z.isPreNoMobs() );
-		c.set(ppath + "keepEntities", z.getPreNoMobsExceptionList() );
+		List<IAction> pre = z.preActions.actions;
+		List<IAction> post = z.postActions.actions;
 		
-		c.set( ppath + "removeSpawnPoints", z.isPreNoSpawns() );
-		
-		if ( z.getPreSpawnLocation() != null ) {
-			c.set( ppath + "setSpawn.world", z.getPreSpawnLocation().getWorld().getName() );
-			c.set( ppath + "setSpawn.location", new ArrayList<Integer>(Arrays.asList( z.getPreSpawnLocation().getBlockX(), z.getPreSpawnLocation().getBlockY(), z.getPreSpawnLocation().getBlockZ() ) ) );
+		for ( IAction a : pre ) {			
+			saveActionToConfig( "zones." + z.getTag() + ".pre.", a );			
 		}
 		
-		if ( z.getPreNewLocation() != null ) {
-			c.set( ppath + "movePlayers.world", z.getPreNewLocation().getWorld().getName() );
-			c.set( ppath + "movePlayers.location", new ArrayList<Integer>(Arrays.asList( z.getPreNewLocation().getBlockX(), z.getPreNewLocation().getBlockY(), z.getPreNewLocation().getBlockZ() ) ) );		
+		for ( IAction a : z.resetActions.actions ) {
+			saveActionToConfig( "zones." + z.getTag() + ".reset.", a ); 
 		}
 		
+		for ( IAction a : post ) {
+			saveActionToConfig( "zones." + z.getTag() + ".post.", a );
+		}
 		
-		ppath = path + "messages";
-		
-		if ( !z.getTimedMessages().isEmpty() ) {
+		if ( z.triggers.onJoin != null ) {
 			
-			c.set(ppath + "messages.timed", formatMessageForConfig( z.getTimedMessages() ) );
+			String value = "timer";
+			if ( z.triggers.onJoin.resetSeconds == 0 ) {
+				value = "zones";
+			} else if ( z.triggers.onJoin.resetSeconds > 0 ) {
+				value = Utilities.getTimeStampAsString( z.triggers.onJoin.resetSeconds );
+			}
+			c.set( path + "trigger.onjoin.reset", value );
 			
 		}
 		
-		ppath = path + "spawn.";
-		if ( !z.getSpawnBlocks() ) c.set("blocks", z.getSpawnBlocks() );
-		if ( !z.getSpawnBlocks() ) c.set("mobs", z.getSpawnMobs() );
+		if ( z.triggers.onQuit != null ) {
+			
+			String value = "timer";
+			if ( z.triggers.onQuit.resetSeconds == 0 ) {
+				value = "zones";
+			} else if ( z.triggers.onQuit.resetSeconds > 0 ) {
+				value = Utilities.getTimeStampAsString( z.triggers.onQuit.resetSeconds );
+			}
+			c.set( path + "trigger.onquit.reset", value );
+			
+		}		
 		
-		
-		/**
-		 * Triggers that may cause resetting
-		 */
-		ppath = path + "trigger.";
-		
-		if ( z.isTrigOnPlayerJoin() ) c.set(ppath + "onPlayerJoin", z.isTrigOnPlayerJoin() );
-		if ( z.getTrigOnPlayerJoinList().size() > 0 ) c.set(ppath + "whenPlayersJoin", z.getTrigOnPlayerJoinList() ); 
-		if ( z.isTrigOnPlayerQuit() ) c.set(ppath + "onPlayerQuit", z.isTrigOnPlayerQuit() );
-		if ( z.getTrigOnPlayerQuitList().size() > 0 ) c.set(ppath + "whenPlayersQuit", z.getTrigOnPlayerQuitList() );
-		if ( z.getTrigTimer() > 0 ) c.set( ppath + "onTimer", z.getTrigTimerText() );
-		if ( z.getOnInteractLocation() != null ) {
-			c.set(ppath + "onInteract.item", z.getOnInteractMaterialId() );
-			c.set( ppath + "onInteract.world", z.getOnInteractLocation().getWorld().getName() );
-			c.set( ppath + "onInteract.location", new ArrayList<Integer>(Arrays.asList( z.getOnInteractLocation().getBlockX(), z.getOnInteractLocation().getBlockY(), z.getOnInteractLocation().getBlockZ() ) ) );
+		if ( z.triggers.onInteract != null ) {
+			
+			Location l = z.triggers.onInteract.location;
+			List<Integer> xyz = new ArrayList<Integer>();
+			xyz.add( l.getBlockX() ); xyz.add( l.getBlockY() ); xyz.add( l.getBlockZ() );
+			c.set( path + "trigger.oninteract.xyz", xyz );
+			c.set( path + "trigger.oninteract.world", l.getWorld().getName() );
+			c.set( path + "trigger.oninteract.item", z.triggers.onInteract.materialId );
+			
 		}
 		
+		if ( z.triggers.onEnter != null ) {
+			
+			String value = "timer";
+			if ( z.triggers.onEnter.resetSeconds == 0 ) {
+				value = "zones";
+			} else if ( z.triggers.onEnter.resetSeconds > 0 ) {
+				value = Utilities.getTimeStampAsString( z.triggers.onEnter.resetSeconds );
+			}
+			c.set( path + "trigger.onenter.reset", value );
+			
+		}
+		
+		if ( z.triggers.onExit != null ) {
+			
+			String value = "timer";
+			if ( z.triggers.onExit.resetSeconds == 0 ) {
+				value = "zones";
+			} else if ( z.triggers.onExit.resetSeconds > 0 ) {
+				value = Utilities.getTimeStampAsString( z.triggers.onExit.resetSeconds );
+			}
+			c.set( path + "trigger.onexit.reset", value );
+			
+		}
+		
+		if ( z.triggers.onTimed != null ) {
+			
+			String value = "timer";
+			if ( z.triggers.onTimed.resetSeconds == 0 ) {
+				value = "zones";
+			} else if ( z.triggers.onTimed.resetSeconds > 0 ) {
+				value = Utilities.getTimeStampAsString( z.triggers.onTimed.resetSeconds );
+			}
+			c.set( path + "trigger.ontime.reset", value );
+			
+		}		
+		
+		if ( z.resetMessage != null ) {
+			
+			c.set( path + "messages.onreset.scope", z.resetMessage.scope.toString().toLowerCase() );
+			c.set( path + "messages.onreset.message", z.resetMessage.text );
+						
+		}
+		
+		saveMessagesToConfig( path + "messages.timed", z.tasks.tasks );		
 		
 		/**
 		 * Save it.
@@ -205,6 +264,110 @@ public class Config {
 		
 	}
 
+	public static void saveMessagesToConfig( String path, List<ITask> tasks ) {
+		
+		List<Map<String, Object>> timer = new ArrayList<Map<String, Object>>();
+		
+		for ( ITask i : tasks ) {
+			if ( i instanceof MessageTask ) {
+				MessageTask m = (MessageTask)i;
+				Map<String, Object> o = new HashMap<String, Object>();
+				o.put( "scope",  m.scope.toString().toLowerCase() );
+				if ( m.secStart != null ) o.put( "start", Utilities.getTimeStampAsString( m.secStart ) );
+				if ( m.secInterval != null ) o.put( "interval", Utilities.getTimeStampAsString( m.secInterval ) );
+				if ( m.secEnd != null ) o.put( "end", Utilities.getTimeStampAsString( m.secEnd ) );
+				o.put( "message", m.rawMessage );
+				timer.add( o );
+			}
+		}
+		
+		c.set( path, timer );
+		
+		
+	}
+	
+	public static void saveActionToConfig( String path, IAction act ) {
+		
+		if ( act instanceof ActionRemoveEntities ) {
+			
+			ActionRemoveEntities a = (ActionRemoveEntities) act;
+			c.set(path + "remove.scope", a.scope.toString().toLowerCase() );
+			c.set(path + "remove.animals", a.removeAnimals);
+			c.set(path + "remove.drops", a.removeDrops );
+			c.set(path + "remove.mobs", a.removeMobs );
+			c.set(path + "remove.containers", a.removeTiles );
+						
+		} else if ( act instanceof ActionSetSpawnPoints ) {
+						
+			ActionSetSpawnPoints a = (ActionSetSpawnPoints) act;
+			
+			if ( a.location == null ) {
+				c.set( path + "remove.spawnpoints.scope", a.scope.toString().toLowerCase() );
+				
+			} else  {
+				c.set( path + "setspawn.scope", a.scope.toString().toLowerCase() );
+				List<Integer> xyz = new ArrayList<Integer>();
+				xyz.add( a.location.getBlockX() ); xyz.add( a.location.getBlockY() ); xyz.add( a.location.getBlockZ() );
+				c.set( path + "setspawn.xyz", xyz );
+				c.set( path + "setspawn.world", a.location.getWorld().getName() );	
+			}
+			
+		} else if ( act instanceof ActionMovePlayers ) {
+			
+			ActionMovePlayers a = (ActionMovePlayers) act;
+			c.set( path + "moveplayers.scope", a.scope.toString().toLowerCase() );			
+			List<Integer> xyz = new ArrayList<Integer>();
+			xyz.add( a.toX ); xyz.add( a.toY ); xyz.add( a.toZ );
+			c.set( path + "moveplayers.xyz", xyz );
+			c.set( path + "moveplayers.world", a.worldName );
+			
+		} else if ( act instanceof ResetAction ) {
+			
+			ResetAction a = ( ResetAction ) act;
+			c.set( path + "blocks" , a.resetBlocks );
+			c.set( path + "containers", a.resetContainers );
+			c.set( path + "mobs", a.resetMobs );
+			
+			
+		} else if ( act instanceof ActionEmptyPlayerInventory ) {
+			
+			ActionEmptyPlayerInventory a = ( ActionEmptyPlayerInventory ) act;
+			c.set( path + "removeinventory.scope", a.scope.toString().toLowerCase() );
+			c.set( path + "removeinventory.whitelist", a.isWhitelist );
+			
+			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+			for ( ItemStack i : a.exceptions ) {
+				Map<String, Object> add = new HashMap<String, Object>();
+				add.put("item", i.getTypeId() );
+				add.put("amount", i.getAmount() );
+				add.put("damage", i.getAmount() );
+				add.put("meta", i.getItemMeta().serialize() );
+				items.add( add );
+			}
+			
+			c.set( path + "removeinventory.exceptions", items );
+			
+		} else if ( act instanceof ActionFillPlayerInventory ) {
+			
+			ActionFillPlayerInventory a = ( ActionFillPlayerInventory ) act;
+			c.set( path + "addinventory.scope", a.scope.toString().toLowerCase() );
+			
+			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+			for ( ItemStack i : a.items ) {
+				Map<String, Object> add = new HashMap<String, Object>();
+				add.put("item", i.getTypeId() );
+				add.put("amount", i.getAmount() );
+				add.put("damage", i.getAmount() );
+				add.put("meta", i.getItemMeta().serialize() );
+				items.add( add );
+			}
+			
+			c.set( path + "addinventory.items", items );
+			
+		}
+		
+		
+	}
 	
 	public static List< Map<String, Object>> formatMessageForConfig( List<Message> message ) {
 		

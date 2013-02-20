@@ -56,14 +56,13 @@ abstract class CommandBase  implements CommandExecutor {
 		}
 		
 		Config.saveZoneConfig(z);
-		z.saveBlocks();
+		Zones.saveZone( z );
+		
 		Zones.addZone( z.getTag(), Config.c.getConfigurationSection("zones." + z.getTag() ) );
 		Zones.loadInteractKeys();
 		Markers.hideZoneBoundaries( p );
 		Utilities.clearPlayerMetaData( p );
-
-		Utilities.queueResets(z);
-		Utilities.queueMessages(z);
+		Zones.getZone( z.getTag() ).start();
 		this.mess = z.getTag() + " has been saved.";		
 		
 		
@@ -72,6 +71,7 @@ abstract class CommandBase  implements CommandExecutor {
 	protected void cancelEdit( Player p ) {
 		Utilities.clearPlayerMetaData(p);
 	}
+	
 	
 	protected void copyZone( Player p, String newTag ) {
 		Zone z = this.getEditZone( p );

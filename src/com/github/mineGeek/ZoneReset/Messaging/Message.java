@@ -8,31 +8,34 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 
 public class Message implements Runnable {
 	
-	public enum ZRMessageType {LIST, REGION, WORLD, SERVER};
-	
 	public String 	zoneTag;
 	public String 	timeText;
 	public Long 	showTime;
+	public Long 	start;
+	public Long		end;
+	public Long		endStamp;
+	public Long		interval;
 	public int 		task;
 	public String 	text;
-	public ZRMessageType type;
+	public ZRScope	scope;
 	public List<String> players = new ArrayList<String>();
 
 	
-	public Message( ZRMessageType type, String text ) {
+	public Message( ZRScope type, String text ) {
 		this.text = text;
-		this.type = type;
+		this.scope = type;
 	}
 	
 	public void send() {
 		
-		Bukkit.getServer().broadcastMessage( this.text );
+		Bukkit.getServer().broadcastMessage( this.getMessage( this.text ) );
 			
 		
 	}
@@ -42,7 +45,7 @@ public class Message implements Runnable {
 		if ( !players.isEmpty() ) {
 			for( String x : players ) {
 				if ( Bukkit.getPlayer( x ).isOnline() ) {
-					Bukkit.getPlayer( x ).sendMessage( this.text );
+					Bukkit.getPlayer( x ).sendMessage( this.getMessage( this.text ) );
 				}
 			}
 		}
@@ -51,7 +54,11 @@ public class Message implements Runnable {
 	
 	public void send( Zone zone ) {
 		
-		this.send( Utilities.getPlayersNearZone( zone ) );
+		List<String> names = Utilities.getPlayersNearZone( zone );
+		
+		if ( names != null && !names.isEmpty() ) {
+			this.send( names );
+		}
 		
 	}
 	
@@ -59,12 +66,24 @@ public class Message implements Runnable {
 		
 		for ( Player p : Bukkit.getWorld( worldName ).getPlayers() ) {
 			
-			p.sendMessage( this.text );
+			p.sendMessage( this.getMessage( this.text ) );
 			
 		}
 		
 	}
 
+	public String getMessage( String value ) {
+		
+		if ( endStamp != null && endStamp != 0 ) {
+			Long diff = ( endStamp - (System.currentTimeMillis()/1000));
+			Object[] args = {Utilities.getTimeStampAsString( diff )};
+			return String.format( value, args );
+		}
+		
+		return text;
+		
+	}
+	
 	public Long getTime() {
 		if ( this.timeText != null ) return Utilities.getSecondsFromText( this.timeText );
 		return null;
@@ -73,18 +92,18 @@ public class Message implements Runnable {
 	@Override
 	public void run() {
 
-		if ( this.type.equals( ZRMessageType.LIST ) ) {
+		if ( this.scope.equals( ZRScope.LIST ) ) {
 			this.send( this.players );
-		} else if ( this.type.equals( ZRMessageType.REGION ) ) {
+		} else if ( this.scope.equals( ZRScope.REGION ) ) {
 			
 			Zone z = Zones.getZone( this.zoneTag );
 			if ( z.getArea().ne() != null && z.getArea().sw() != null ) {
 				this.send( z );
 			}
 			
-		} else if ( this.type.equals( ZRMessageType.SERVER ) ) {
+		} else if ( this.scope.equals( ZRScope.SERVER ) ) {
 			this.send();
-		} else if ( this.type.equals( ZRMessageType.WORLD ) ) {
+		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
 			this.send( Zones.getZone( this.zoneTag ).getWorldName() );
 		}
 		
@@ -94,14 +113,13 @@ public class Message implements Runnable {
 	public Map<String, Object> getList() {
 		
 		Map<String, Object> r = new HashMap<String, Object>();
-		r.put("scope", this.type.toString().toLowerCase() );
+		r.put("scope", this.scope.toString().toLowerCase() );
 		if ( this.timeText != null ) r.put("time", this.timeText );
 		if ( this.text != null ) r.put("text", this.text ) ;
 		
 		return r;
 		
 	}	
-	
 	
 	
 	

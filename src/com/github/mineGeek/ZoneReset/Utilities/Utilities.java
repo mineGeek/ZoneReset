@@ -11,24 +11,16 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Server;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.DoubleChest;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Area;
+import com.github.mineGeek.ZoneReset.Data.MovementMonitor;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
-import com.github.mineGeek.ZoneReset.Data.Zone.ZRMethod;
-import com.github.mineGeek.ZoneReset.Messaging.Message;
 
 
 
@@ -117,16 +109,15 @@ public class Utilities {
 		
 	}
 	
-	public static List<String> getPlayersNearZone( Zone zone ) {
+	public static List<String> getPlayersNearZone( Location ne, Location sw ) {
 		
 		List<String> list = new ArrayList<String>();
-		
-		Area a = zone.getArea();
-		if ( a == null || a.ne() == null || a.sw() == null ) {
+
+		if ( ne == null || sw == null ) {
 			return list;
 		}
 		
-		List<String> chunks = getChunkSigsFromArea( a );
+		List<String> chunks = getChunkSigsFromArea( ne, sw );
 		
 		if ( !chunks.isEmpty() && !playersByChunkSig.isEmpty() ) {
 			
@@ -141,13 +132,25 @@ public class Utilities {
 			
 		}
 		
-		return list;
+		return list;		
 		
 	}
 	
+	public static List<String> getPlayersNearZone( Area area ) {
+		return getPlayersNearZone( area.ne(), area.sw() );
+	}
+	
+	public static List<String> getPlayersNearZone( Zone zone ) {
+		return getPlayersNearZone( zone.getArea() );
+	}
+	
 	public static List<String> getChunkSigsFromArea( Area a ) {
+		return getChunkSigsFromArea( a.ne(), a.sw() );
+	}
+	
+	public static List<String> getChunkSigsFromArea( Location ne, Location sw ) {
 		
-		List<Chunk> chunks = getChunksFromArea( a );
+		List<Chunk> chunks = getChunksFromArea( ne, sw );
 		List<String> list = new ArrayList<String>();
 		
 		if ( !chunks.isEmpty() ) {
@@ -161,11 +164,12 @@ public class Utilities {
 	}
 	
 	public static List<Chunk> getChunksFromArea( Area a ) {
+		return getChunksFromArea( a.ne(), a.sw() );
+	}
+	
+	public static List<Chunk> getChunksFromArea( Location ne, Location sw ) {
 		
 		List<Chunk> list = new ArrayList<Chunk>();
-		
-		Location ne = a.ne();
-		Location sw = a.sw();
 		
 		int fromX = ( (int)ne.getX()/16) -1 ;
 		int toX = ( (int)sw.getX()/16) + 1;
@@ -186,135 +190,11 @@ public class Utilities {
 	}
 	
 	
-	public static void queue() {
+	public static void startAllZones() {
 		
-		plugin.clearAllMessages();
-		plugin.clearAllResets();
-		
-		for ( Zone z : Zones.getZones().values() ) {
-			queueResets( z );
-			queueMessages( z );
-		}
-		
+		for ( Zone z : Zones.getZones().values() ) 	z.start();		
 	}
 	
-	public static void queue( Zone z ) {
-		
-		plugin.clearMessages( z.getTag() );
-		plugin.clearResets( z.getTag() );
-		queueResets( z );
-		queueMessages( z );
-		
-	}
-	
-	public static void queueMessages() {
-		
-		plugin.clearAllMessages();
-		
-		for ( Zone z : Zones.getZones().values() ) {
-			queueMessages( z );
-		}
-		
-	}
-	
-	public static void queueMessages( Zone z ) {
-		
-		List<Message> messages = z.getTimedMessages();
-		
-		if ( !messages.isEmpty() ) {
-			
-			for ( Message m : messages ) {
-				
-				Long next = z.getNextTimedReset();
-				
-				if ( next != null && next != 0 ) {
-					
-					if ( next < System.currentTimeMillis() ) {
-						//overdue. Run now.
-						next = 0L;
-					} else {
-						next = next - System.currentTimeMillis();
-					}
-					
-				}				
-				
-				Long interval = z.getTrigTimer();
-				Long time = m.getTime();
-				
-				
-				if ( time != null ) {
-					
-					if ( time < 0 ) {
-						next = interval + time;
-					} else {
-						next = next + time;
-					}
-					
-	    			BukkitTask task = plugin.getServer().getScheduler().runTaskTimer( plugin, m , next * 20 , interval * 20 );
-	    			
-	    			if ( plugin.messages.containsKey( z.getTag() ) ) {
-	    				plugin.messages.get( z.getTag() ).add( task );
-	    			} else {	    			
-	    				plugin.messages.put( z.getTag(), new ArrayList<BukkitTask>( Arrays.asList( task ) ) );
-	    			}
-					
-				}
-				
-			}
-			
-		}		
-		
-	}
-	
-	public static void queueResets() {
-		
-		plugin.clearAllResets();
-		for ( Zone z : Zones.getZones().values() ) {
-			queueResets( z );
-		}
-		
-	}
-	
-	public static void queueResets( Zone z ) {
-		
-		if ( z.getTrigTimer() > 0 ) {
-			
-			Long next = z.getNextTimedReset();
-			
-			if ( next != null && next != 0 ) {
-				
-				if ( next < System.currentTimeMillis() ) {
-					//overdue. Run now.
-					next = 0L;
-				} else {
-					next = next - System.currentTimeMillis();
-				}
-				
-			}
-			
-			final Long nextRun = next * 20 + 1;
-			final Long repeatRun = z.getTrigTimer() * 20;
-			final String tag = z.getTag();
-			
-			BukkitTask task = plugin.getServer().getScheduler().runTaskTimer( plugin, new Runnable() {
-	    	    @Override  
-	    	    public void run() {
-	    	    	try {
-	    	    		Zones.getZone(tag).reset( ZRMethod.TIMED );
-	    	    		Zones.getZone(tag).setNextTimedRest( Zones.getZone(tag).getTrigTimer() + System.currentTimeMillis() );
-	    	    	} catch (Exception e ) {}
-	    	    }
-	    	}, nextRun , repeatRun );
-			
-			if ( plugin.tasks.containsKey( z.getTag() ) ) {
-				plugin.tasks.get( z.getTag() ).add( task );
-			} else {	    			
-				plugin.tasks.put( z.getTag(), new ArrayList<BukkitTask>( Arrays.asList( task ) ) );
-			}
-			
-		}		
-		
-	}
 	
 	public static boolean zoneHasPlayers( Zone zone ) {
 		return zoneHasPlayers( zone.getArea() );
@@ -367,71 +247,53 @@ public class Utilities {
 		
 		return null;
 		
+	}
+	
+	public static String getTimeStampAsString( Long timeStamp ) {
+		
+		return getTimeStampAsString( (int) (timeStamp/1000) );
+		
+	}	
+	
+	public static String getTimeStampAsString( int timeStamp ) {
+		
+		int sec = 	(timeStamp % 60 );
+		int min = 	(timeStamp * 60) % 60;
+		int hours = (timeStamp *60*60) % 24;
+		int days = 	(timeStamp *60*60*24) % 7;
+		int weeks = (timeStamp *60*60*24*7); 
+  
+		String result = null;
+		if ( weeks > 0 ) 	result = weeks + " week" + ( weeks == 1 ? "" : "s");
+		if ( days > 0) 		result = ( result.length() > 0 ? ", " : "" ) + days + " day"  	+ ( days == 1 ? "" : "s");
+		if ( hours > 0) 	result = ( result.length() > 0 ? ", " : "" ) + hours + " hour"  + ( hours == 1 ? "" : "s");
+		if ( min > 0) 		result = ( result.length() > 0 ? ", " : "" ) + min + " minute" 	+ ( min == 1 ? "" : "s");
+		if ( sec > 0) 		result = ( result.length() > 0 ? ", " : "" ) + sec + " second" 	+ ( sec == 1 ? "" : "s");
+		
+		return result;
+		
 	}	
 	
 	public static void clearPlayerMetaData( Player p ) {
 		
-		Plugin plug = Bukkit.getPluginManager().getPlugin("ZoneReset");
+		Plugin plug = plugin;
 		String[] keys = {"zra", "zrinteract" };
 		
 		for ( String x : keys ) {
 			p.removeMetadata( x , plug );
 		}
 		
+		try {
+			((MovementMonitor)p.getMetadata("ZRMM").get(0).value()).close();
+			p.removeMetadata("ZRMM", plug );
+		} catch (Exception e ) {}
 		
-		
-	}
-	
-	public static void resetZoneSpawnPoints( Zone zone ) {
-		resetZoneSpawnPoints( zone.getArea(), zone.getPreSpawnLocation() );
-	}
-	
-	public static void resetZoneSpawnPoints( Area area, Location location ) {
-		
-		Server server = Bukkit.getServer();		
-		Player[] ps = server.getOnlinePlayers();
-		
-		if ( ps.length == 0 ) return;
-		
-		for ( Player p : ps ) {
-			
-			if ( area.intersectsWith( p.getBedSpawnLocation() ) )  {
-				p.setBedSpawnLocation( location, true );
-			}
-			
-		}		
 		
 		
 	}
 	
-	public static void movePlayersInZone( Zone zone ) {
-		movePlayersInZoneTo( zone.getArea(), zone.getPreNewLocation() );
-	}
 	
-	public static void movePlayersInZoneTo( Area area, Location destination ) {
-		
-		Server server = Bukkit.getServer();
-		
-		Player[] ps = server.getOnlinePlayers();
-		
-		if ( ps.length == 0 ) return;
-		
-		for ( Player p : ps ) {
-			
-			if ( area.intersectsWith( p.getLocation() ) )  {
-				p.teleport( destination );
-			}
-			
-		}
-		
-	}
-	
-	
-	public static void clearZoneOfEntities( Zone zone ) {
-		clearLocationOfEntities( zone.getArea(), zone.getPreNoMobsExceptionList() );
-	}	
-	
-	public static void clearLocationOfEntities( Area area, List<EntityType> exclusions ) {
+	public static List<Chunk> getChunksInArea( Area area ) {
 		
 		List<Chunk> chunks = new ArrayList<Chunk>();
 	    
@@ -452,48 +314,9 @@ public class Utilities {
 				chunks.add( ne.getWorld().getChunkAt(x, z) );
 			}
 			
-		}		
-		
-		if ( chunks.size() > 0 ) {
-
-			for ( Chunk chunk : chunks ) {
-
-				for ( BlockState bs : chunk.getTileEntities() ) {
-					
-					if ( area.intersectsWith( bs.getLocation()) ) {
-					
-						if ( bs instanceof InventoryHolder ) {
-							
-							((InventoryHolder)bs).getInventory().clear();
-							
-						}
-						bs.getBlock().setType( Material.AIR);
-
-						
-					}					
-					
-					
-				}
-				
-				for( Entity e : chunk.getEntities()) {
-					if ( !( e instanceof Player ) ) {
-						if ( !exclusions.contains( e.getType() ) ) { 
-							if ( area.intersectsWith( e.getLocation() ) ) {
-								
-								if ( e instanceof DoubleChest ) {
-									
-
-								} else {
-									e.remove();
-								}
-							}
-						}
-					}
-				}
-
-			}
-			
 		}
+		
+		return chunks;
 		
 	}
 	

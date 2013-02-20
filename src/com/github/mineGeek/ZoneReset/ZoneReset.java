@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -28,6 +29,9 @@ import com.github.mineGeek.ZoneReset.Utilities.Utilities;
  */
 public class ZoneReset extends JavaPlugin {
 
+	
+	public enum ZRScope {LIST, REGION, WORLD, SERVER};
+	public enum ZRTrigger {NONE, MANUAL, TIMED, ONJOIN, ONQUIT, ONINTERACT, ONENTER, ONEXIT}
 	/**
 	 * List of tasks that control automatic resets.
 	 */
@@ -71,6 +75,8 @@ public class ZoneReset extends JavaPlugin {
     	 */
     	Zones.close();
     	
+    	this.getServer().getScheduler().cancelTasks( this );
+    	
     	/**
     	 * Tell the console that it won.
     	 */
@@ -90,7 +96,7 @@ public class ZoneReset extends JavaPlugin {
     	 */
 		this.saveDefaultConfig();
 		
-		
+		Utilities.plugin = this;
 		/**
 		 * Commands
 		 */
@@ -139,6 +145,7 @@ public class ZoneReset extends JavaPlugin {
     		}
     	}    	
     	
+    	
     	/**
     	 * Load config.yml
     	 */
@@ -153,7 +160,8 @@ public class ZoneReset extends JavaPlugin {
     	
     	Utilities.plugin = this;
     	Utilities.checkAllPlayerChunks();
-    	Utilities.queue();
+    	Bukkit.getLogger().info("Starting q from Zone Reset");
+    	//Utilities.queue();
     	
     	/**
     	 * Force loads the class for shits and giggles.
@@ -180,6 +188,7 @@ public class ZoneReset extends JavaPlugin {
     			
 	    		for ( BukkitTask t : this.tasks.get(zoneTag) ) {
 	    			t.cancel();
+	    			//Bukkit.getLogger().info( "Cancelling " + t.getTaskId() );
 	    		} 
 	    		
 	    		this.tasks.get(zoneTag).clear();
@@ -195,6 +204,7 @@ public class ZoneReset extends JavaPlugin {
     	if ( !this.tasks.isEmpty() ) {
 	    	for ( List<BukkitTask> task : this.tasks.values() ) {
 	    		for ( BukkitTask t : task ) {
+	    			//Bukkit.getLogger().info("Stopping all resets");
 	    			t.cancel();
 	    		}
 	    	}
@@ -210,10 +220,12 @@ public class ZoneReset extends JavaPlugin {
     		if ( this.messages.containsKey(zoneTag) ) {
     			
 	    		for ( BukkitTask t : this.messages.get(zoneTag) ) {
+	    			//Bukkit.getLogger().info("Stopping " +  zoneTag  + " messages");
 	    			t.cancel();
 	    		}    			
     		
 	    		this.messages.get(zoneTag).clear();
+	    		Zones.getZone( zoneTag ).tasks.stop();
     		}
     		
     	}
@@ -225,6 +237,7 @@ public class ZoneReset extends JavaPlugin {
     	if ( !this.messages.isEmpty() ) {
     		for ( List<BukkitTask> task : this.messages.values() ) {
 	    		for ( BukkitTask t : task ) {
+	    			//Bukkit.getLogger().info("Stopping all messages");
 	    			t.cancel();
 	    		}
     		}

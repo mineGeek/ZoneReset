@@ -36,6 +36,7 @@ public class Listeners implements Listener {
 		Utilities.clearPlayerMetaData( evt.getPlayer() );
 		Zones.triggerPlayerJoin( evt.getPlayer() );
 		Utilities.checkPlayerChunk( evt.getPlayer() );
+		Zones.triggerPlayerMove( evt.getPlayer() );
 	}
 	
 	
@@ -48,8 +49,9 @@ public class Listeners implements Listener {
     {
     	
     	Utilities.removePlayerFromChunks( evt.getPlayer() );
-    	Utilities.clearPlayerMetaData( evt.getPlayer() );
     	Zones.triggerPlayerQuit( evt.getPlayer() );
+    	Utilities.clearPlayerMetaData( evt.getPlayer() );
+    	
     	
     }
     
@@ -58,12 +60,14 @@ public class Listeners implements Listener {
     	
     	
     	if ( evt.getFrom().getBlock().equals( evt.getTo().getBlock() ) ) return;
+    	Zones.triggerPlayerMove( evt.getPlayer() );
     	Utilities.checkPlayerChunk( evt.getPlayer() );
     }
     
     @EventHandler( priority = EventPriority.LOWEST )
     public void PlayerPort( PlayerTeleportEvent evt ) {
     	Utilities.checkPlayerChunk( evt.getPlayer(), evt.getTo() );
+    	Zones.triggerPlayerMove( evt.getPlayer() );
     }
     
     /**
@@ -73,11 +77,13 @@ public class Listeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent evt) {
     	Utilities.checkPlayerChunk( evt.getPlayer() );
+    	Zones.triggerPlayerMove( evt.getPlayer() );
     }
     
 	@EventHandler(priority = EventPriority.LOWEST )
     public void onRespawn(PlayerRespawnEvent evt) {
 		Utilities.checkPlayerChunk( evt.getPlayer() );
+		Zones.triggerPlayerMove( evt.getPlayer() );
 	}
     
 	/**
@@ -130,8 +136,9 @@ public class Listeners implements Listener {
 					 * Editing interaction
 					 */
 					if ( evt.getPlayer().hasMetadata("zrinteract") ) {
-						z.setOnInteractMaterialId( evt.getClickedBlock().getTypeId() );
-						z.setOnInteractLocation( l.getWorld().getName(), l.getBlockX(), l.getBlockY(), l.getBlockZ() );
+						
+						z.triggers.onInteract.materialId = evt.getClickedBlock().getTypeId();
+						z.triggers.onInteract.location = l;
 						evt.getPlayer().sendMessage("You set a trigger on " + Material.getMaterial( evt.getClickedBlock().getTypeId() ).name() + " at " + m );
 						evt.getPlayer().removeMetadata("zrinteract", Bukkit.getPluginManager().getPlugin("ZoneReset"));
 					}

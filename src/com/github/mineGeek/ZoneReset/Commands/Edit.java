@@ -33,7 +33,7 @@ public class Edit extends CommandBase {
 			Markers.showZoneBoundaries(p, this.getEditZone(p) );
 
 		} else {
-			 Zones.getZone( args[0] ).setEnabled( false );
+			 Zones.getZone( args[0] ).enabled = false;
 			this.setEditZone(p,new Zone( Zones.getZone( args[0] ), args[0]) );
 			mess = "You are now editing zone " + args[0] + ". /cancel or /save to end edit mode. Set options via /zr set [options]";
 			Markers.showZoneBoundaries(p, this.getEditZone(p) );

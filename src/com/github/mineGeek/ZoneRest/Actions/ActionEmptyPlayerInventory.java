@@ -18,6 +18,7 @@ public class ActionEmptyPlayerInventory extends Action {
 	public List<ItemStack> exceptions = new ArrayList<ItemStack>();
 	public boolean isWhitelist = false;
 	
+	
 	public void run() {
 		
 		List<Player> players = new ArrayList<Player>();

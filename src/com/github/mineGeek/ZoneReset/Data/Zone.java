@@ -11,17 +11,18 @@ public class Zone {
 	public String 	tag;
 	public String	worldName;
 	
-	private Area	area;
+	private Area	area = new Area();
 	
 	public boolean	enabled = true;
 	
 	public Triggers triggers;
-	public Tasks 	tasks;
-	public Actions 	preActions;
-	public Actions	resetActions;
-	public Actions 	postActions;
+	public Tasks 	tasks = null;
+	public Actions 	preActions = null;
+	public Actions	resetActions = null;
+	public Actions 	postActions = null;
 	
-	public Message	resetMessage;
+	public Message	resetMessage = null;
+	public boolean	requiresNoPlayers = false;
 	
 	public String 	getTag() 				{ return this.tag; }
 	public void 	setTag( String value ) 	{ this.tag = value; }
@@ -36,6 +37,7 @@ public class Zone {
 	
 	public Zone( Zone clone, String tag ) {
 		
+		this();
 		this.tag = tag;
 		this.worldName = clone.worldName;
 		this.area = clone.area;

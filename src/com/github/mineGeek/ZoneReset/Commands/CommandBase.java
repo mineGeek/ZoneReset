@@ -1,5 +1,6 @@
 package com.github.mineGeek.ZoneReset.Commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -146,7 +147,7 @@ abstract class CommandBase  implements CommandExecutor {
 		
 		if ( mess != null ) {
 			
-			sender.sendMessage( this.mess );
+			sender.sendMessage( ChatColor.YELLOW + this.mess );
 			
 		}
 		

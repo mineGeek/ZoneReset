@@ -42,6 +42,8 @@ public class Markers {
 	 */
 	public static void showZoneBoundaries( Player p, Location ne, Location sw ) {
 		
+		boolean withFlags = true;
+		
 		/**
 		 * Hide previous markers for shits and giggles
 		 */
@@ -69,6 +71,9 @@ public class Markers {
 			
 		}
 		
+		if ( ( ne.getX() == 0D && ne.getY() == 0D && ne.getZ() == 0D ) || 
+			( sw.getX() == 0D && sw.getY() == 0D && sw.getZ() == 0D ) ) withFlags = false;
+		
 		/**
 		 * Get cuboid points
 		 */
@@ -80,7 +85,7 @@ public class Markers {
 		 */
 		if ( !l.isEmpty() ) {
 			for ( Marker m : l ) {
-				m.highlight( p );
+				m.highlight( p, withFlags );
 			}
 		}
 
@@ -160,9 +165,9 @@ public class Markers {
 			l.add( getMarker( worldName, maxX, maxY, maxZ, maxX-1, maxZ-1 ) );
 			
 		} else if ( ne != null && sw==null ) {
-			l.add( getMarker(  ne ) );
+			l.add( getMarker(  ne, false ) );
 		} else if ( sw != null ) {
-			l.add( getMarker(  sw ) );
+			l.add( getMarker(  sw, false ) );
 			
 		}
 		
@@ -176,6 +181,9 @@ public class Markers {
 	 * @return
 	 */
 	public static Marker getMarker( Location l ) {
+		return getMarker( l, true );
+	}
+	public static Marker getMarker( Location l, boolean withFlags ) {
 		return getMarker( l.getWorld().getName(), l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getBlockX(), l.getBlockZ() );
 	}
 	
@@ -190,9 +198,13 @@ public class Markers {
 	 * @return
 	 */
 	public static Marker getMarker( String worldName, int x, int y, int z, int xFlag, int zFlag ) {
+		return getMarker( worldName, x, y, z, xFlag, zFlag, true );
+	}
+	public static Marker getMarker( String worldName, int x, int y, int z, int xFlag, int zFlag, boolean withFlags ) {
 		
 		World world = Bukkit.getWorld( worldName );
 		Block b1 = world.getBlockAt(x, y, z);
+
 		Block b2 = world.getBlockAt( xFlag, y, z );
 		Block b3 = world.getBlockAt( x, y, zFlag );
 		

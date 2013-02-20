@@ -12,6 +12,7 @@ import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
@@ -160,20 +161,31 @@ public class Config {
 		//TODO: Reimpliment c.set( path + "requirements.noPlayers", z.isRequireNoPlayers() );
 		
 		
-		List<IAction> pre = z.preActions.actions;
-		List<IAction> post = z.postActions.actions;
+		//List<IAction> pre = z.preActions.actions;
+		//List<IAction> post = z.postActions.actions;
+				
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.movePlayers );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.containerFill );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.inventoryEmpty );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.inventoryFill );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.removeEntities );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.removeSpawnPoints );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.reset );
+		//saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.resetTasks );
+		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.setSpawnPoints );
+
+		saveActionToConfig( "zones." + z.getTag() + ".reset.", z.resetActions.resetTasks );		
 		
-		for ( IAction a : pre ) {			
-			saveActionToConfig( "zones." + z.getTag() + ".pre.", a );			
-		}
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.movePlayers );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.containerFill );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.inventoryEmpty );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.inventoryFill );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.removeEntities );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.removeSpawnPoints );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.reset );
+		//saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.resetTasks );
+		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.setSpawnPoints );
 		
-		for ( IAction a : z.resetActions.actions ) {
-			saveActionToConfig( "zones." + z.getTag() + ".reset.", a ); 
-		}
-		
-		for ( IAction a : post ) {
-			saveActionToConfig( "zones." + z.getTag() + ".post.", a );
-		}
 		
 		if ( z.triggers.onJoin != null ) {
 			
@@ -288,10 +300,13 @@ public class Config {
 	
 	public static void saveActionToConfig( String path, IAction act ) {
 		
+		
 		if ( act instanceof ActionRemoveEntities ) {
 			
 			ActionRemoveEntities a = (ActionRemoveEntities) act;
-			c.set(path + "remove.scope", a.scope.toString().toLowerCase() );
+			if ( !a.enabled ) return;
+			
+			if ( !a.scope.equals( ZRScope.REGION ) ) c.set(path + "remove.scope", a.scope.toString().toLowerCase() );
 			c.set(path + "remove.animals", a.removeAnimals);
 			c.set(path + "remove.drops", a.removeDrops );
 			c.set(path + "remove.mobs", a.removeMobs );
@@ -300,12 +315,12 @@ public class Config {
 		} else if ( act instanceof ActionSetSpawnPoints ) {
 						
 			ActionSetSpawnPoints a = (ActionSetSpawnPoints) act;
-			
+			if ( !a.enabled ) return;
 			if ( a.location == null ) {
 				c.set( path + "remove.spawnpoints.scope", a.scope.toString().toLowerCase() );
 				
 			} else  {
-				c.set( path + "setspawn.scope", a.scope.toString().toLowerCase() );
+				if ( !a.scope.equals( ZRScope.REGION ) ) c.set( path + "setspawn.scope", a.scope.toString().toLowerCase() );
 				List<Integer> xyz = new ArrayList<Integer>();
 				xyz.add( a.location.getBlockX() ); xyz.add( a.location.getBlockY() ); xyz.add( a.location.getBlockZ() );
 				c.set( path + "setspawn.xyz", xyz );
@@ -315,7 +330,8 @@ public class Config {
 		} else if ( act instanceof ActionMovePlayers ) {
 			
 			ActionMovePlayers a = (ActionMovePlayers) act;
-			c.set( path + "moveplayers.scope", a.scope.toString().toLowerCase() );			
+			if ( !a.enabled ) return;
+			if ( !a.scope.equals( ZRScope.REGION ) ) c.set( path + "moveplayers.scope", a.scope.toString().toLowerCase() );			
 			List<Integer> xyz = new ArrayList<Integer>();
 			xyz.add( a.toX ); xyz.add( a.toY ); xyz.add( a.toZ );
 			c.set( path + "moveplayers.xyz", xyz );
@@ -324,6 +340,7 @@ public class Config {
 		} else if ( act instanceof ResetAction ) {
 			
 			ResetAction a = ( ResetAction ) act;
+			if ( !a.enabled ) return;
 			c.set( path + "blocks" , a.resetBlocks );
 			c.set( path + "containers", a.resetContainers );
 			c.set( path + "mobs", a.resetMobs );
@@ -332,7 +349,8 @@ public class Config {
 		} else if ( act instanceof ActionEmptyPlayerInventory ) {
 			
 			ActionEmptyPlayerInventory a = ( ActionEmptyPlayerInventory ) act;
-			c.set( path + "removeinventory.scope", a.scope.toString().toLowerCase() );
+			if ( !a.enabled ) return;
+			if ( !a.scope.equals( ZRScope.REGION ) ) c.set( path + "removeinventory.scope", a.scope.toString().toLowerCase() );
 			c.set( path + "removeinventory.whitelist", a.isWhitelist );
 			
 			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
@@ -350,7 +368,8 @@ public class Config {
 		} else if ( act instanceof ActionFillPlayerInventory ) {
 			
 			ActionFillPlayerInventory a = ( ActionFillPlayerInventory ) act;
-			c.set( path + "addinventory.scope", a.scope.toString().toLowerCase() );
+			if ( !a.enabled ) return;
+			if ( !a.scope.equals( ZRScope.REGION ) ) c.set( path + "addinventory.scope", a.scope.toString().toLowerCase() );
 			
 			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
 			for ( ItemStack i : a.items ) {

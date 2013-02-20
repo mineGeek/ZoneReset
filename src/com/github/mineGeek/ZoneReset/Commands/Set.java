@@ -1,17 +1,12 @@
 package com.github.mineGeek.ZoneReset.Commands;
 
-
-
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Zone;
-import com.github.mineGeek.ZoneRest.Actions.IAction;
-import com.github.mineGeek.ZoneRest.Actions.ResetAction;
+import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 
 
 
@@ -227,7 +222,6 @@ public class Set extends CommandBase {
 			
 			if ( args.length < 3 ) {
 				
-			}
 				if ( option.equals( "move" ) && option2 == null ) {
 					
 					z.preActions.movePlayers.enabled = true;
@@ -293,7 +287,7 @@ public class Set extends CommandBase {
 				}
 			}
 			
-		/*			
+				
 		} else if ( key.equals("trigger" ) ) {
 				
 			if ( args.length < 2 ) {
@@ -301,104 +295,58 @@ public class Set extends CommandBase {
 				mess = "Invalid number of arguments";
 				return false;
 			}
-			
 			String type = args[1].toLowerCase();
 			
 			if ( type.equals("join") ) {
 				
-				if ( args.length == 2 ) {
+				Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );
+				
+				if ( toggle == null ) {
 					
-					z.setTrigOnPlayerJoin( !z.isTrigOnPlayerJoin() );
-					mess = z.getTag() + " will " + ( z.isTrigOnPlayerJoin() ? "now" : "no longer") + " auto reset when a player joins.";
+					z.triggers.onJoin.enabled = !z.triggers.onJoin.enabled;
 					
-				} else if ( args.length > 2 ) {
+				} else  {
 					
-					if ( args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("on") ) {
-						z.setTrigOnPlayerJoin( true );
-						mess = z.getTag() + " will now auto reset when a player joins.";
-					} else if ( args[2].equalsIgnoreCase( "false" ) || args[2].equalsIgnoreCase("off" ) ) {
-						z.setTrigOnPlayerJoin( false );
-						mess = z.getTag() + " will no longer auto reset when a player joins.";
-					} else if ( args[2].equalsIgnoreCase("add" ) && args.length > 3) {
-						
-						for ( int x = 3; x < args.length; x++ ) {
-							z.getTrigOnPlayerJoinList().remove( args[x] );
-							z.getTrigOnPlayerJoinList().add( args[x] );
-							p.sendMessage( "Player " + args[x] + " will now reset zone '" + z.getTag() + "' when they join." );
-						}								
-						
-						
-					} else if ( args[2].equalsIgnoreCase("remove") && args.length > 2 ) {
-						
-						for ( int x = 3; x < args.length; x++ ) {
-							z.getTrigOnPlayerJoinList().remove( args[x] );
-							p.sendMessage( "Player " + args[x] + " will no longer reset zone '" + z.getTag() + "' when they join." );
-						}							
-						
-					} else if ( args[2].equalsIgnoreCase( "clear") ) {
-						
-						z.getTrigOnPlayerJoinList().clear();
-						mess = z.getTag() + " player reset onJoin list cleared.";
-						
-					}
+					z.triggers.onJoin.enabled = toggle;
 				}
+				
+				mess = z.getTag() + " will " + ( z.triggers.onJoin.enabled ? "now" : "no longer") + " auto reset when a player joins.";
 					
 			} else if ( type.equals("quit") ) {
 					
-				if ( args.length == 2 ) {
+				
+				Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );
+				
+				if ( toggle == null ) {
 					
-					z.setTrigOnPlayerQuit( !z.isTrigOnPlayerQuit() );
-					mess = z.getTag() + " will " + ( z.isTrigOnPlayerQuit() ? "now" : "no longer") + " auto reset when a player leaves.";
+					z.triggers.onQuit.enabled = !z.triggers.onQuit.enabled;
 					
-				} else if ( args.length > 2 ) {
+				} else  {
 					
-					if ( args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("on") ) {
-						z.setTrigOnPlayerQuit( true );
-						mess = z.getTag() + " will now auto reset when a player quits.";
-					} else if ( args[2].equalsIgnoreCase( "false" ) || args[2].equalsIgnoreCase("off" ) ) {
-						z.setTrigOnPlayerQuit( false );
-						mess = z.getTag() + " will no longer auto reset when a player quits.";
-					} else if ( args[2].equalsIgnoreCase("add" ) && args.length > 3) {
-						
-						for ( int x = 3; x < args.length; x++ ) {
-							z.getTrigOnPlayerQuitList().remove( args[x] );
-							z.getTrigOnPlayerQuitList().add( args[x] );
-							p.sendMessage( "Player " + args[x] + " will now reset zone '" + z.getTag() + "' when they quit." );
-						}								
-						
-						
-					} else if ( args[2].equalsIgnoreCase("remove") && args.length > 2 ) {
-						
-						for ( int x = 3; x < args.length; x++ ) {
-							z.getTrigOnPlayerQuitList().remove( args[x] );
-							p.sendMessage( "Player " + args[x] + " will no longer reset zone '" + z.getTag() + "' when they quit." );
-						}							
-						
-					} else if ( args[2].equalsIgnoreCase( "clear") ) {
-						
-						z.getTrigOnPlayerQuitList().clear();
-						mess = z.getTag() + " player reset onQuit list cleared.";
-						
-					}
-					
+					z.triggers.onQuit.enabled = toggle;
 				}
+				
+				mess = z.getTag() + " will " + ( z.triggers.onQuit.enabled ? "now" : "no longer") + " auto reset when a player quits.";
 					
 			} else if ( type.equals( "time" ) ) {
-					
-				if ( args.length == 2 ) {
-					mess = "Invalid option. Expect a format of #d#h#m#s (e.g. 2d3m for every 48 hours and 3 minutes)";
+				
+				String option = ( args.length > 2 ? args[2].toLowerCase() : null );
+				String option2 = ( args.length == 4 ? args[3].toLowerCase() : null );
+				
+				if ( option == null || option2 == null ) {
+					mess = "Invalid option. Expect a format of  #d#h#m#s e.g. /set trigger time [interval|reset] 2d3m (for every 48 hours and 3 minutes)";
 					return true;
 				}
 				
-				z.setTrigTimerText( args[2] );
+				z.triggers.onTimed.enabled = true;
 				
-				if ( z.getTrigTimer() == 0 ) {
-					mess = "Failure reading time argument. format should be in days, hours, minutes, seconds #[d|h|m|s]. Example for 24 hours: 1d or 24h. You can combined them all together, eg : /zr set time 1d3h5m0s";
-				} else {
-					mess = "Set Zone '" + z.getTag() + "' to automatically reset evey " + z.getTrigTimerText();
+				if ( option.equals("interval") ) {
+					z.triggers.onTimed.resetSeconds = (int) (Utilities.getSecondsFromText( option2 )*1);
+					z.triggers.onTimed.restartTimer = true;
 				}
 				
-				return true;
+				mess = z.getTag() + " will reset every " + Utilities.getTimeStampAsString( z.triggers.onTimed.resetSeconds ) + ".";
+			
 					
 			} else if ( type.equals( "interact") ) {
 					
@@ -414,9 +362,9 @@ public class Set extends CommandBase {
 				mess = "Right click object to set trigger.";
 				return true;
 					
-			}			
+			}
+		}
 			
-		}*/
 			
 		
 		return true;

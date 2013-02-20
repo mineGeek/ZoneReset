@@ -33,6 +33,8 @@ public class Message implements Runnable {
 		this.scope = type;
 	}
 	
+	public Message() {}
+
 	public void send() {
 		
 		Bukkit.getServer().broadcastMessage( this.getMessage( this.text ) );

@@ -15,11 +15,11 @@ public class Zone {
 	
 	public boolean	enabled = true;
 	
-	public Triggers triggers;
-	public Tasks 	tasks = null;
-	public Actions 	preActions = null;
-	public Actions	resetActions = null;
-	public Actions 	postActions = null;
+	public Triggers triggers = new Triggers();
+	public Tasks 	tasks = new Tasks();
+	public Actions 	preActions = new Actions();
+	public Actions	resetActions = new Actions();
+	public Actions 	postActions = new Actions();
 	
 	public Message	resetMessage = null;
 	public boolean	requiresNoPlayers = false;

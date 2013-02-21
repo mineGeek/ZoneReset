@@ -161,30 +161,23 @@ public class Config {
 		//TODO: Reimpliment c.set( path + "requirements.noPlayers", z.isRequireNoPlayers() );
 		
 		
-		//List<IAction> pre = z.preActions.actions;
-		//List<IAction> post = z.postActions.actions;
-				
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.movePlayers );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.containerFill );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.inventoryEmpty );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.inventoryFill );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.removeEntities );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.removeSpawnPoints );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.reset );
-		//saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.resetTasks );
-		saveActionToConfig( "zones." + z.getTag() + ".pre.", z.preActions.setSpawnPoints );
 
-		saveActionToConfig( "zones." + z.getTag() + ".reset.", z.resetActions.resetTasks );		
+		saveActionToConfig( "zones." + z.getTag() + ".reset.", z.preActions.reset );
+		saveActionToConfig( "zones." + z.getTag() + ".timer.", z.resetActions.resetTasks );
 		
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.movePlayers );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.containerFill );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.inventoryEmpty );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.inventoryFill );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.removeEntities );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.removeSpawnPoints );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.reset );
-		//saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.resetTasks );
-		saveActionToConfig( "zones." + z.getTag() + ".post.", z.postActions.setSpawnPoints );
+		saveActionToConfig( "zones." + z.getTag() + ".inventory.remove.", z.preActions.inventoryEmpty );
+		saveActionToConfig( "zones." + z.getTag() + ".inventory.give", z.postActions.inventoryFill );
+		
+		saveActionToConfig( "zones." + z.getTag() + ".spawnpoints.remove.", z.preActions.removeSpawnPoints );
+		saveActionToConfig( "zones." + z.getTag() + ".spawnpoints.set", z.preActions.setSpawnPoints );
+		saveActionToConfig( "zones." + z.getTag() + ".moveplayers.", z.preActions.movePlayers );
+		
+		saveActionToConfig( "zones." + z.getTag() + ".remove.", z.preActions.removeEntities );
+		
+		
+		
+		saveActionToConfig( "zones." + z.getTag() + ".containers.fill", z.postActions.containerFill );
+
 		
 		
 		if ( z.triggers.onJoin != null ) {

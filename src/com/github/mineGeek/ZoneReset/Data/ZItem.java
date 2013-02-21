@@ -33,6 +33,28 @@ public class ZItem implements Serializable {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
+	public ZItem( Map<String, Object> map ) {
+		
+		materialId = (Integer) map.get("item");
+		data = (Byte) map.get("data");
+		durability = (Short) map.get("data");
+		amount = (Integer) map.get("amount");
+		meta = (Map<String, Object>) map.get("meta");
+	}
+	
+	public Map<String, Object> getMap() {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("item", materialId );
+		map.put("data", data );
+		map.put("durability", durability );
+		map.put("amount", amount );
+		map.put("meta", meta );
+		
+		return map;
+	}
+	
 	public ItemStack getItemStack() {
 		
 		ItemStack i = new ItemStack( this.materialId );

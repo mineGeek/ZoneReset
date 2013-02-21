@@ -2,11 +2,14 @@ package com.github.mineGeek.ZoneRest.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.github.mineGeek.ZoneReset.Data.ZItem;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
@@ -47,6 +50,48 @@ public class ActionFillPlayerInventory extends Action {
 			}
 			
 		}
+		
+		
+	}
+
+	@Override
+	public void setToConfig(String root, ConfigurationSection c) {
+
+		if ( !enabled ) return;
+		
+		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".inventory.add.scope", scope.toString().toLowerCase() );
+		
+		List<Map<String, Object>> a = new ArrayList<Map<String, Object>>();
+		
+		for ( ItemStack i : items ) {
+			
+			a.add( new ZItem(i).getMap() );				
+			
+		}
+		
+		if ( !a.isEmpty() ) c.set( root + ".inventory.add.items", a );
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void loadFromConfig(String root, ConfigurationSection c) {
+		
+		scope = ZRScope.valueOf( c.getString( root + ".inventory.add.scope", "region").toUpperCase() );
+		
+		if ( c.isSet( root + ".inventory.add.items") ) {
+			List<Map<?, ?>> a = c.getMapList( root + ".inventory.add.items");
+			items.clear();
+			
+			if ( !a.isEmpty() ) {
+				for ( Map<?,?> map : a ) {
+					items.add( new ZItem( (Map<String, Object>)map ).getItemStack() );
+				}
+			}
+			
+		}
+		
+		enabled = ( !scope.equals( ZRScope.REGION ) || !items.isEmpty() );
 		
 		
 	}	

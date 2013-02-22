@@ -16,8 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
@@ -35,6 +33,7 @@ import com.github.mineGeek.ZoneRest.Actions.ActionEmptyPlayerInventory;
 import com.github.mineGeek.ZoneRest.Actions.ActionFillPlayerInventory;
 import com.github.mineGeek.ZoneRest.Actions.ActionMovePlayers;
 import com.github.mineGeek.ZoneRest.Actions.ActionRemoveEntities;
+import com.github.mineGeek.ZoneRest.Actions.ActionRemoveSpawnPoints;
 import com.github.mineGeek.ZoneRest.Actions.ActionSetSpawnPoints;
 import com.github.mineGeek.ZoneRest.Actions.IAction;
 import com.github.mineGeek.ZoneRest.Actions.ResetAction;
@@ -263,119 +262,35 @@ public class Zones {
 		 */
 		IAction pre;
 		
-		pre = new ActionRemoveEntities();
-		((ActionRemoveEntities)pre).removeAnimals = c.getBoolean("pre.remove.animals", true );
-		((ActionRemoveEntities)pre).removeDrops = c.getBoolean("pre.remove.drops", true );
-		((ActionRemoveEntities)pre).removeMobs = c.getBoolean("pre.remove.mobs", true );
-		((ActionRemoveEntities)pre).removeTiles = c.getBoolean("pre.remove.containers", true );
-		((ActionRemoveEntities)pre).scope = ZRScope.valueOf( c.getString("pre.remove.scope", "REGION").toUpperCase() );
-		((ActionRemoveEntities)pre).tag = r.getTag();
-		r.preActions.add( pre );
+		pre = new ActionRemoveEntities( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.preActions.add( pre );
 		
+		pre = new ActionRemoveSpawnPoints( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.preActions.add( pre );		
 		
+		pre = new ActionSetSpawnPoints( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.preActions.add( pre );			
 		
-		/**
-		 * Remove any spawnPoints?
-		 */
-		if ( c.isSet( "pre.remove.spawnpoints.scope") ) {
-			pre = new ActionSetSpawnPoints();
-			((ActionSetSpawnPoints)pre).scope = ZRScope.valueOf( c.getString("pre.remove.spawnpoints.scope", "REGION").toUpperCase() );
-			((ActionSetSpawnPoints)pre).tag = r.getTag();
-			r.preActions.add( pre );
-		}
+		pre = new ActionMovePlayers( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.preActions.add( pre );			
 
-		if ( c.isSet( "pre.setspawn.xyz") ) {
-			pre = new ActionSetSpawnPoints();
-			List<Integer> l = c.getIntegerList( "pre.setspawn.xyz" );
-			String w = c.getString("pre.setspawn.world", worldName );
-			((ActionSetSpawnPoints)pre).location = new Location( Bukkit.getWorld(w), l.get(0), l.get(1), l.get(2));
-			((ActionSetSpawnPoints)pre).scope = ZRScope.valueOf( c.getString("pre.setspawn.scope", "REGION").toUpperCase() );
-			((ActionSetSpawnPoints)pre).tag = r.getTag();
-			r.preActions.add( pre );
-		}
 		
-		if ( c.isSet("pre.moveplayers.xyz" ) ) {
-			
-			ActionMovePlayers move = new ActionMovePlayers();
-			move.scope = ZRScope.valueOf( c.getString("pre.moveplayers.scope", "REGION").toUpperCase() );
-			move.tag = r.getTag();
-			List<Integer> l = c.getIntegerList("pre.moveplayers.xyz");
-			String w = c.getString("pre.moveplayers.world", worldName);
-			move.toX = l.get(0); move.toY = l.get(1); move.toZ = l.get(2);
-			move.worldName = w;
-			r.preActions.add( move );
-		}		
-				
-		/**
-		 * Require zone to be void of humans?
-		 */
-		//TODO: add back in r.setRequireNoPlayers( c.getBoolean("requirements.noPlayers", false) );
+		pre = new ResetAction( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.resetActions.add( pre );			
 		
-		ResetAction reset = new ResetAction();
-		reset.tag = r.getTag();
-		reset.resetBlocks = c.getBoolean("reset.blocks", true );
-		reset.resetContainers = c.getBoolean("reset.containers", true );
-		reset.resetMobs = c.getBoolean("reset.mobs");
-		r.resetActions.add( reset );
+		pre = new ActionEmptyPlayerInventory( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.postActions.add( pre );				
+
+		pre = new ActionFillPlayerInventory( r.tag );
+		pre.loadFromConfig("", c);
+		if ( pre.isEnabled() ) r.postActions.add( pre );		
 		
-		
-		/**
-		 * Set players inventory
-		 */
-		if ( c.isSet( "post.removeinventory.whitelist") ) {
-			ActionEmptyPlayerInventory empty = new ActionEmptyPlayerInventory();
-			empty.scope = ZRScope.valueOf( c.getString("post.removeinventory.scope", "REGION").toUpperCase() );
-			empty.tag = r.getTag();
-			empty.isWhitelist = c.getBoolean("post.removeinventory.whitelist", true );
-			List<Map<?, ?>> items = c.getMapList("post.removeinventory.exceptions");
-			
-			for ( Map<?, ?> item : items ) {
-				
-				if ( item.containsKey("item") ) {
-					
-					int amount = (Integer) ( item.containsKey("amount") ? item.get("amount") : 1 );
-					short damage = Short.valueOf( (String) (item.containsKey("damage") ? item.get("damage") : "0") );
-					
-					ItemStack i = new ItemStack( (Integer)item.get("item"), amount, damage );
-					
-					if ( item.containsKey("meta") ) {						
-						i.setItemMeta( (ItemMeta) item.get("meta") );
-					}
-					
-					empty.exceptions.add( i );
-					
-				}
-				
-			}
-			r.postActions.add( empty );
-		}
-		
-		if ( c.isSet( "post.addinventory.items") ) {
-			ActionFillPlayerInventory fill = new ActionFillPlayerInventory();
-			fill.scope = ZRScope.valueOf( c.getString("post.addinventory.scope", "REGION").toUpperCase() );
-			fill.tag = r.getTag();
-			
-			List<Map<?, ?>> items = c.getMapList("post.addinventory.items");
-			
-			for ( Map<?, ?> item : items ) {
-				
-				if ( item.containsKey("item") ) {
-					
-					int amount = (Integer) ( item.containsKey("amount") ? item.get("amount") : 1 );
-					short damage = Short.valueOf( (String) (item.containsKey("damage") ? item.get("damage") : "0") );
-					
-					ItemStack i = new ItemStack( (Integer)item.get("item"), amount, damage );
-					if ( item.containsKey("meta") ) {						
-						i.setItemMeta( (ItemMeta) item.get("meta") );
-					}					
-					fill.items.add( i );
-					
-				}
-				
-			}
-			r.postActions.add( fill );
-		}
-	
 		boolean trackMovements = false;
 
 		if ( c.isSet("trigger.onjoin.reset" ) ) {

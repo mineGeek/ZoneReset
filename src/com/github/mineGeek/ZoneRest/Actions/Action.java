@@ -9,4 +9,9 @@ abstract class Action implements IAction {
 	
 
 	
+	public Action( String tag ) {
+		this.tag = tag;
+	}
+
+	
 }

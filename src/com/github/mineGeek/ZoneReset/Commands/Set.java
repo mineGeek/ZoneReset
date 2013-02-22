@@ -7,6 +7,10 @@ import org.bukkit.entity.Player;
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
+import com.github.mineGeek.ZoneRest.Actions.ActionRemoveEntities;
+import com.github.mineGeek.ZoneRest.Actions.ActionRemoveSpawnPoints;
+import com.github.mineGeek.ZoneRest.Actions.IAction;
+import com.github.mineGeek.ZoneRest.Actions.ResetAction;
 
 
 
@@ -97,13 +101,21 @@ public class Set extends CommandBase {
 				return true;
 			}
 			
+			ResetAction reset = (ResetAction) z.resetActions.getByClass( "ResetAction" );
+			if ( reset != null ) {
+				sender.sendMessage("There has been an error with this command.");
+				return false;
+			}
 			
 			if ( args.length == 1 ) {
-				z.resetActions.reset.resetBlocks = !z.resetActions.reset.resetBlocks;
-				z.resetActions.reset.resetMobs = !z.resetActions.reset.resetMobs;
-				z.resetActions.reset.resetContainers = !z.resetActions.reset.resetContainers;
-				mess = z.getTag() + " will " + ( z.resetActions.reset.resetMobs ? "" : "not") + "spawn mobs, " + ( z.resetActions.reset.resetBlocks ? "" : "not") + "reset blocks and " + ( z.resetActions.reset.resetContainers ? "" : "not") + "reset containers inventory.";
-				return true;				
+				
+				if ( reset != null ) {
+					reset.resetBlocks = !reset.resetBlocks;
+					reset.resetMobs = !reset.resetMobs;
+					reset.resetContainers = !reset.resetContainers;
+					mess = z.getTag() + " will " + ( reset.resetMobs ? "" : "not") + "spawn mobs, " + ( reset.resetBlocks ? "" : "not") + "reset blocks and " + ( reset.resetContainers ? "" : "not") + "reset containers inventory.";
+					return true;	
+				}
 			}
 			
 			String noun = args[1].toLowerCase();
@@ -113,39 +125,39 @@ public class Set extends CommandBase {
 
 				if ( toggle == null ) {
 					
-					z.resetActions.reset.resetMobs = !z.resetActions.reset.resetMobs;
+					reset.resetMobs = !reset.resetMobs;
 					
 				} else {
-					z.resetActions.reset.resetMobs = toggle;
+					reset.resetMobs = toggle;
 				}
 				
-				mess = z.getTag() + " will " + ( z.resetActions.reset.resetMobs ? "no longer " : "now ") + "spawn mobs on reset";
+				mess = z.getTag() + " will " + ( reset.resetMobs ? "no longer " : "now ") + "spawn mobs on reset";
 			}
 			
 			if ( noun.equals( "blocks") ) {
 
 				if ( toggle == null ) {
 					
-					z.resetActions.reset.resetBlocks = !z.resetActions.reset.resetBlocks;
+					reset.resetBlocks = !reset.resetBlocks;
 					
 				} else {
-					z.resetActions.reset.resetBlocks = toggle;
+					reset.resetBlocks = toggle;
 				}
 				
-				mess = z.getTag() + " will " + ( z.resetActions.reset.resetBlocks ? "no longer " : "now ") + "reset blocks";
+				mess = z.getTag() + " will " + ( reset.resetBlocks ? "no longer " : "now ") + "reset blocks";
 			}
 			
 			if ( noun.equals( "container") || noun.equals( "containers") ) {
 
 				if ( toggle == null ) {
 					
-					z.resetActions.reset.resetContainers = !z.resetActions.reset.resetContainers;
+					reset.resetContainers = !reset.resetContainers;
 					
 				} else {
-					z.resetActions.reset.resetContainers = toggle;
+					reset.resetContainers = toggle;
 				}
 				
-				mess = z.getTag() + " will " + ( z.resetActions.reset.resetContainers ? "no longer " : "now ") + "reset containers";
+				mess = z.getTag() + " will " + ( reset.resetContainers ? "no longer " : "now ") + "reset containers";
 			}			
 			
 			
@@ -153,46 +165,53 @@ public class Set extends CommandBase {
 		} else if ( key.equals("no") ) {
 			
 			String noun = args[1].toLowerCase();
-			Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );
+			Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );			
+			
+			ActionRemoveEntities remove = (ActionRemoveEntities) z.preActions.getByClass( "ActionRemoveEntities" );
+			
+			if ( remove != null ) {
+				sender.sendMessage("There has been an error with this command.");
+				return false;
+			}			
 			
 			if ( noun.equals("mobs") ) {
 				
 				if ( toggle == null ) {
 					
-					z.preActions.removeEntities.removeMobs = !z.preActions.removeEntities.removeMobs;
+					remove.removeMobs = !remove.removeMobs;
 					
 				} else {
-					z.preActions.removeEntities.removeMobs = toggle;
+					remove.removeMobs = toggle;
 				}				
 				
 			} else if ( noun.equals("animals") ) {
 					
 					if ( toggle == null ) {
 						
-						z.preActions.removeEntities.removeAnimals = !z.preActions.removeEntities.removeAnimals;
+						remove.removeAnimals = !remove.removeAnimals;
 						
 					} else {
-						z.preActions.removeEntities.removeAnimals = toggle;
+						remove.removeAnimals = toggle;
 					}
 					
 			} else if ( noun.equals("drops") ) {
 				
 				if ( toggle == null ) {
 					
-					z.preActions.removeEntities.removeAnimals = !z.preActions.removeEntities.removeDrops;
+					remove.removeAnimals = !remove.removeDrops;
 					
 				} else {
-					z.preActions.removeEntities.removeDrops = toggle;
+					remove.removeDrops = toggle;
 				}
 				
 			} else if ( noun.equals("containers") ) {
 				
 				if ( toggle == null ) {
 					
-					z.preActions.removeEntities.removeTiles = !z.preActions.removeEntities.removeTiles;
+					remove.removeTiles = !remove.removeTiles;
 					
 				} else {
-					z.preActions.removeEntities.removeTiles = toggle;
+					remove.removeTiles = toggle;
 				}
 				
 			} else if ( noun.equals("spawnpoints") ) {

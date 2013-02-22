@@ -16,6 +16,9 @@ import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 public class ActionFillPlayerInventory extends Action {
 
+	public ActionFillPlayerInventory(String tag) {
+		super(tag);
+	}
 	public ZRScope scope = ZRScope.REGION;
 	public List<ItemStack> items = new ArrayList<ItemStack>();
 	
@@ -94,6 +97,10 @@ public class ActionFillPlayerInventory extends Action {
 		enabled = ( !scope.equals( ZRScope.REGION ) || !items.isEmpty() );
 		
 		
+	}
+	@Override
+	public boolean isEnabled() {
+		return enabled;
 	}	
 	
 }

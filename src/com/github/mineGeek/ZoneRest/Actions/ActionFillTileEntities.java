@@ -25,6 +25,10 @@ import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 public class ActionFillTileEntities extends Action {
 	
+	public ActionFillTileEntities(String tag) {
+		super(tag);
+	}
+
 	public List<ItemStack> items = new ArrayList<ItemStack>();
 	public List<Map<String, Object>> entities = new ArrayList<Map<String, Object>>();
 	public ZRScope scope = ZRScope.REGION;
@@ -169,5 +173,10 @@ public class ActionFillTileEntities extends Action {
 		if ( !entities.isEmpty() ) c.set( root + ".containers.add.to", entities );		
 		
 	}
+	
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}	
 
 }

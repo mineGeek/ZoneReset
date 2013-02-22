@@ -16,6 +16,10 @@ import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 public class ActionMovePlayers extends Action {
 
+	public ActionMovePlayers(String tag) {
+		super(tag);
+	}
+
 	public ZRScope scope = ZRScope.REGION;
 	public Location location = null;
 
@@ -79,6 +83,11 @@ public class ActionMovePlayers extends Action {
 		enabled = ( !scope.equals( ZRScope.REGION ) || location != null );
 		
 	}
+	
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}	
 	
 	
 }

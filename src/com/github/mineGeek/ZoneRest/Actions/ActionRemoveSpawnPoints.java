@@ -13,9 +13,9 @@ import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
-public class ActionSetSpawnPoints extends Action {
+public class ActionRemoveSpawnPoints extends Action {
 
-	public ActionSetSpawnPoints(String tag) {
+	public ActionRemoveSpawnPoints(String tag) {
 		super(tag);
 	}
 
@@ -63,11 +63,11 @@ public class ActionSetSpawnPoints extends Action {
 		
 		if ( !enabled ) return;
 		
-		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".setspawnpoint.scope", scope.toString().toLowerCase() );
+		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".remove.spawnpoints.scope", scope.toString().toLowerCase() );
 		
 		if ( location != null ) {
-			c.set( root + ".setspawnpoint.world", location.getWorld().getName() );
-			c.set( root + ".setspawnpoint.xyz", new ArrayList<Integer>( Arrays.asList( location.getBlockX(), location.getBlockY(), location.getBlockZ() ) ) );			
+			c.set( root + ".remove.spawnpoints.world", location.getWorld().getName() );
+			c.set( root + ".remove.spawnpoints.xyz", new ArrayList<Integer>( Arrays.asList( location.getBlockX(), location.getBlockY(), location.getBlockZ() ) ) );			
 		}
 		
 	}
@@ -75,13 +75,13 @@ public class ActionSetSpawnPoints extends Action {
 	@Override
 	public void loadFromConfig(String root, ConfigurationSection c) {
 		
-		scope = ZRScope.valueOf( c.getString( root + ".setspawnpoint.scope", "region").toUpperCase() );
+		scope = ZRScope.valueOf( c.getString( root + ".remove.spawnpoints.scope", "region").toUpperCase() );
 		String worldName = Zones.getZone( this.tag ).getWorldName();
 		
-		worldName = c.getString( root + ".setspawnpoint.world", worldName );
+		worldName = c.getString( root + ".remove.spawnpoints.world", worldName );
 		
-		if ( c.isSet( root + ".setspawnpoint.xyz" ) ) {
-			List<Integer> xyz = c.getIntegerList( root + ".setspawnpoint.xyz" );
+		if ( c.isSet( root + ".remove.spawnpoints.xyz" ) ) {
+			List<Integer> xyz = c.getIntegerList( root + ".remove.spawnpoints.xyz" );
 			location = new Location( Bukkit.getWorld( worldName ), xyz.get(0), xyz.get(1), xyz.get(2) );
 		}		
 		enabled = ( !scope.equals( ZRScope.REGION ) || location != null );

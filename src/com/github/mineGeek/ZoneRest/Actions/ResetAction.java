@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -13,8 +14,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.InventoryHolder;
 
+import com.github.mineGeek.ZoneReset.Data.Area;
 import com.github.mineGeek.ZoneReset.Data.ZArea;
 import com.github.mineGeek.ZoneReset.Data.ZBlock;
 import com.github.mineGeek.ZoneReset.Data.ZItem;
@@ -28,12 +31,19 @@ import com.github.mineGeek.ZoneReset.nms.NMSHelper;
 
 public class ResetAction extends Action {
 
+	public ResetAction(String tag) {
+		super(tag);
+	}
+
 	public boolean resetBlocks = true;
 	public boolean resetContainers = true;
 	public boolean resetMobs = true;
+	public boolean enabled = true;
+	public Area area;
+	
 	@Override
 	public void run() {
-		ZArea z = this.getArea();
+		 ZArea z = this.getArea();
 		if ( z != null ) this.resetArea( z );
 	}
 	
@@ -171,6 +181,49 @@ public class ResetAction extends Action {
 		}
 		
 		
-	}	
+	}
+
+	@Override
+	public void setToConfig(String root, ConfigurationSection c) {
+			
+		if ( area != null && area.ne() != null && area.sw() != null ) {
+			c.set( root + ".reset.world", area.worldName );
+			c.set( root + ".reset.ne", new ArrayList<Integer>( Arrays.asList( area.ne().getBlockX(), area.ne().getBlockY(), area.ne().getBlockZ() ) ) );
+			c.set( root + ".reset.sw", new ArrayList<Integer>( Arrays.asList( area.sw().getBlockX(), area.sw().getBlockY(), area.sw().getBlockZ() ) ) );
+		}		
+		
+		c.set( root + ".reset.blocks", this.resetBlocks );
+		c.set( root + ".reset.containers", this.resetContainers );
+		c.set( root + ".reset.mobs", this.resetMobs );
+		
+		
+	}
+
+	@Override
+	public void loadFromConfig(String root, ConfigurationSection c) {
+		
+		String worldName = Zones.getZone( this.tag ).getWorldName();
+		worldName = c.getString(".reset.world", worldName );
+		List<Integer> neXyz = c.getIntegerList(".reset.ne");
+		List<Integer> swXyz = c.getIntegerList(".reset.sw");
+		
+		if ( neXyz != null && swXyz != null ) {
+			this.area = new Area( worldName, neXyz.get(0), neXyz.get(1), neXyz.get(2), swXyz.get(0), swXyz.get(1), swXyz.get(2));
+		}
+		
+		this.resetBlocks = c.getBoolean(".reset.blocks", true );
+		this.resetContainers = c.getBoolean(".reset.containers", true );
+		this.resetMobs = c.getBoolean( ".reset.mobs", true);
+		
+		enabled = ( this.area != null );
+		
+		
+		
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
 
 }

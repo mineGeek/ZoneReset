@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
@@ -76,6 +77,7 @@ public class ActionRemoveSpawnPoints extends Action {
 	public void loadFromConfig(String root, ConfigurationSection c) {
 		
 		scope = ZRScope.valueOf( c.getString( root + ".remove.spawnpoints.scope", "region").toUpperCase() );
+
 		String worldName = Zones.getZone( this.tag ).getWorldName();
 		
 		worldName = c.getString( root + ".remove.spawnpoints.world", worldName );

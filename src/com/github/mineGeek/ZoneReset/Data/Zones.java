@@ -170,7 +170,7 @@ public class Zones {
 	public static void triggerPlayerJoin( Player p ) {
 		
 		for ( Zone z : zones.values() ) {
-			z.triggers.onJoin.run( p );			
+			z.triggers.onJoin( p );			
 		}
 		
 	}
@@ -178,7 +178,7 @@ public class Zones {
 	public static void triggerPlayerQuit( Player p ) {
 		
 		for ( Zone z : zones.values() ) {
-			z.triggers.onQuit.run( p );		
+			z.triggers.onQuit( p );		
 		}
 		
 	}
@@ -192,7 +192,7 @@ public class Zones {
 		
 			for ( String x : interactKeys.get(i) ) {
 				Zone z = zones.get( x );
-				if ( z != null ) z.triggers.onInteract.run(m, l);
+				if ( z != null ) z.triggers.onInteract(m, l);
 			}
 			
 		}
@@ -202,7 +202,7 @@ public class Zones {
 	public static void addZone( String tag, ConfigurationSection c ) {
 		
 		Zone r = new Zone();
-
+		Zones.zones.put( tag , r );
 		
 		/**
 		 * Unique name for Zone
@@ -401,7 +401,7 @@ public class Zones {
 		
 		if ( trackMovements ) Config.trackMovement = true;
 		
-		Zones.zones.put( tag , r );
+		
 		r.start();
 		
 	}

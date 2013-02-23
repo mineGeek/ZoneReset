@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+
 public class Triggers {
 
 	public TriggerOnJoin 	onJoin;
@@ -30,6 +31,7 @@ public class Triggers {
 		if ( onExit != null ) onExit.close();
 		
 	}
+	
 	
 	
 }

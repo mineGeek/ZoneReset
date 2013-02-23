@@ -7,9 +7,10 @@ import org.bukkit.entity.Player;
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
+import com.github.mineGeek.ZoneRest.Actions.ActionMovePlayers;
 import com.github.mineGeek.ZoneRest.Actions.ActionRemoveEntities;
 import com.github.mineGeek.ZoneRest.Actions.ActionRemoveSpawnPoints;
-import com.github.mineGeek.ZoneRest.Actions.IAction;
+import com.github.mineGeek.ZoneRest.Actions.ActionSetSpawnPoints;
 import com.github.mineGeek.ZoneRest.Actions.ResetAction;
 
 
@@ -102,64 +103,63 @@ public class Set extends CommandBase {
 			}
 			
 			ResetAction reset = (ResetAction) z.resetActions.getByClass( "ResetAction" );
-			if ( reset != null ) {
+			
+			if ( reset == null ) {
+				
 				sender.sendMessage("There has been an error with this command.");
 				return false;
-			}
-			
-			if ( args.length == 1 ) {
 				
-				if ( reset != null ) {
-					reset.resetBlocks = !reset.resetBlocks;
-					reset.resetMobs = !reset.resetMobs;
-					reset.resetContainers = !reset.resetContainers;
-					mess = z.getTag() + " will " + ( reset.resetMobs ? "" : "not") + "spawn mobs, " + ( reset.resetBlocks ? "" : "not") + "reset blocks and " + ( reset.resetContainers ? "" : "not") + "reset containers inventory.";
-					return true;	
-				}
-			}
-			
-			String noun = args[1].toLowerCase();
-			Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );
-
-			if ( noun.equals( "mobs") ) {
-
-				if ( toggle == null ) {
-					
-					reset.resetMobs = !reset.resetMobs;
-					
-				} else {
-					reset.resetMobs = toggle;
-				}
+			} else if ( args.length == 1 ) {
 				
-				mess = z.getTag() + " will " + ( reset.resetMobs ? "no longer " : "now ") + "spawn mobs on reset";
-			}
-			
-			if ( noun.equals( "blocks") ) {
-
-				if ( toggle == null ) {
+				reset.resetBlocks = !reset.resetBlocks;
+				reset.resetMobs = !reset.resetMobs;
+				reset.resetContainers = !reset.resetContainers;
+				mess = z.getTag() + " will " + ( reset.resetMobs ? "" : "not") + "spawn mobs, " + ( reset.resetBlocks ? "" : "not") + "reset blocks and " + ( reset.resetContainers ? "" : "not") + "reset containers inventory.";
+				return true;
+				
+			} else {			
+				String noun = args[1].toLowerCase();
+				Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );
+	
+				if ( noun.equals( "mobs") ) {
+	
+					if ( toggle == null ) {
+						
+						reset.resetMobs = !reset.resetMobs;
+						
+					} else {
+						reset.resetMobs = toggle;
+					}
 					
-					reset.resetBlocks = !reset.resetBlocks;
-					
-				} else {
-					reset.resetBlocks = toggle;
+					mess = z.getTag() + " will " + ( reset.resetMobs ? "no longer " : "now ") + "spawn mobs on reset";
 				}
 				
-				mess = z.getTag() + " will " + ( reset.resetBlocks ? "no longer " : "now ") + "reset blocks";
-			}
-			
-			if ( noun.equals( "container") || noun.equals( "containers") ) {
-
-				if ( toggle == null ) {
+				if ( noun.equals( "blocks") ) {
+	
+					if ( toggle == null ) {
+						
+						reset.resetBlocks = !reset.resetBlocks;
+						
+					} else {
+						reset.resetBlocks = toggle;
+					}
 					
-					reset.resetContainers = !reset.resetContainers;
-					
-				} else {
-					reset.resetContainers = toggle;
+					mess = z.getTag() + " will " + ( reset.resetBlocks ? "no longer " : "now ") + "reset blocks";
 				}
 				
-				mess = z.getTag() + " will " + ( reset.resetContainers ? "no longer " : "now ") + "reset containers";
-			}			
-			
+				if ( noun.equals( "container") || noun.equals( "containers") ) {
+	
+					if ( toggle == null ) {
+						
+						reset.resetContainers = !reset.resetContainers;
+						
+					} else {
+						reset.resetContainers = toggle;
+					}
+					
+					mess = z.getTag() + " will " + ( reset.resetContainers ? "no longer " : "now ") + "reset containers";
+				}			
+			}
 			
 		
 		} else if ( key.equals("no") ) {
@@ -167,9 +167,10 @@ public class Set extends CommandBase {
 			String noun = args[1].toLowerCase();
 			Boolean toggle = ( args.length == 3 ? args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true") : null );			
 			
+			ActionRemoveSpawnPoints nospawn = null;
 			ActionRemoveEntities remove = (ActionRemoveEntities) z.preActions.getByClass( "ActionRemoveEntities" );
 			
-			if ( remove != null ) {
+			if ( remove == null ) {
 				sender.sendMessage("There has been an error with this command.");
 				return false;
 			}			
@@ -216,21 +217,28 @@ public class Set extends CommandBase {
 				
 			} else if ( noun.equals("spawnpoints") ) {
 				
+				nospawn = (ActionRemoveSpawnPoints) z.preActions.getByClass( "ActionRemoveEntities" );
+				
+				if ( nospawn == null ) {
+					sender.sendMessage("There has been an error with this command.");
+					return false;
+				}				
+				
 				if ( toggle == null ) {
 					
-					z.preActions.removeSpawnPoints.enabled = false;
+					nospawn.enabled = false;
 					
 				} else {
-					z.preActions.removeEntities.enabled = toggle;
+					nospawn.enabled = toggle;
 				}					
 				
 			}
 			
-			mess = "Before " + z.getTag() + "resets, the following will be removed - Animals:" + z.preActions.removeEntities.removeAnimals + ", " +
-					"Mobs:" + z.preActions.removeEntities.removeMobs + ", " +
-					"Drops:" + z.preActions.removeEntities.removeDrops + ", " +
-					"Containers :" + z.preActions.removeEntities.removeTiles + ", " +
-					"spawnpoints:" + z.preActions.removeSpawnPoints + ".";
+			mess = "Before " + z.getTag() + "resets, the following will be removed - Animals:" + remove.removeAnimals + ", " +
+					"Mobs:" + remove.removeMobs + ", " +
+					"Drops:" + remove.removeDrops + ", " +
+					"Containers :" + remove.removeTiles + ", " +
+					"spawnpoints:" + nospawn.enabled + ".";
 			
 			
 			
@@ -239,34 +247,43 @@ public class Set extends CommandBase {
 			String option = args[1].toLowerCase();
 			String option2 = ( args.length == 3 ? args[2].toLowerCase() : null );
 			
+			ActionMovePlayers move = (ActionMovePlayers) z.preActions.getByClass( "ActionRemoveEntities" );
+			ActionSetSpawnPoints spawn = null;
+			
+			if ( move == null ) {
+				sender.sendMessage("There has been an error with this command.");
+				return false;
+			}			
+			
+			
 			if ( args.length < 3 ) {
 				
 				if ( option.equals( "move" ) && option2 == null ) {
 					
-					z.preActions.movePlayers.enabled = true;
-					z.preActions.movePlayers.worldName = p.getWorld().getName();
-					z.preActions.movePlayers.toX = p.getLocation().getBlockX();
-					z.preActions.movePlayers.toY = p.getLocation().getBlockY();
-					z.preActions.movePlayers.toZ = p.getLocation().getBlockZ();
+					move.enabled = true;
+					move.location = p.getLocation().clone();
 					
-					mess = "Players in " + z.preActions.movePlayers.scope.toString().toLowerCase() + " will move to here on reset.";
+					mess = "Players in " + move.scope.toString().toLowerCase() + " will move to here on reset.";
 				
 				} else if ( option.equals( "move") ) {
 					
-					z.preActions.movePlayers.enabled = false;
-					mess = "Players in " + z.preActions.movePlayers.scope.toString().toLowerCase() + " will no longer move on reset.";
+					move.enabled = false;
+					mess = "Players in " + move.scope.toString().toLowerCase() + " will no longer move on reset.";
 					
 				} else if ( option.equals( "spawn") && option2 == null ) {
 					
-					z.preActions.setSpawnPoints.enabled = true;
-					z.preActions.setSpawnPoints.location = p.getLocation().clone();
+					spawn = (ActionSetSpawnPoints) z.preActions.getByClass( "ActionRemoveEntities" );
 					
-					mess = "Players in " + z.preActions.movePlayers.scope.toString().toLowerCase() + " will respawn here on reset.";
+					spawn.enabled = true;
+					spawn.location = p.getLocation().clone();
+					
+					mess = "Players in " + spawn.scope.toString().toLowerCase() + " will respawn here on reset.";
 					
 				} else if ( option.equals( "spawn") ) {
 					
-					z.preActions.setSpawnPoints.enabled = false;
-					mess = "Players in " + z.preActions.movePlayers.scope.toString().toLowerCase() + " will no longer respawn here on reset.";
+					spawn = (ActionSetSpawnPoints) z.preActions.getByClass( "ActionRemoveEntities" );
+					spawn.enabled = false;
+					mess = "Players in " + spawn.scope.toString().toLowerCase() + " will no longer respawn here on reset.";
 				}
 			
 			} else {
@@ -278,6 +295,7 @@ public class Set extends CommandBase {
 					return false;
 					
 				}
+						
 				
 				String 	noun 		= args[2].toLowerCase();
 				String 	action 		= Bukkit.getWorld( args[3].toLowerCase() ).getName();
@@ -285,23 +303,24 @@ public class Set extends CommandBase {
 				Integer locy 		= Integer.parseInt( args[5] );
 				Integer locz 		= Integer.parseInt( args[6] );
 				
+				Location loc = new Location( Bukkit.getWorld( action ), locx, locy, locz );
 					
 				if ( noun.equals( "players") ) {
 					
-					z.preActions.movePlayers.enabled = true;
-					z.preActions.movePlayers.worldName = action;
-					z.preActions.movePlayers.toX = locx;
-					z.preActions.movePlayers.toY = locy;
-					z.preActions.movePlayers.toZ = locz;
+					move.enabled = true;
+					move.location = loc;
 					
-					mess = "Any players in '" + z.preActions.movePlayers.scope.toString().toLowerCase() + "' will be moved to " + action + " ("+ locx + ", " + locy + ", " + locz + ") when " + z.getTag() + " resets.";
+					
+					mess = "Any players in '" + move.scope.toString().toLowerCase() + "' will be moved to " + action + " ("+ locx + ", " + locy + ", " + locz + ") when " + z.getTag() + " resets.";
 					
 				} else if ( noun.equals("spawn") ) {
 
-					z.preActions.setSpawnPoints.enabled = true;
-					z.preActions.setSpawnPoints.location = new Location( Bukkit.getWorld( action ), locx, locy, locz );
+					spawn = (ActionSetSpawnPoints) z.preActions.getByClass( "ActionRemoveEntities" );
+					
+					spawn.enabled = true;
+					spawn.location = loc;
 
-					mess = "Any players in '" + z.preActions.setSpawnPoints.scope.toString().toLowerCase() + "' will have their spawn set to " + action + " (" + locx + ", " + locy + ", " + locz + ") when " + z.getTag() + " resets.";					
+					mess = "Any players in '" + spawn.scope.toString().toLowerCase() + "' will have their spawn set to " + action + " (" + locx + ", " + locy + ", " + locz + ") when " + z.getTag() + " resets.";					
 					
 				}
 			}

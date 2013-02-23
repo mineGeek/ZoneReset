@@ -207,7 +207,7 @@ public class ResetAction extends Action {
 		List<Integer> neXyz = c.getIntegerList(".reset.ne");
 		List<Integer> swXyz = c.getIntegerList(".reset.sw");
 		
-		if ( neXyz != null && swXyz != null ) {
+		if ( neXyz.size() > 0 && swXyz.size() > 0 ) {
 			this.area = new Area( worldName, neXyz.get(0), neXyz.get(1), neXyz.get(2), swXyz.get(0), swXyz.get(1), swXyz.get(2));
 		}
 		

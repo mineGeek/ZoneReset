@@ -17,15 +17,14 @@ public class Zone {
 	
 	public Triggers triggers = new Triggers();
 	public Tasks 	tasks = new Tasks();
-	public Actions 	preActions = new Actions();
-	public Actions	resetActions = new Actions();
-	public Actions 	postActions = new Actions();
+	public Actions 	preActions = null;
+	public Actions	resetActions = null;
+	public Actions 	postActions = null;
 	
 	public Message	resetMessage = null;
 	public boolean	requiresNoPlayers = false;
 	
 	public String 	getTag() 				{ return this.tag; }
-	public void 	setTag( String value ) 	{ this.tag = value; }
 	
 	public String	getWorldName()			{ return this.worldName; }
 	public void		setWorldName(String val){ this.worldName = val;}
@@ -48,6 +47,21 @@ public class Zone {
 		this.postActions = clone.postActions;
 		this.resetMessage = clone.resetMessage;
 		this.tasks = clone.tasks;		
+	}
+	
+	public Zone( String tag ) {
+		this.setTag( tag );
+	}
+	
+	public void setTag( String tag ) {
+		
+		this.tag = tag;
+		
+		preActions = new Actions( tag );
+		resetActions = new Actions( tag );
+		postActions = new Actions( tag );		
+		
+		
 	}
 	
 	public void start() {

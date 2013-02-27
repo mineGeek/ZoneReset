@@ -44,7 +44,6 @@ public class ZMob implements Serializable {
 		this.z = l.getZ();
 		this.pitch = l.getPitch();
 		this.yaw = l.getYaw();
-		//this.direction = l.getDirection();
 		this.vx = l.getDirection().getX();
 		this.vy = l.getDirection().getY();
 		this.vz = l.getDirection().getZ();

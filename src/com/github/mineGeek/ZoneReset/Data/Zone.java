@@ -1,8 +1,11 @@
 package com.github.mineGeek.ZoneReset.Data;
 
+import java.util.List;
+
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 import com.github.mineGeek.ZoneReset.Tasks.Tasks;
 import com.github.mineGeek.ZoneReset.Triggers.Triggers;
+import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 import com.github.mineGeek.ZoneRest.Actions.Actions;
 
 public class Zone {
@@ -63,6 +66,13 @@ public class Zone {
 		
 		
 	}
+	
+	public List<String> getPlayers() {
+		
+		return Tracking.getPlayersInZone( this );
+		
+	}	
+	
 	
 	public void start() {
 		tasks.start();

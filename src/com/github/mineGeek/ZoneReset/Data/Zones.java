@@ -28,6 +28,7 @@ import com.github.mineGeek.ZoneReset.Triggers.TriggerOnInteract;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnJoin;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnQuit;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
+import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneRest.Actions.ActionEmptyPlayerInventory;
 import com.github.mineGeek.ZoneRest.Actions.ActionFillPlayerInventory;
@@ -43,7 +44,8 @@ public class Zones {
 	private static Map<String, Zone> zones = new HashMap<String, Zone>();
 	private static Map<String, List<String>> interactKeys = new HashMap<String, List<String>>();
 	private static Map<String, List<String>> chunkKeys = new HashMap<String, List<String>>();
-	private static Map<String, MovementMonitor> moves = new HashMap<String, MovementMonitor>();
+	
+
 	
 	public static Zone getZone( String tag ) {
 		return zones.get( tag );
@@ -157,13 +159,9 @@ public class Zones {
 	
 	public static void triggerPlayerMove( Player p ) {
 		
-		if ( !Config.trackMovement ) return;
-		
-		if ( !moves.containsKey( p.getName() ) ) {
-			moves.put( p.getName(), new MovementMonitor() );
-		}
-		
-		moves.get( p.getName() ).update( p );
+		Tracking.updatePlayerChunkMap( p );		
+		if ( !Config.trackMovement ) return;		
+		Tracking.playerMove( p );
 		
 	}
 	

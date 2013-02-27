@@ -56,7 +56,7 @@ public class Message implements Runnable {
 	
 	public void send( Zone zone ) {
 		
-		List<String> names = Utilities.getPlayersNearZone( zone );
+		List<String> names = zone.getPlayers();
 		
 		if ( names != null && !names.isEmpty() ) {
 			this.send( names );

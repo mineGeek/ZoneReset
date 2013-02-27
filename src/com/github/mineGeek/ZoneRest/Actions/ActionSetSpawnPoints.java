@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.Data.Zones;
-import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 public class ActionSetSpawnPoints extends Action {
@@ -30,7 +29,7 @@ public class ActionSetSpawnPoints extends Action {
 		
 		if ( this.scope.equals( ZRScope.REGION ) ) {
 			
-			List<String> ps = Utilities.getPlayersNearZone( Zones.getZone( this.tag ) );
+			List<String> ps = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : ps ) {
 				if (Bukkit.getPlayer(x).isOnline() || online ) players.add( Bukkit.getPlayer(x) );
 			}

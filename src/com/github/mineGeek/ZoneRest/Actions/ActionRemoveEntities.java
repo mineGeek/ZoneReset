@@ -12,7 +12,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 
 import com.github.mineGeek.ZoneReset.Data.Zones;
-import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 public class ActionRemoveEntities extends Action {
@@ -32,7 +31,7 @@ public class ActionRemoveEntities extends Action {
 		
 		if ( this.scope.equals( ZRScope.REGION ) ) {
 			
-			List<Chunk> chunks = Utilities.getChunksFromArea( Zones.getZone( this.tag ).getArea() );
+			List<Chunk> chunks = Zones.getZone( this.tag ).getArea().getChunks();
 			
 			for ( Chunk c : chunks ) {
 				

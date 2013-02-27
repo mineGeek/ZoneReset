@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.Data.Zones;
-import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 public class ActionMovePlayers extends Action {
@@ -29,7 +28,7 @@ public class ActionMovePlayers extends Action {
 		
 		if ( this.scope.equals( ZRScope.REGION ) ) {
 			
-			List<String> players = Utilities.getPlayersNearZone( Zones.getZone( this.tag ) );
+			List<String> players = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : players ) {
 				if ( Bukkit.getPlayer(x).isOnline() ) Bukkit.getPlayer(x).teleport(location);
 			}

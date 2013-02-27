@@ -35,7 +35,6 @@ public class Listeners implements Listener {
 
 		Utilities.clearPlayerMetaData( evt.getPlayer() );
 		Zones.triggerPlayerJoin( evt.getPlayer() );
-		Utilities.checkPlayerChunk( evt.getPlayer() );
 		Zones.triggerPlayerMove( evt.getPlayer() );
 	}
 	
@@ -47,42 +46,29 @@ public class Listeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLeave(PlayerQuitEvent evt )
     {
-    	
-    	Utilities.removePlayerFromChunks( evt.getPlayer() );
     	Zones.triggerPlayerQuit( evt.getPlayer() );
     	Utilities.clearPlayerMetaData( evt.getPlayer() );
-    	
-    	
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void PlayerMove( PlayerMoveEvent evt ) {
     	
-    	
     	if ( evt.getFrom().getBlock().equals( evt.getTo().getBlock() ) ) return;
     	Zones.triggerPlayerMove( evt.getPlayer() );
-    	Utilities.checkPlayerChunk( evt.getPlayer() );
     }
     
     @EventHandler( priority = EventPriority.LOWEST )
     public void PlayerPort( PlayerTeleportEvent evt ) {
-    	Utilities.checkPlayerChunk( evt.getPlayer(), evt.getTo() );
     	Zones.triggerPlayerMove( evt.getPlayer() );
     }
     
-    /**
-     * When the player changes worlds, we reload their rules
-     * @param evt
-     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent evt) {
-    	Utilities.checkPlayerChunk( evt.getPlayer() );
     	Zones.triggerPlayerMove( evt.getPlayer() );
     }
     
 	@EventHandler(priority = EventPriority.LOWEST )
     public void onRespawn(PlayerRespawnEvent evt) {
-		Utilities.checkPlayerChunk( evt.getPlayer() );
 		Zones.triggerPlayerMove( evt.getPlayer() );
 	}
     

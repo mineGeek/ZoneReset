@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.mineGeek.ZoneReset.Data.ZItem;
 import com.github.mineGeek.ZoneReset.Data.Zones;
-import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
 
@@ -36,7 +35,7 @@ public class ActionEmptyPlayerInventory extends Action {
 		
 		if ( this.scope.equals( ZRScope.REGION ) ) {
 			
-			List<String> ps = Utilities.getPlayersNearZone( Zones.getZone( this.tag ) );
+			List<String> ps = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : ps ) {
 				if (Bukkit.getPlayer(x).isOnline() ) players.add( Bukkit.getPlayer(x) );
 			}

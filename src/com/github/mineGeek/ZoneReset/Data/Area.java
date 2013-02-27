@@ -1,10 +1,14 @@
 package com.github.mineGeek.ZoneReset.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+
+import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 
 
 /**
@@ -22,7 +26,7 @@ public class Area {
 	private int neZ;
 		
 	/**
-	 * opposite corner of cuboid
+	 * opposite corner
 	 */
 	public Location cachedSw;
 	private int swX;
@@ -31,6 +35,7 @@ public class Area {
 	
 	public String worldName = null;
 	
+	private List<Integer> ChunkList = null;
 	
 	
 	/**
@@ -208,6 +213,40 @@ public class Area {
 		
 	}
 	
+	public List<Chunk> getChunks() {
+		return Tracking.getChunksFromArea( this.ne(), this.sw() );
+	}
+	
+	public void setChunkIDs() {
+		
+		if ( this.ChunkList != null ) this.ChunkList.clear();
+		if ( this.ne() != null && this.sw() != null ) {
+			List<Chunk> chunks = Tracking.getChunksFromArea( this.ne(), this.sw() );
+			this.ChunkList = new ArrayList<Integer>();
+			
+			if ( !chunks.isEmpty() ) {
+				for( Chunk c : chunks ) {
+					this.ChunkList.add( c.hashCode() );
+				}
+			}
+		}
+		
+	}
+	
+	public List<Integer> getChunkIDs() {
+		
+		if ( this.ChunkList == null ) {
+			this.setChunkIDs();
+		}
+		
+		if ( this.ChunkList != null ) {
+			return this.ChunkList;
+		}
+		
+		return new ArrayList<Integer>();
+		
+	}
+	
 	/**
 	 * Get all the ZRBlocks in this area.
 	 * TODO: Won't this fart out if only 1 location object is set?
@@ -229,6 +268,7 @@ public class Area {
 	public void close() {
 		this.cachedNe = null;
 		this.cachedSw = null;
+		if ( this.ChunkList != null ) this.ChunkList.clear();
 	}
 
 	

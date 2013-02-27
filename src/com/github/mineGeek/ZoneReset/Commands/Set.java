@@ -234,11 +234,16 @@ public class Set extends CommandBase {
 				
 			}
 			
-			mess = "Before " + z.getTag() + "resets, the following will be removed - Animals:" + remove.removeAnimals + ", " +
+			mess = "Before " + z.getTag() + " resets, the following will be removed - ";
+			
+			if ( remove != null ) {
+				mess = mess + "Animals:" + remove.removeAnimals + ", " +
 					"Mobs:" + remove.removeMobs + ", " +
 					"Drops:" + remove.removeDrops + ", " +
-					"Containers :" + remove.removeTiles + ", " +
-					"spawnpoints:" + nospawn.enabled + ".";
+					"Containers :" + remove.removeTiles + " ";			
+			}
+
+			if ( nospawn != null ) mess = mess + "spawnpoints:" + nospawn.enabled + ".";
 			
 			
 			

@@ -24,6 +24,7 @@ public class ZBlock implements Serializable {
 	public byte data;
 	public boolean hasInventory = false;
 	public boolean deferred = false;
+	public boolean isContainer = false;
 	
 	public ArrayList<String> lines = null;
 	public ArrayList<ZItem> items = null;
@@ -53,7 +54,7 @@ public class ZBlock implements Serializable {
 		}
 		
 		if ( block.getState() instanceof InventoryHolder ) {
-		
+			isContainer = true;
 			Inventory inv = null;
 			if ( block.getState() instanceof Chest ) {
 				inv = ((Chest)block.getState()).getBlockInventory();				

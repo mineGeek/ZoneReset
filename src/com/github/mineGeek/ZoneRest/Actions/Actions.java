@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 public class Actions {
 
 	public List<IAction> actions = new ArrayList<IAction>();
@@ -27,10 +29,11 @@ public class Actions {
 		
 		for ( IAction a : actions ) {
 			try {
-				if ( Class.forName(className).isInstance(a) ) {
+
+				if ( a.getClass().getSimpleName().equalsIgnoreCase( className ) ) {
 					return a;
 				}
-			} catch (ClassNotFoundException e) {}
+			} catch (Exception e) {}
 		}
 
 		Class<?> clazz;

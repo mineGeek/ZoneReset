@@ -20,6 +20,7 @@ import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Events.Listeners;
 import com.github.mineGeek.ZoneReset.Markers.Markers;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
+import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 
 /**
@@ -73,6 +74,7 @@ public class ZoneReset extends JavaPlugin {
     	/**
     	 * Shut down and dispose of Zones
     	 */
+    	Tracking.close();
     	Zones.close();
     	
     	this.getServer().getScheduler().cancelTasks( this );
@@ -156,6 +158,9 @@ public class ZoneReset extends JavaPlugin {
     	 */
     	Zones.loadDataZones();
     	
+    	if ( Config.trackMovement ) {
+    		Tracking.loadZones();
+    	}
     	
     	
     	Utilities.plugin = this;

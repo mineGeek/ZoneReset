@@ -7,9 +7,11 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Slime;
 
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
@@ -36,7 +38,7 @@ public class ActionRemoveEntities extends Action {
 			for ( Chunk c : chunks ) {
 				
 				for ( Entity e : c.getEntities() ) {
-
+					
 					remove(e);
 					
 				}
@@ -80,12 +82,12 @@ public class ActionRemoveEntities extends Action {
 	
 	private void remove( Entity e ) {
 	
-		if ( removeMobs && e instanceof Monster ) {
-			e.remove();
-		} else if ( removeAnimals && e instanceof Monster ) {
-			e.remove();
+		if ( removeMobs && ( e instanceof Monster || e instanceof Slime ) ) {
+			e.remove(); Bukkit.getLogger().info( " rem " + e.getType().toString() );
+		} else if ( removeAnimals && e instanceof Animals ) {
+			e.remove(); Bukkit.getLogger().info( " rem " + e.getType().toString() );
 		} else if ( removeDrops && e instanceof Item ) {
-			e.remove();
+			e.remove(); Bukkit.getLogger().info( " rem " + e.getType().toString() );
 		}		
 		
 	}
@@ -96,10 +98,10 @@ public class ActionRemoveEntities extends Action {
 		if ( !enabled ) return;
 		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".remove.entities.scope", scope.toString().toLowerCase() );
 		
-		c.set("remove.entities.mobs", removeMobs );
-		c.set("remove.entities.animals", removeAnimals );
-		c.set("remove.entities.drops", removeDrops );
-		c.set("remove.entities.containers", removeTiles );
+		c.set( root + ".remove.entities.mobs", removeMobs );
+		c.set( root + ".remove.entities.animals", removeAnimals );
+		c.set( root + ".remove.entities.drops", removeDrops );
+		c.set( root + ".remove.entities.containers", removeTiles );
 		
 	}
 
@@ -108,12 +110,12 @@ public class ActionRemoveEntities extends Action {
 
 		scope = ZRScope.valueOf( c.getString( root + ".remove.entities.scope", "region").toUpperCase() );
 		
-		removeMobs = c.getBoolean(".remove.entities.mobs", false );
-		removeAnimals = c.getBoolean(".remove.entities.animals", false );
-		removeDrops = c.getBoolean(".remove.entities.drops", false );
-		removeTiles = c.getBoolean(".remove.entities.containers", false );
+		removeMobs = c.getBoolean( root + ".remove.entities.mobs", false );
+		removeAnimals = c.getBoolean( root + ".remove.entities.animals", false );
+		removeDrops = c.getBoolean( root + ".remove.entities.drops", false );
+		removeTiles = c.getBoolean( root + ".remove.entities.containers", false );
 		
-		enabled = ( !scope.equals(ZRScope.REGION) || !removeMobs || !removeAnimals || !removeDrops || !removeTiles  );
+		enabled = (!(scope.equals(ZRScope.REGION)) || (removeMobs || removeAnimals || removeDrops || removeTiles ) ) ;
 		
 	}
 	

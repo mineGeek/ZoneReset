@@ -47,7 +47,7 @@ public class Config {
 	 */
 	public static boolean debug_area_chunkEntrance = false;
 	public static boolean debug_area_chunkExit = false;
-	public static boolean debug_area_chunkChange = false;
+	public static boolean debug_area_chunkChange = true;
 	
 	public static String folderPlayers;
 	public static String folderZones;

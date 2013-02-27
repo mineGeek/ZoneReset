@@ -79,8 +79,7 @@ public class ZMob implements Serializable {
 	}
 	
 	public Entity spawnEntity() {
-		
-		//Vector v = new Vector( this.vx, this.vy, this.vz);
+
 		Location l = new Location( Bukkit.getWorld( this.worldName), this.x, this.y, this.z, this.pitch, this.yaw );
 
 		Entity e = Bukkit.getWorld( this.worldName ).spawnEntity(l, EntityType.fromName( this.entityType) );
@@ -102,7 +101,7 @@ public class ZMob implements Serializable {
 		}
 		
 		if ( e instanceof Damageable ) {
-			((Damageable) e).setHealth( this.health );
+			if ( this.health > 0 && this.health < 1 ) ((Damageable) e).setHealth( this.health );
 		}
 		
 		if ( e instanceof Ageable ) {

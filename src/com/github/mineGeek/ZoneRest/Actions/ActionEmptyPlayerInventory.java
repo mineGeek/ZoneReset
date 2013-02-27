@@ -127,7 +127,7 @@ public class ActionEmptyPlayerInventory extends Action {
 			
 		}
 		
-		enabled = ( !scope.equals( ZRScope.REGION ) || !allow.isEmpty() || !remove.isEmpty() );
+		enabled = (  (!scope.equals( ZRScope.REGION ) ) || ( allow.isEmpty() || remove.isEmpty() ) );
 		
 		
 	}

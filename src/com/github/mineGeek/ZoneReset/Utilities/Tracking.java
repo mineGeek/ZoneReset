@@ -38,6 +38,7 @@ public class Tracking {
 	public static void updatePlayerChunkMap( Player p ) {
 		
 		if ( playerToChunkMap.containsKey( p.getName() ) && playerToChunkMap.get( p.getName() ) != p.getLocation().getChunk().hashCode() ) {
+			if ( Config.debug_area_chunkChange ) p.sendMessage( "new chunk: " + p.getLocation().getChunk().hashCode() );
 			Integer i = playerToChunkMap.get( p.getName() );
 			if (chunkToPlayersMap.containsKey(i) ) chunkToPlayersMap.get( i ).remove( p.getName() );
 			if ( chunkToPlayersMap.containsKey( p.getLocation().getChunk().hashCode() ) ) {

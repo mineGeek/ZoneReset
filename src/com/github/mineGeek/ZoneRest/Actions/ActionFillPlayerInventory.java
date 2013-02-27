@@ -93,7 +93,7 @@ public class ActionFillPlayerInventory extends Action {
 			
 		}
 		
-		enabled = ( !scope.equals( ZRScope.REGION ) || !items.isEmpty() );
+		enabled = ( ( !scope.equals( ZRScope.REGION ) ) || items.isEmpty() );
 		
 		
 	}

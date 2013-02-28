@@ -7,6 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -29,6 +30,7 @@ public class ZMob implements Serializable {
 	public double vx;
 	public double vy;
 	public double vz;
+	public boolean isMob = true;
 	
 	Map<String, ZItem> items;
 	
@@ -75,6 +77,8 @@ public class ZMob implements Serializable {
 			this.age = ((Ageable)e).getAge();
 			
 		}
+		
+		if ( e instanceof Animals ) this.isMob = false;
 		
 	}
 	

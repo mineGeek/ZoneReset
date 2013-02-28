@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Actions;
+package com.github.mineGeek.ZoneReset.Actions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public class ActionMovePlayers extends Action {
 	@Override
 	public void setToConfig(String root, ConfigurationSection c) {
 		
-		if ( !enabled ) return;
+		if ( !isEnabled() ) return;
 		
 		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".moveplayers.scope", scope.toString().toLowerCase() );
 		
@@ -79,13 +79,13 @@ public class ActionMovePlayers extends Action {
 			List<Integer> xyz = c.getIntegerList( root + ".moveplayers.xyz" );
 			location = new Location( Bukkit.getWorld( worldName ), xyz.get(0), xyz.get(1), xyz.get(2) );
 		}		
-		enabled = ( !scope.equals( ZRScope.REGION ) || location != null );
+		enabled = isEnabled();
 		
 	}
 	
 	@Override
 	public boolean isEnabled() {
-		return enabled;
+		return ( !scope.equals( ZRScope.REGION ) || location != null );
 	}	
 	
 	

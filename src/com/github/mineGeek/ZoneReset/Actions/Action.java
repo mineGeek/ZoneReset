@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Actions;
+package com.github.mineGeek.ZoneReset.Actions;
 
 
 

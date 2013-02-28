@@ -32,6 +32,36 @@ public class Triggers {
 		
 	}
 	
+	public TriggerOnJoin getOnJoin() {
+		if ( onJoin == null ) onJoin = new TriggerOnJoin();
+		return onJoin;
+	}
+	
+	public TriggerOnQuit getOnQuit() {
+		if ( onQuit == null ) onQuit = new TriggerOnQuit();
+		return onQuit;
+	}
+	
+	public TriggerOnInteract getOnInteract() {
+		if ( onInteract == null ) onInteract = new TriggerOnInteract();
+		return onInteract;
+	}
+	
+	public Trigger getOnTimed() {
+		if ( onTimed == null ) onTimed = new TriggerOnEnter();
+		return onTimed;
+	}
+	
+	public TriggerOnEnter getOnEnter() {
+		if ( onEnter == null ) onEnter = new TriggerOnEnter();
+		return onEnter;
+	}
+	
+	public TriggerOnExit getOnExit() {
+		if ( onExit == null ) onExit = new TriggerOnExit();
+		return onExit;
+	}	
+	
 	
 	
 }

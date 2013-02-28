@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Actions;
+package com.github.mineGeek.ZoneReset.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class ActionFillPlayerInventory extends Action {
 	@Override
 	public void setToConfig(String root, ConfigurationSection c) {
 
-		if ( !enabled ) return;
+		if ( !isEnabled() ) return;
 		
 		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".inventory.add.scope", scope.toString().toLowerCase() );
 		
@@ -93,13 +93,13 @@ public class ActionFillPlayerInventory extends Action {
 			
 		}
 		
-		enabled = ( ( !scope.equals( ZRScope.REGION ) ) || items.isEmpty() );
+		enabled = isEnabled();
 		
 		
 	}
 	@Override
 	public boolean isEnabled() {
-		return enabled;
+		return ( ( !scope.equals( ZRScope.REGION ) ) || items.isEmpty() );
 	}	
 	
 }

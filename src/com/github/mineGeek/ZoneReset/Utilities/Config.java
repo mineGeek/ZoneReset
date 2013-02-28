@@ -11,12 +11,12 @@ import org.bukkit.Location;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import com.github.mineGeek.ZoneReset.Actions.IAction;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 import com.github.mineGeek.ZoneReset.Tasks.ITask;
 import com.github.mineGeek.ZoneReset.Tasks.MessageTask;
-import com.github.mineGeek.ZoneRest.Actions.IAction;
 
 
 
@@ -66,7 +66,7 @@ public class Config {
 		Config.spamPlayerMessageTimeout		= c.getInt( "playerMessageTimeout", 1500 );		
 		Config.debug_area_chunkEntrance		= c.getBoolean("debug.area.chunkEntrance", false);
 		Config.debug_area_chunkExit			= c.getBoolean("debug.area.chunkExit", false);
-		Config.debug_area_chunkChange		= c.getBoolean("debug.area.chunkChange", false);
+		Config.debug_area_chunkChange		= c.getBoolean("debug.area.chunkChange", true);
 		Config.noNMS						= c.getBoolean("no-nms", false);
 		Config.loadZonesFromConfig( c );
 	}	
@@ -206,7 +206,7 @@ public class Config {
 			if ( z.triggers.onEnter.resetSeconds == 0 ) {
 				value = "zones";
 			} else if ( z.triggers.onEnter.resetSeconds > 0 ) {
-				value = Utilities.getTimeStampAsString( z.triggers.onEnter.resetSeconds );
+				value = Utilities.getTimeStampAsShorthand( z.triggers.onEnter.resetSeconds );
 			}
 			c.set( path + "trigger.onenter.reset", value );
 			
@@ -218,7 +218,7 @@ public class Config {
 			if ( z.triggers.onExit.resetSeconds == 0 ) {
 				value = "zones";
 			} else if ( z.triggers.onExit.resetSeconds > 0 ) {
-				value = Utilities.getTimeStampAsString( z.triggers.onExit.resetSeconds );
+				value = Utilities.getTimeStampAsShorthand( z.triggers.onExit.resetSeconds );
 			}
 			c.set( path + "trigger.onexit.reset", value );
 			
@@ -230,7 +230,7 @@ public class Config {
 			if ( z.triggers.onTimed.resetSeconds == 0 ) {
 				value = "zones";
 			} else if ( z.triggers.onTimed.resetSeconds > 0 ) {
-				value = Utilities.getTimeStampAsString( z.triggers.onTimed.resetSeconds );
+				value = Utilities.getTimeStampAsShorthand( z.triggers.onTimed.resetSeconds );
 			}
 			c.set( path + "trigger.ontime.reset", value );
 			

@@ -37,10 +37,41 @@ public class Tracking {
 	
 	public static void updatePlayerChunkMap( Player p ) {
 		
+		Integer x = p.getLocation().getChunk().hashCode();
+		
+		if ( !playerToChunkMap.containsKey( p.getName() ) ) {
+			
+			playerToChunkMap.put( p.getName(), x );
+			
+			if ( chunkToPlayersMap.containsKey( x ) ) {
+				chunkToPlayersMap.get(x).add( p.getName() );
+			} else {
+				chunkToPlayersMap.put( x , new ArrayList<String>( Arrays.asList( p.getName() ) ) );
+			}
+		
+		} else if ( !playerToChunkMap.get( p.getName() ).equals( x ) ){
+			//Contains a hash, but is different
+			Integer oldX = playerToChunkMap.get( p.getName() );
+			if ( Config.debug_area_chunkChange ) p.sendMessage( "new chunk: " + x );
+ 			if ( chunkToPlayersMap.containsKey( oldX ) ) chunkToPlayersMap.get( oldX ).remove( p.getName() );
+			
+			if ( chunkToPlayersMap.containsKey( x ) ) {
+				chunkToPlayersMap.get(x).add( p.getName() );
+			} else {
+				chunkToPlayersMap.put( x , new ArrayList<String>( Arrays.asList( p.getName() ) ) );
+			}
+			
+			playerToChunkMap.put( p.getName(), x );
+			
+		}
+		/*
 		if ( playerToChunkMap.containsKey( p.getName() ) && playerToChunkMap.get( p.getName() ) != p.getLocation().getChunk().hashCode() ) {
 			if ( Config.debug_area_chunkChange ) p.sendMessage( "new chunk: " + p.getLocation().getChunk().hashCode() );
+			
 			Integer i = playerToChunkMap.get( p.getName() );
+			
 			if (chunkToPlayersMap.containsKey(i) ) chunkToPlayersMap.get( i ).remove( p.getName() );
+			
 			if ( chunkToPlayersMap.containsKey( p.getLocation().getChunk().hashCode() ) ) {
 				chunkToPlayersMap.get( p.getLocation().getChunk().hashCode() ).add( p.getName() );
 			} else {
@@ -49,6 +80,8 @@ public class Tracking {
 		} else if ( !playerToChunkMap.containsKey( p.getName() ) ) {
 			playerToChunkMap.put( p.getName(), p.getLocation().getChunk().hashCode() );
 		}
+		*/
+		
 	}
 	
 	public static void playerMove( Player p, Location to ) {

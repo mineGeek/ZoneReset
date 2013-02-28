@@ -1,10 +1,8 @@
-package com.github.mineGeek.ZoneRest.Actions;
+package com.github.mineGeek.ZoneReset.Actions;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.Bukkit;
 
 public class Actions {
 
@@ -39,10 +37,13 @@ public class Actions {
 		Class<?> clazz;
 		IAction a = null;
 		try {
-			clazz = Class.forName(className);
+			clazz = Class.forName("com.github.mineGeek.ZoneReset.Actions." + className );
+			//clazz = Class.forName( className );
 			Constructor<?> ctor = clazz.getConstructor(String.class);
 			a = (IAction) ctor.newInstance(new Object[] { this.tag });			
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		add(a);
 		return a;

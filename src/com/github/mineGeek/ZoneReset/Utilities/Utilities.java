@@ -63,6 +63,25 @@ public class Utilities {
 		
 	}
 	
+	public static String getTimeStampAsShorthand( int timeStamp ) {
+		
+		int sec = 	(timeStamp % 60 );
+		int min = 	(timeStamp / 60) % 60;
+		int hours = (timeStamp / (60*60 ) ) % 24;
+		int days = 	(timeStamp / (60*60*24 ) ) % 7;
+		int weeks = (timeStamp / (60*60*24*7)); 
+  
+		String result = "";
+		if ( weeks > 0 ) 	result = weeks + "w";
+		if ( days > 0) 		result = result + days + "d";
+		if ( hours > 0) 	result = result + hours + "h";
+		if ( min > 0) 		result = result + min + "m";
+		if ( sec > 0) 		result = result + sec + "s";
+		
+		return result;
+		
+	}	
+	
 	public static String getTimeStampAsString( Long timeStamp ) {
 		
 		return getTimeStampAsString( (int) (timeStamp/1000) );
@@ -71,11 +90,11 @@ public class Utilities {
 	
 	public static String getTimeStampAsString( int timeStamp ) {
 		
-		int sec = 	(timeStamp % 60 );
-		int min = 	(timeStamp * 60) % 60;
-		int hours = (timeStamp *60*60) % 24;
-		int days = 	(timeStamp *60*60*24) % 7;
-		int weeks = (timeStamp *60*60*24*7); 
+		int sec = 	( timeStamp % 60 );
+		int min = 	( timeStamp / 60) % 60;
+		int hours = ( timeStamp / (60*60 ) ) % 24;
+		int days = 	( timeStamp / (60*60*24) ) % 7;
+		int weeks = ( timeStamp / (60*60*24*7) ); 
   
 		String result = null;
 		if ( weeks > 0 ) 	result = weeks + " week" + ( weeks == 1 ? "" : "s");

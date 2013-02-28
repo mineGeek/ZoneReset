@@ -1,5 +1,7 @@
 package com.github.mineGeek.ZoneReset.Triggers;
 
+import com.github.mineGeek.ZoneReset.Data.Zones;
+
 public class Trigger {
 
 	public String 	tag;
@@ -13,6 +15,8 @@ public class Trigger {
 	
 	public void run() {
 		
+		Zones.getZone( tag ).reset();
+		if ( restartTimer ) Zones.getZone( tag ).tasks.restart();
 	}
 	
 	public void close() {

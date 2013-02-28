@@ -2,11 +2,11 @@ package com.github.mineGeek.ZoneReset.Data;
 
 import java.util.List;
 
+import com.github.mineGeek.ZoneReset.Actions.Actions;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 import com.github.mineGeek.ZoneReset.Tasks.Tasks;
 import com.github.mineGeek.ZoneReset.Triggers.Triggers;
 import com.github.mineGeek.ZoneReset.Utilities.Tracking;
-import com.github.mineGeek.ZoneRest.Actions.Actions;
 
 public class Zone {
 
@@ -77,6 +77,7 @@ public class Zone {
 	public void start() {
 		tasks.start();
 	}
+	
 	
 	public void reset() {
 		tasks.stop();

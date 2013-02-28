@@ -18,9 +18,18 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
+import com.github.mineGeek.ZoneReset.Actions.ActionEmptyPlayerInventory;
+import com.github.mineGeek.ZoneReset.Actions.ActionFillPlayerInventory;
+import com.github.mineGeek.ZoneReset.Actions.ActionMovePlayers;
+import com.github.mineGeek.ZoneReset.Actions.ActionRemoveEntities;
+import com.github.mineGeek.ZoneReset.Actions.ActionRemoveSpawnPoints;
+import com.github.mineGeek.ZoneReset.Actions.ActionSetSpawnPoints;
+import com.github.mineGeek.ZoneReset.Actions.IAction;
+import com.github.mineGeek.ZoneReset.Actions.ResetAction;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 
 import com.github.mineGeek.ZoneReset.Tasks.MessageTask;
+import com.github.mineGeek.ZoneReset.Tasks.ResetTask;
 import com.github.mineGeek.ZoneReset.Triggers.Trigger;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnEnter;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnExit;
@@ -30,14 +39,6 @@ import com.github.mineGeek.ZoneReset.Triggers.TriggerOnQuit;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneRest.Actions.ActionEmptyPlayerInventory;
-import com.github.mineGeek.ZoneRest.Actions.ActionFillPlayerInventory;
-import com.github.mineGeek.ZoneRest.Actions.ActionMovePlayers;
-import com.github.mineGeek.ZoneRest.Actions.ActionRemoveEntities;
-import com.github.mineGeek.ZoneRest.Actions.ActionRemoveSpawnPoints;
-import com.github.mineGeek.ZoneRest.Actions.ActionSetSpawnPoints;
-import com.github.mineGeek.ZoneRest.Actions.IAction;
-import com.github.mineGeek.ZoneRest.Actions.ResetAction;
 
 public class Zones {
 
@@ -393,7 +394,12 @@ public class Zones {
 				time.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
 			}
 			
-			r.triggers.onTimed = time;			
+			r.triggers.onTimed = time;
+
+			ResetTask t = new ResetTask();
+			t.secInterval = time.resetSeconds;
+			r.tasks.add( t );
+			
 			
 		}
 		

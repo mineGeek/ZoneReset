@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Actions;
+package com.github.mineGeek.ZoneReset.Actions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +37,7 @@ public class ResetAction extends Action {
 	public boolean resetBlocks = true;
 	public boolean resetContainers = true;
 	public boolean resetMobs = true;
+	public boolean resetAnimals = true;
 	public boolean enabled = true;
 	public Area area;
 	
@@ -169,16 +170,15 @@ public class ResetAction extends Action {
 			}
 		}
 		
-		if ( this.resetMobs ) {
-			if ( !mobs.isEmpty() ) {
+		if ( !mobs.isEmpty() ) {
+			
+			for ( ZMob mob : mobs ) {
 				
-				for ( ZMob mob : mobs ) {
-					
+				if ( ( mob.isMob && this.resetMobs ) || ( !mob.isMob && this.resetAnimals )) {
 					mob.spawnEntity();
-					
-				}
-				
+				} 
 			}
+			
 		}
 		
 		
@@ -217,7 +217,7 @@ public class ResetAction extends Action {
 		this.resetContainers = c.getBoolean( root + ".reset.containers", true );
 		this.resetMobs = c.getBoolean( root + ".reset.mobs", true);
 		
-		enabled = ( this.area != null );
+		enabled = isEnabled();
 		
 		
 		
@@ -225,7 +225,7 @@ public class ResetAction extends Action {
 
 	@Override
 	public boolean isEnabled() {
-		return enabled;
+		return ( this.area != null );
 	}
 
 }

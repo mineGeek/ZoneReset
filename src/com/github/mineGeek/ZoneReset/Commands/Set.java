@@ -1,17 +1,18 @@
 package com.github.mineGeek.ZoneReset.Commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.ZoneReset;
+import com.github.mineGeek.ZoneReset.Actions.ActionMovePlayers;
+import com.github.mineGeek.ZoneReset.Actions.ActionRemoveEntities;
+import com.github.mineGeek.ZoneReset.Actions.ActionRemoveSpawnPoints;
+import com.github.mineGeek.ZoneReset.Actions.ActionSetSpawnPoints;
+import com.github.mineGeek.ZoneReset.Actions.ResetAction;
 import com.github.mineGeek.ZoneReset.Data.Zone;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
-import com.github.mineGeek.ZoneRest.Actions.ActionMovePlayers;
-import com.github.mineGeek.ZoneRest.Actions.ActionRemoveEntities;
-import com.github.mineGeek.ZoneRest.Actions.ActionRemoveSpawnPoints;
-import com.github.mineGeek.ZoneRest.Actions.ActionSetSpawnPoints;
-import com.github.mineGeek.ZoneRest.Actions.ResetAction;
 
 
 
@@ -114,7 +115,11 @@ public class Set extends CommandBase {
 				reset.resetBlocks = !reset.resetBlocks;
 				reset.resetMobs = !reset.resetMobs;
 				reset.resetContainers = !reset.resetContainers;
-				mess = z.getTag() + " will " + ( reset.resetMobs ? "" : "not") + "spawn mobs, " + ( reset.resetBlocks ? "" : "not") + "reset blocks and " + ( reset.resetContainers ? "" : "not") + "reset containers inventory.";
+				reset.resetAnimals = !reset.resetAnimals;
+				
+				mess = z.getTag() + " will " + ( reset.resetMobs ? "" : "not ") + "spawn mobs, " + 
+				( reset.resetBlocks ? "" : "not") + "reset blocks and " + ( reset.resetContainers ? "" : "not ") + "reset containers inventory." +
+				( reset.resetBlocks ? "" : "not") + "reset blocks and " + ( reset.resetAnimals ? "" : "not ") + "spawn animals.";
 				return true;
 				
 			} else {			
@@ -158,7 +163,21 @@ public class Set extends CommandBase {
 					}
 					
 					mess = z.getTag() + " will " + ( reset.resetContainers ? "no longer " : "now ") + "reset containers";
-				}			
+				}
+				
+				if ( noun.equals( "animals") || noun.equals( "animal") ) {
+					
+					if ( toggle == null ) {
+						
+						reset.resetAnimals = !reset.resetAnimals;
+						
+					} else {
+						reset.resetAnimals = toggle;
+					}
+					
+					mess = z.getTag() + " will " + ( reset.resetAnimals ? "no longer " : "now ") + "reset animals";
+				}				
+				
 			}
 			
 		
@@ -249,10 +268,17 @@ public class Set extends CommandBase {
 			
 		} else if ( key.equals("location") || key.equals("loc") ) {
 			
+			if ( args.length == 1 ) {
+				
+				mess = ChatColor.RED + "Incorrect amount of parameters. Try /set loc [move|spawn]";
+				return false;
+				
+			}
+			
 			String option = args[1].toLowerCase();
 			String option2 = ( args.length == 3 ? args[2].toLowerCase() : null );
 			
-			ActionMovePlayers move = (ActionMovePlayers) z.preActions.getByClass( "ActionRemoveEntities" );
+			ActionMovePlayers move = (ActionMovePlayers) z.preActions.getByClass( "ActionMovePlayers" );
 			ActionSetSpawnPoints spawn = null;
 			
 			if ( move == null ) {
@@ -277,7 +303,7 @@ public class Set extends CommandBase {
 					
 				} else if ( option.equals( "spawn") && option2 == null ) {
 					
-					spawn = (ActionSetSpawnPoints) z.preActions.getByClass( "ActionRemoveEntities" );
+					spawn = (ActionSetSpawnPoints) z.preActions.getByClass( "ActionSetSpawnPoints" );
 					
 					spawn.enabled = true;
 					spawn.location = p.getLocation().clone();
@@ -381,14 +407,14 @@ public class Set extends CommandBase {
 					return true;
 				}
 				
-				z.triggers.onTimed.enabled = true;
+				z.triggers.getOnTimed().enabled = true;
 				
 				if ( option.equals("interval") ) {
-					z.triggers.onTimed.resetSeconds = (int) (Utilities.getSecondsFromText( option2 )*1);
-					z.triggers.onTimed.restartTimer = true;
+					z.triggers.getOnTimed().resetSeconds = (int) (Utilities.getSecondsFromText( option2 )*1);
+					z.triggers.getOnTimed().restartTimer = true;
 				}
 				
-				mess = z.getTag() + " will reset every " + Utilities.getTimeStampAsString( z.triggers.onTimed.resetSeconds ) + ".";
+				mess = z.getTag() + " will reset every " + Utilities.getTimeStampAsString( z.triggers.getOnTimed().resetSeconds ) + ".";
 			
 					
 			} else if ( type.equals( "interact") ) {

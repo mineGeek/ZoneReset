@@ -1,4 +1,4 @@
-package com.github.mineGeek.ZoneRest.Actions;
+package com.github.mineGeek.ZoneReset.Actions;
 
 import java.util.List;
 
@@ -95,7 +95,7 @@ public class ActionRemoveEntities extends Action {
 	@Override
 	public void setToConfig(String root, ConfigurationSection c) {
 		
-		if ( !enabled ) return;
+		if ( !isEnabled() ) return;
 		if ( !scope.equals( ZRScope.REGION ) ) c.set( root + ".remove.entities.scope", scope.toString().toLowerCase() );
 		
 		c.set( root + ".remove.entities.mobs", removeMobs );
@@ -115,13 +115,13 @@ public class ActionRemoveEntities extends Action {
 		removeDrops = c.getBoolean( root + ".remove.entities.drops", false );
 		removeTiles = c.getBoolean( root + ".remove.entities.containers", false );
 		
-		enabled = (!(scope.equals(ZRScope.REGION)) || (removeMobs || removeAnimals || removeDrops || removeTiles ) ) ;
+		enabled = isEnabled();
 		
 	}
 	
 	@Override
 	public boolean isEnabled() {
-		return enabled;
+		return (!(scope.equals(ZRScope.REGION)) || (removeMobs || removeAnimals || removeDrops || removeTiles ) );
 	}	
 
 }

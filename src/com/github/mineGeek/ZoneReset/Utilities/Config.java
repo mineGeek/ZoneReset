@@ -227,10 +227,10 @@ public class Config {
 		if ( z.triggers.onTimed != null ) {
 			
 			String value = "timer";
-			if ( z.triggers.onTimed.resetSeconds == 0 ) {
+			if ( z.triggers.getOnTimed().resetSeconds == 0 ) {
 				value = "zones";
-			} else if ( z.triggers.onTimed.resetSeconds > 0 ) {
-				value = Utilities.getTimeStampAsShorthand( z.triggers.onTimed.resetSeconds );
+			} else if ( z.triggers.getOnTimed().resetSeconds > 0 ) {
+				value = Utilities.getTimeStampAsShorthand( z.triggers.getOnTimed().resetSeconds );
 			}
 			c.set( path + "trigger.ontime.reset", value );
 			

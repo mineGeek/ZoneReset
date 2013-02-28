@@ -4,6 +4,7 @@ import com.github.mineGeek.ZoneReset.Data.Zones;
 
 public class ResetTask extends Task implements ITask {
 
+	public ResetTask( String tag ) { super(tag); }
 	
 	@Override
 	public void run() {

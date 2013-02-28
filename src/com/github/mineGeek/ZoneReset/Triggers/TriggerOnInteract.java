@@ -5,6 +5,10 @@ import org.bukkit.Material;
 
 public class TriggerOnInteract extends Trigger {
 
+	public TriggerOnInteract(String tag) {
+		super(tag);
+	}
+
 	public Location location = null;
 	public int materialId;
 	

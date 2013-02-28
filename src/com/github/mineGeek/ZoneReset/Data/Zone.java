@@ -2,6 +2,8 @@ package com.github.mineGeek.ZoneReset.Data;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 import com.github.mineGeek.ZoneReset.Actions.Actions;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 import com.github.mineGeek.ZoneReset.Tasks.Tasks;
@@ -59,7 +61,7 @@ public class Zone {
 	public void setTag( String tag ) {
 		
 		this.tag = tag;
-		
+		triggers.tag = tag;
 		preActions = new Actions( tag );
 		resetActions = new Actions( tag );
 		postActions = new Actions( tag );		
@@ -80,6 +82,7 @@ public class Zone {
 	
 	
 	public void reset() {
+		Bukkit.getLogger().info("resetting " + tag );
 		tasks.stop();
 		preActions.run();
 		resetActions.run();

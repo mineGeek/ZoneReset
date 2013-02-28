@@ -30,12 +30,12 @@ import com.github.mineGeek.ZoneReset.Messaging.Message;
 
 import com.github.mineGeek.ZoneReset.Tasks.MessageTask;
 import com.github.mineGeek.ZoneReset.Tasks.ResetTask;
-import com.github.mineGeek.ZoneReset.Triggers.Trigger;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnEnter;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnExit;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnInteract;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnJoin;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnQuit;
+import com.github.mineGeek.ZoneReset.Triggers.TriggerOnTime;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
@@ -294,7 +294,7 @@ public class Zones {
 
 		if ( c.isSet("trigger.onjoin.reset" ) ) {
 			
-			TriggerOnJoin onJoin = new TriggerOnJoin();
+			TriggerOnJoin onJoin = new TriggerOnJoin( tag );
 			onJoin.tag = r.getTag();
 			String mode = c.getString("trigger.onjoin.reset").toLowerCase();
 			
@@ -312,7 +312,7 @@ public class Zones {
 		
 		if ( c.isSet("trigger.onquit.reset" ) ) {
 			
-			TriggerOnQuit onQuit = new TriggerOnQuit();
+			TriggerOnQuit onQuit = new TriggerOnQuit( tag );
 			onQuit.tag = r.getTag();
 			String mode = c.getString("trigger.onquit.reset").toLowerCase();
 			
@@ -330,7 +330,7 @@ public class Zones {
 		
 		if ( c.isSet("trigger.oninteract.xyz") ) {
 			
-			TriggerOnInteract interact = new TriggerOnInteract();
+			TriggerOnInteract interact = new TriggerOnInteract( tag );
 			interact.tag = r.getTag();
 			List<Integer> l = c.getIntegerList("trigger.oninteract.xyz");
 			String w = c.getString("trigger.oninteract.world", worldName);			
@@ -344,7 +344,7 @@ public class Zones {
 		
 		if ( c.isSet("trigger.onenter.reset" ) ) {
 			
-			TriggerOnEnter enter = new TriggerOnEnter();
+			TriggerOnEnter enter = new TriggerOnEnter( tag );
 			enter.tag = r.getTag();
 			String mode = c.getString("trigger.onenter.reset").toLowerCase();
 			
@@ -363,7 +363,7 @@ public class Zones {
 		
 		if ( c.isSet("trigger.onexit.reset" ) ) {
 			
-			TriggerOnExit exit = new TriggerOnExit();
+			TriggerOnExit exit = new TriggerOnExit( tag );
 			exit.tag = r.getTag();
 			String mode = c.getString("trigger.onexit.reset").toLowerCase();
 			
@@ -382,7 +382,7 @@ public class Zones {
 		
 		if ( c.isSet("trigger.ontime.reset" ) ) {
 			
-			Trigger time = new Trigger();
+			TriggerOnTime time = new TriggerOnTime( tag );
 			time.tag = r.getTag();
 			String mode = c.getString("trigger.ontime.reset").toLowerCase();
 			
@@ -396,7 +396,7 @@ public class Zones {
 			
 			r.triggers.onTimed = time;
 
-			ResetTask t = new ResetTask();
+			ResetTask t = new ResetTask( tag );
 			t.secInterval = time.resetSeconds;
 			r.tasks.add( t );
 			

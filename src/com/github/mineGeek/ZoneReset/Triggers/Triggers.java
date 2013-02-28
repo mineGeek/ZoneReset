@@ -10,9 +10,14 @@ public class Triggers {
 	public TriggerOnJoin 	onJoin;
 	public TriggerOnQuit 	onQuit;
 	public TriggerOnInteract onInteract;
-	public Trigger 			onTimed;
+	public TriggerOnTime	onTimed;
 	public TriggerOnEnter 	onEnter;
 	public TriggerOnExit 	onExit;
+	
+	public String tag;
+	
+	public Triggers() {}
+	public Triggers( String tag ) { this.tag = tag; }
 	
 	public void onJoin( Player p ) 					{ if ( onJoin != null ) onJoin.run(p); }
 	public void onQuit( Player p ) 					{ if ( onQuit != null ) onQuit.run(p); }
@@ -33,32 +38,32 @@ public class Triggers {
 	}
 	
 	public TriggerOnJoin getOnJoin() {
-		if ( onJoin == null ) onJoin = new TriggerOnJoin();
+		if ( onJoin == null ) onJoin = new TriggerOnJoin( tag );
 		return onJoin;
 	}
 	
 	public TriggerOnQuit getOnQuit() {
-		if ( onQuit == null ) onQuit = new TriggerOnQuit();
+		if ( onQuit == null ) onQuit = new TriggerOnQuit( tag );
 		return onQuit;
 	}
 	
 	public TriggerOnInteract getOnInteract() {
-		if ( onInteract == null ) onInteract = new TriggerOnInteract();
+		if ( onInteract == null ) onInteract = new TriggerOnInteract( tag );
 		return onInteract;
 	}
 	
-	public Trigger getOnTimed() {
-		if ( onTimed == null ) onTimed = new TriggerOnEnter();
+	public TriggerOnTime getOnTimed() {
+		if ( onTimed == null ) onTimed = new TriggerOnTime( tag );
 		return onTimed;
 	}
 	
 	public TriggerOnEnter getOnEnter() {
-		if ( onEnter == null ) onEnter = new TriggerOnEnter();
+		if ( onEnter == null ) onEnter = new TriggerOnEnter( tag );
 		return onEnter;
 	}
 	
 	public TriggerOnExit getOnExit() {
-		if ( onExit == null ) onExit = new TriggerOnExit();
+		if ( onExit == null ) onExit = new TriggerOnExit( tag );
 		return onExit;
 	}	
 	

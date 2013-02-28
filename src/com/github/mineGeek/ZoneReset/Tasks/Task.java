@@ -7,7 +7,7 @@ import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 
 abstract class Task implements Runnable {
 
-	public Integer 	id;
+	public Integer 	id = null;
 	public Integer 	endId;
 	public Integer 	secStart;
 	public Integer 	secEnd;
@@ -19,6 +19,9 @@ abstract class Task implements Runnable {
 	public Integer	secResume;
 	
 	public Task() {}
+	
+	public Task( String tag ) { this.tag = tag; }
+	
 	public Task( Integer start ) {
 		this.secStart = start;
 	}
@@ -45,6 +48,8 @@ abstract class Task implements Runnable {
 			secResume = null;
 		}
 		
+		if ( toStart == null && secInterval != null ) toStart = secInterval;
+		
 		if ( secInterval != null && toStart != null ) {
 			task = Bukkit.getScheduler().runTaskTimer( Utilities.plugin, this, toStart * 20, secInterval * 20 );
 		} else if ( toStart != null ){
@@ -52,6 +57,7 @@ abstract class Task implements Runnable {
 		}
 		
 		lastStarted = System.currentTimeMillis();
+		
 		
 		id = task.getTaskId();
 		final int endTaskId = new Integer(id);

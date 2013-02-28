@@ -96,7 +96,7 @@ public class Utilities {
 		int days = 	( timeStamp / (60*60*24) ) % 7;
 		int weeks = ( timeStamp / (60*60*24*7) ); 
   
-		String result = null;
+		String result = "";
 		if ( weeks > 0 ) 	result = weeks + " week" + ( weeks == 1 ? "" : "s");
 		if ( days > 0) 		result = ( result.length() > 0 ? ", " : "" ) + days + " day"  	+ ( days == 1 ? "" : "s");
 		if ( hours > 0) 	result = ( result.length() > 0 ? ", " : "" ) + hours + " hour"  + ( hours == 1 ? "" : "s");

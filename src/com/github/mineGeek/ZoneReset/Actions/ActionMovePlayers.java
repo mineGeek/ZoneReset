@@ -30,7 +30,7 @@ public class ActionMovePlayers extends Action {
 			
 			List<String> players = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : players ) {
-				if ( Bukkit.getPlayer(x).isOnline() ) Bukkit.getPlayer(x).teleport(location);
+				if ( Bukkit.getPlayer(x) != null ) Bukkit.getPlayer(x).teleport(location);
 			}
 		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
 			

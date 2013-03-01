@@ -12,13 +12,14 @@ import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 
 public class Zone {
 
-	
+	public enum ZRPVPMode {ON, OFF, DEFAULT, TIMED}
 	public String 	tag;
 	public String	worldName;
 	
 	private Area	area = new Area();
 	
 	public boolean	enabled = true;
+	public ZRPVPMode pvpMode = ZRPVPMode.DEFAULT;
 	
 	public Triggers triggers = new Triggers();
 	public Tasks 	tasks = new Tasks();

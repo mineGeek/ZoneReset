@@ -31,7 +31,7 @@ public class ActionSetSpawnPoints extends Action {
 			
 			List<String> ps = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : ps ) {
-				if (Bukkit.getPlayer(x).isOnline() || online ) players.add( Bukkit.getPlayer(x) );
+				if ( Bukkit.getPlayer(x) != null ) players.add( Bukkit.getPlayer(x) );
 			}
 			
 		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
@@ -48,7 +48,12 @@ public class ActionSetSpawnPoints extends Action {
 			
 			for ( Player p : players ) {
 				
-				p.setBedSpawnLocation( location, true ); 
+				if ( p.isOnline() ) {
+					p.setBedSpawnLocation( location, true );
+				} else {
+					//OfflinePlayer op = Bukkit.getOfflinePlayer( p.getName() );
+					
+				}
 				
 			}
 			

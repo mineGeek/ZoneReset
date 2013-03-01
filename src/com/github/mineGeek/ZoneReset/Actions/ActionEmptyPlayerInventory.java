@@ -37,7 +37,7 @@ public class ActionEmptyPlayerInventory extends Action {
 			
 			List<String> ps = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : ps ) {
-				if (Bukkit.getPlayer(x).isOnline() ) players.add( Bukkit.getPlayer(x) );
+				if (Bukkit.getPlayer(x) != null ) players.add( Bukkit.getPlayer(x) );
 			}
 		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
 			
@@ -52,6 +52,8 @@ public class ActionEmptyPlayerInventory extends Action {
 		if ( !players.isEmpty() ) {
 			
 			for ( Player p : players ) {
+				
+				if ( !p.isOnline() ) continue;
 				
 				while( remove.iterator().hasNext() ) {
 					ItemStack i = remove.iterator().next();

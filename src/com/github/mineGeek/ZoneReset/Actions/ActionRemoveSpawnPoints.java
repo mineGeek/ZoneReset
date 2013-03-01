@@ -31,7 +31,7 @@ public class ActionRemoveSpawnPoints extends Action {
 			
 			List<String> ps = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : ps ) {
-				if (Bukkit.getPlayer(x).isOnline() || online ) players.add( Bukkit.getPlayer(x) );
+				if (Bukkit.getPlayer(x) != null ) players.add( Bukkit.getPlayer(x) );
 			}
 			
 		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
@@ -48,7 +48,7 @@ public class ActionRemoveSpawnPoints extends Action {
 			
 			for ( Player p : players ) {
 				
-				p.setBedSpawnLocation( location ); 
+				if ( p.isOnline() ) p.setBedSpawnLocation( location ); 
 				
 			}
 			

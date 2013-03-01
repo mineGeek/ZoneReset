@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 
 public class Triggers {
 
+	public enum ZRTriggerMode {INSTANT, TIMER, DELAYED, NONE};
+	
 	public TriggerOnJoin 	onJoin;
 	public TriggerOnQuit 	onQuit;
 	public TriggerOnInteract onInteract;

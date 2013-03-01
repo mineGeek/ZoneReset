@@ -46,7 +46,7 @@ public class Message implements Runnable {
 		
 		if ( !players.isEmpty() ) {
 			for( String x : players ) {
-				if ( Bukkit.getPlayer( x ).isOnline() ) {
+				if ( Bukkit.getPlayer( x ) != null && Bukkit.getPlayer( x ).isOnline() ) {
 					Bukkit.getPlayer( x ).sendMessage( this.getMessage( this.text ) );
 				}
 			}

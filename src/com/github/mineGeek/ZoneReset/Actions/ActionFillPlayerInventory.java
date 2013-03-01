@@ -29,7 +29,7 @@ public class ActionFillPlayerInventory extends Action {
 			
 			List<String> players = Zones.getZone( this.tag ).getPlayers();
 			for ( String x : players ) {
-				if (Bukkit.getPlayer(x).isOnline() ) p.add( Bukkit.getPlayer(x) );
+				if (Bukkit.getPlayer(x) != null ) p.add( Bukkit.getPlayer(x) );
 			}
 		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
 			
@@ -48,7 +48,7 @@ public class ActionFillPlayerInventory extends Action {
 		if ( !p.isEmpty() && !this.items.isEmpty() ) {
 			
 			for ( Player player : p ) {
-				player.getInventory().addItem((ItemStack[]) items.toArray());
+				if ( player.isOnline() ) player.getInventory().addItem((ItemStack[]) items.toArray());
 			}
 			
 		}

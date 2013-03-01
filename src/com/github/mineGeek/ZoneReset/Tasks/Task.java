@@ -50,12 +50,14 @@ abstract class Task implements Runnable {
 		BukkitTask task = null;
 		
 		Integer toStart = secStart;
-		if ( secResume != null ) {
-			toStart = secResume;
-			secResume = null;
-		}
 		
-		//if ( toStart == null && secInterval != null ) toStart = secInterval;
+		if ( secResume != null ) {
+			if ( secResume < toStart ) {
+				toStart -= secResume;
+			} else {
+				toStart = secResume - toStart;
+			}
+		}
 		
 		if ( secInterval != null && toStart != null ) {
 			task = Bukkit.getScheduler().runTaskTimer( Utilities.plugin, this, toStart * 20, secInterval * 20 );
@@ -65,22 +67,36 @@ abstract class Task implements Runnable {
 		
 		lastStarted = System.currentTimeMillis();
 		
+		if ( secResume != null ) lastStarted -= secResume * 1000; 
 		
 		id = task.getTaskId();
 		final int endTaskId = new Integer(id);
 		
 		if ( secEnd != null ) {
+			
+			Integer toEnd = secEnd;
+			if ( secResume != null ) {
+				if ( toEnd < secResume ) {
+					toEnd = secResume - toEnd;
+					
+				} else {
+					toEnd -= secResume;
+				}
+			}
+			
 			BukkitTask endTask = Bukkit.getScheduler().runTaskLater( Utilities.plugin, new Runnable() {
 				
 				public void run() {
 					Bukkit.getScheduler().cancelTask( endTaskId );
 				}
 				
-			}, secEnd * 20 );
+			}, toEnd * 20 );
 			
 			endId = endTask.getTaskId();
 			
 		}
+		
+		secResume = null;
 		
 		
 	}

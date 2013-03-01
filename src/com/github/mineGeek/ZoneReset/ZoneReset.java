@@ -26,7 +26,7 @@ public class ZoneReset extends JavaPlugin {
 
 	
 	public enum ZRScope {LIST, REGION, WORLD, SERVER};
-
+	
 
 	/**
 	 * Process shut down or disable
@@ -136,7 +136,7 @@ public class ZoneReset extends JavaPlugin {
     	 * Load zone saved data
     	 */
     	Zones.loadDataZones();
-
+    	Zones.startZones();
     	
     	if ( Config.trackMovement ) {
     		Tracking.loadZones();

@@ -165,7 +165,7 @@ public class Config {
 		}
 		
 		
-		if ( z.triggers.onJoin != null ) {
+		if ( z.triggers.getOnJoin().enabled ) {
 			
 			String value = "timer";
 			if ( z.triggers.onJoin.resetSeconds == 0 ) {
@@ -177,7 +177,7 @@ public class Config {
 			
 		}
 		
-		if ( z.triggers.onQuit != null ) {
+		if ( z.triggers.getOnQuit().enabled ) {
 			
 			String value = "timer";
 			if ( z.triggers.onQuit.resetSeconds == 0 ) {
@@ -189,7 +189,7 @@ public class Config {
 			
 		}		
 		
-		if ( z.triggers.onInteract != null ) {
+		if ( z.triggers.getOnInteract().enabled ) {
 			
 			Location l = z.triggers.onInteract.location;
 			List<Integer> xyz = new ArrayList<Integer>();
@@ -200,7 +200,7 @@ public class Config {
 			
 		}
 		
-		if ( z.triggers.onEnter != null ) {
+		if ( z.triggers.getOnEnter().enabled ) {
 			
 			String value = "timer";
 			if ( z.triggers.onEnter.resetSeconds == 0 ) {
@@ -212,7 +212,7 @@ public class Config {
 			
 		}
 		
-		if ( z.triggers.onExit != null ) {
+		if ( z.triggers.getOnEnter().enabled ) {
 			
 			String value = "timer";
 			if ( z.triggers.onExit.resetSeconds == 0 ) {
@@ -224,7 +224,7 @@ public class Config {
 			
 		}
 		
-		if ( z.triggers.onTimed != null ) {
+		if ( z.triggers.getOnTimed().enabled ) {
 			
 			String value = "timer";
 			if ( z.triggers.getOnTimed().resetSeconds == 0 ) {

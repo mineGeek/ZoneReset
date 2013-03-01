@@ -26,6 +26,7 @@ import com.github.mineGeek.ZoneReset.Actions.ActionRemoveSpawnPoints;
 import com.github.mineGeek.ZoneReset.Actions.ActionSetSpawnPoints;
 import com.github.mineGeek.ZoneReset.Actions.IAction;
 import com.github.mineGeek.ZoneReset.Actions.ResetAction;
+import com.github.mineGeek.ZoneReset.Data.Zone.ZRPVPMode;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 
 import com.github.mineGeek.ZoneReset.Tasks.MessageTask;
@@ -36,6 +37,7 @@ import com.github.mineGeek.ZoneReset.Triggers.TriggerOnInteract;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnJoin;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnQuit;
 import com.github.mineGeek.ZoneReset.Triggers.TriggerOnTime;
+import com.github.mineGeek.ZoneReset.Triggers.Triggers.ZRTriggerMode;
 import com.github.mineGeek.ZoneReset.Utilities.Config;
 import com.github.mineGeek.ZoneReset.Utilities.Tracking;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
@@ -133,13 +135,22 @@ public class Zones {
 		interactKeys.clear();
 		
 		for ( Zone z : zones.values() ) {
-			if ( z.triggers.getOnInteract() != null ) {
-				Location l = z.triggers.getOnInteract().location;
-				String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + z.triggers.getOnInteract().materialId;
-				if ( interactKeys.containsKey(i) ) {
-					interactKeys.get(i).add(i);
-				} else {
-					interactKeys.put(i, new ArrayList<String>( Arrays.asList( z.getTag() ) ) );
+			
+			if ( !z.triggers.getOnInteract().enabled ) continue;
+			
+			Location l = z.triggers.getOnInteract().location;
+			int id = z.triggers.getOnInteract().materialId;
+			
+			if ( l != null && id > 0 ) {
+				
+				
+				if ( l != null ) {
+					String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + z.triggers.getOnInteract().materialId;
+					if ( interactKeys.containsKey(i) ) {
+						interactKeys.get(i).add(i);
+					} else {
+						interactKeys.put(i, new ArrayList<String>( Arrays.asList( z.getTag() ) ) );
+					}
 				}
 			}
 		}
@@ -255,6 +266,20 @@ public class Zones {
 		}
 			
 		
+		if ( c.isSet( "pvp") ) {
+			
+			if ( c.getBoolean("pvp.on", false ) ) r.pvpMode = ZRPVPMode.ON;
+			
+			if ( c.isSet("pvp.time" ) ) {
+				
+				if ( c.isSet("pvp.time.start") ) {
+					
+				}
+				
+			}
+			
+		}
+		
 		
 
 		/**
@@ -299,12 +324,15 @@ public class Zones {
 			onJoin.tag = r.getTag();
 			String mode = c.getString("trigger.onjoin.reset").toLowerCase();
 			
+			onJoin.message = c.getString( "trigger.onjoin.message");
+			
 			if ( mode.equals("timer") ) {
-				onJoin.restartTimer = true;
+				onJoin.method = ZRTriggerMode.TIMER;
 			} else if ( mode.equals("zone") ) {
-				onJoin.resetSeconds = 0;
+				onJoin.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
 				onJoin.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				onJoin.method = ZRTriggerMode.DELAYED;
 			}
 			
 			r.triggers.onJoin = onJoin;
@@ -317,12 +345,15 @@ public class Zones {
 			onQuit.tag = r.getTag();
 			String mode = c.getString("trigger.onquit.reset").toLowerCase();
 			
+			onQuit.message = c.getString( "trigger.onquit.message");
+			
 			if ( mode.equals("timer") ) {
-				onQuit.restartTimer = true;
+				onQuit.method = ZRTriggerMode.TIMER;
 			} else if ( mode.equals("zone") ) {
-				onQuit.resetSeconds = 0;
+				onQuit.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
 				onQuit.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				onQuit.method = ZRTriggerMode.DELAYED;
 			}
 			
 			r.triggers.onQuit = onQuit;
@@ -343,18 +374,21 @@ public class Zones {
 		
 	
 		
-		if ( c.isSet("trigger.onenter.reset" ) ) {
+		if ( c.isSet("trigger.onenter" ) ) {
 			
 			TriggerOnEnter enter = new TriggerOnEnter( tag );
 			enter.tag = r.getTag();
-			String mode = c.getString("trigger.onenter.reset").toLowerCase();
+			String mode = c.getString("trigger.onenter.reset", "").toLowerCase();
+			
+			enter.message = c.getString( "trigger.onenter.message");
 			
 			if ( mode.equals("timer") ) {
-				enter.restartTimer = true;
+				enter.method = ZRTriggerMode.TIMER;
 			} else if ( mode.equals("zone") ) {
-				enter.resetSeconds = 0;
+				enter.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
 				enter.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				enter.method = ZRTriggerMode.DELAYED;
 			}
 			
 			r.triggers.onEnter = enter;
@@ -362,18 +396,21 @@ public class Zones {
 			
 		}
 		
-		if ( c.isSet("trigger.onexit.reset" ) ) {
+		if ( c.isSet("trigger.onexit" ) ) {
 			
 			TriggerOnExit exit = new TriggerOnExit( tag );
 			exit.tag = r.getTag();
-			String mode = c.getString("trigger.onexit.reset").toLowerCase();
+			String mode = c.getString("trigger.onexit.reset", "").toLowerCase();
+			
+			exit.message = c.getString( "trigger.onexit.message");
 			
 			if ( mode.equals("timer") ) {
-				exit.restartTimer = true;
+				exit.method = ZRTriggerMode.TIMER;
 			} else if ( mode.equals("zone") ) {
-				exit.resetSeconds = 0;
+				exit.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
 				exit.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				exit.method = ZRTriggerMode.DELAYED;
 			}
 			
 			r.triggers.onExit = exit;
@@ -388,11 +425,12 @@ public class Zones {
 			String mode = c.getString("trigger.ontime.reset").toLowerCase();
 			
 			if ( mode.equals("timer") ) {
-				time.restartTimer = true;
+				time.method = ZRTriggerMode.TIMER;
 			} else if ( mode.equals("zone") ) {
-				time.resetSeconds = 0;
+				time.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
 				time.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				time.method = ZRTriggerMode.DELAYED;
 			}
 			
 			r.triggers.onTimed = time;
@@ -407,7 +445,7 @@ public class Zones {
 		if ( trackMovements ) Config.trackMovement = true;
 		
 		
-		r.start();
+		//r.start();
 		
 	}
 	

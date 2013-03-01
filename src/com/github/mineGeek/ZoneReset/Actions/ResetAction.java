@@ -49,9 +49,12 @@ public class ResetAction extends Action {
 	
 	private ZArea getArea() {
 		
+		FileInputStream fileIn = null;
+		ObjectInputStream in = null;
+		
 		try {
-			FileInputStream fileIn = new FileInputStream( Config.folderSnapshots + File.separator + this.tag + ".ser" );
-			ObjectInputStream in = new ObjectInputStream( fileIn );
+			fileIn = new FileInputStream( Config.folderSnapshots + File.separator + this.tag + ".ser" );
+			in = new ObjectInputStream( fileIn );
 			ZArea z = ( ZArea ) in.readObject();
 			in.close();
 			fileIn.close();
@@ -63,6 +66,13 @@ public class ResetAction extends Action {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;
+		} finally {
+			if ( in != null )
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 		}
 		
 	}

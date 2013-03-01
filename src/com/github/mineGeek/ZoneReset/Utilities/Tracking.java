@@ -100,9 +100,16 @@ public class Tracking {
 		List<Chunk> chunkList = new ArrayList<Chunk>();
 		
 		for ( Zone z : Zones.getZones().values() ) {
-			
+			chunkList.clear();
 			if ( z.getArea().ne() != null && z.getArea().sw() != null ) {
 				chunkList.addAll( getChunksFromArea(  z.getArea().ne(), z.getArea().sw() ) );
+			}
+			
+			if ( !chunkList.isEmpty() ) {
+				Track track = new Track( z.getTag(), z.getArea().ne(), z.getArea().sw() );
+				for ( Chunk c : chunkList ) {
+					add( c.hashCode(), track  );
+				}
 			}
 			
 		}

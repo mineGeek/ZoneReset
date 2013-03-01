@@ -3,6 +3,8 @@ package com.github.mineGeek.ZoneReset.Triggers;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import com.github.mineGeek.ZoneReset.Data.Zones;
+
 public class TriggerOnInteract extends Trigger {
 
 	public TriggerOnInteract(String tag) {
@@ -14,7 +16,12 @@ public class TriggerOnInteract extends Trigger {
 	
 	public boolean run( Material m, Location l ) {
 		
-		return l.equals( location ) && m.getId() == materialId;
+		if ( l.equals( location ) && m.getId() == materialId ) {
+			Zones.getZone(tag).reset();
+			return true;
+		}
+		
+		return false;
 
 	}
 	

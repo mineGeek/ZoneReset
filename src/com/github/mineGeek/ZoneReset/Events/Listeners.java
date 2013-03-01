@@ -122,9 +122,9 @@ public class Listeners implements Listener {
 					 * Editing interaction
 					 */
 					if ( evt.getPlayer().hasMetadata("zrinteract") ) {
-						
-						z.triggers.onInteract.materialId = evt.getClickedBlock().getTypeId();
-						z.triggers.onInteract.location = l;
+
+						z.triggers.getOnInteract().materialId = evt.getClickedBlock().getTypeId();
+						z.triggers.getOnInteract().location = l;
 						evt.getPlayer().sendMessage("You set a trigger on " + Material.getMaterial( evt.getClickedBlock().getTypeId() ).name() + " at " + m );
 						evt.getPlayer().removeMetadata("zrinteract", Bukkit.getPluginManager().getPlugin("ZoneReset"));
 					}
@@ -169,7 +169,7 @@ public class Listeners implements Listener {
 		 * trigger a reset?
 		 */
 		} else if ( evt.getClickedBlock() != null && evt.getAction() == Action.RIGHT_CLICK_BLOCK ) {
-			Zones.triggerInteract( evt.getMaterial(), evt.getClickedBlock().getLocation() );
+			Zones.triggerInteract( evt.getClickedBlock().getType(), evt.getClickedBlock().getLocation() );
 		}
 			
 		

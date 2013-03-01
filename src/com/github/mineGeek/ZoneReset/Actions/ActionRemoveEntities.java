@@ -83,11 +83,11 @@ public class ActionRemoveEntities extends Action {
 	private void remove( Entity e ) {
 	
 		if ( removeMobs && ( e instanceof Monster || e instanceof Slime ) ) {
-			e.remove(); Bukkit.getLogger().info( " rem " + e.getType().toString() );
+			e.remove(); //Bukkit.getLogger().info( " rem " + e.getType().toString() );
 		} else if ( removeAnimals && e instanceof Animals ) {
-			e.remove(); Bukkit.getLogger().info( " rem " + e.getType().toString() );
+			e.remove(); //Bukkit.getLogger().info( " rem " + e.getType().toString() );
 		} else if ( removeDrops && e instanceof Item ) {
-			e.remove(); Bukkit.getLogger().info( " rem " + e.getType().toString() );
+			e.remove(); //Bukkit.getLogger().info( " rem " + e.getType().toString() );
 		}		
 		
 	}

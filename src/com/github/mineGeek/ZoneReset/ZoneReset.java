@@ -136,10 +136,14 @@ public class ZoneReset extends JavaPlugin {
     	 * Load zone saved data
     	 */
     	Zones.loadDataZones();
+
     	
     	if ( Config.trackMovement ) {
     		Tracking.loadZones();
     	}
+    	
+    	for ( Player p : this.getServer().getOnlinePlayers() ) { Tracking.updatePlayerChunkMap( p ); }
+    	
     	
     	/**
     	 * Force loads the class for shits and giggles.

@@ -9,6 +9,7 @@ public class Tasks {
 	public List<ITask> tasks = new ArrayList<ITask>();
 	@SuppressWarnings("unused")
 	private Integer resume = null;
+	private Long lastStart = null;
 	
 	public void add( List<ITask> tasks ) {
 		
@@ -25,6 +26,26 @@ public class Tasks {
 	}
 	
 	public Integer getResume() {
+		
+		//Are any tasks running?
+		Integer m = null;
+		boolean yes = false;
+		for ( ITask t : tasks ) {
+			
+			if ( t.isRunning() ) {
+				yes = true;
+				break;
+			}
+			
+		}
+		
+		if ( lastStart != null && yes ) {
+			
+			m = (int)( System.currentTimeMillis() - lastStart ) / 1000;
+			
+		}
+		
+		/*
 		Integer m = 0;
 		Integer o = null;
 		
@@ -34,13 +55,14 @@ public class Tasks {
 				m = 0;
 			}
 		}
-		
+		*/
 		return m;
 	}
 	
 	public void start() {
 		
 		for ( ITask x : tasks ) x.start();
+		this.lastStart = System.currentTimeMillis();
 		
 	}
 	
@@ -51,6 +73,7 @@ public class Tasks {
 	
 	public void restart() {
 		for ( ITask x : tasks ) x.restart();
+		this.lastStart = System.currentTimeMillis();
 	}
 	
 	public void clear() {

@@ -88,6 +88,7 @@ public class Zone {
 		resetActions.run();
 		postActions.run();
 		tasks.start();
+		if ( this.resetMessage != null ) this.resetMessage.run();
 	}
 	
 	public void close() {

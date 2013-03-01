@@ -7,5 +7,6 @@ public interface ITask {
 	public void restart();
 	public void setResume( Integer i );
 	public Integer getResume();
+	public boolean isRunning();
 	
 }

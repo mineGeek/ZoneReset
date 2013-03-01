@@ -263,9 +263,9 @@ public class Config {
 				MessageTask m = (MessageTask)i;
 				Map<String, Object> o = new HashMap<String, Object>();
 				o.put( "scope",  m.scope.toString().toLowerCase() );
-				if ( m.secStart != null ) o.put( "start", Utilities.getTimeStampAsString( m.secStart ) );
-				if ( m.secInterval != null ) o.put( "interval", Utilities.getTimeStampAsString( m.secInterval ) );
-				if ( m.secEnd != null ) o.put( "end", Utilities.getTimeStampAsString( m.secEnd ) );
+				if ( m.secStart != null ) o.put( "start", Utilities.getTimeStampAsShorthand( m.secStart ) );
+				if ( m.secInterval != null ) o.put( "interval", Utilities.getTimeStampAsShorthand( m.secInterval ) );
+				if ( m.secEnd != null ) o.put( "end", Utilities.getTimeStampAsShorthand( m.secEnd ) );
 				o.put( "message", m.rawMessage );
 				timer.add( o );
 			}

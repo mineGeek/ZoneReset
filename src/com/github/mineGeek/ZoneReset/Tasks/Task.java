@@ -38,6 +38,13 @@ abstract class Task implements Runnable {
 	public void setResume( Integer i ) { this.secResume = i; }
 	public Integer getResume() { return (int) (this.getTimeSinceStart()/1000); }
 	
+	public boolean isRunning() { 
+		if( id != null ) {
+			return Bukkit.getScheduler().isCurrentlyRunning( id ) || Bukkit.getScheduler().isQueued( id );
+		}
+		return false;
+	}
+	
 	public void start() {
 
 		BukkitTask task = null;
@@ -48,7 +55,7 @@ abstract class Task implements Runnable {
 			secResume = null;
 		}
 		
-		if ( toStart == null && secInterval != null ) toStart = secInterval;
+		//if ( toStart == null && secInterval != null ) toStart = secInterval;
 		
 		if ( secInterval != null && toStart != null ) {
 			task = Bukkit.getScheduler().runTaskTimer( Utilities.plugin, this, toStart * 20, secInterval * 20 );

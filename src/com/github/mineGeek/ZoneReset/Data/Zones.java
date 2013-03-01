@@ -133,9 +133,9 @@ public class Zones {
 		interactKeys.clear();
 		
 		for ( Zone z : zones.values() ) {
-			if ( z.triggers.onInteract != null ) {
-				Location l = z.triggers.onInteract.location;
-				String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + z.triggers.onInteract.materialId;
+			if ( z.triggers.getOnInteract() != null ) {
+				Location l = z.triggers.getOnInteract().location;
+				String i = l.getWorld().getName() + "|" + l.getBlockX() + "|" + l.getBlockY() + "|" + l.getBlockZ() + "|" + z.triggers.getOnInteract().materialId;
 				if ( interactKeys.containsKey(i) ) {
 					interactKeys.get(i).add(i);
 				} else {
@@ -225,11 +225,12 @@ public class Zones {
 		
 		
 			
-		if ( c.isSet( "messages.onReset" ) ) {
+		if ( c.isSet( "messages.onreset" ) ) {
 			
-			ZRScope messageType = ZRScope.valueOf( c.getString("messages.onreset.scope", "region").toUpperCase() );		
+			ZRScope messageType = ZRScope.valueOf( c.getString("messages.onreset.scope", "region").toUpperCase() );	
 			Message post = new Message( messageType, worldName);
 			post.zoneTag = r.getTag();
+			post.text = c.getString("messages.onreset.message", "");
 			r.resetMessage = post;
 			
 		}
@@ -248,7 +249,7 @@ public class Zones {
 			if ( message.containsKey("interval") ) messageTimed.secInterval = (int) (Utilities.getSecondsFromText( message.get("interval").toString() ) * 1);
 			if ( message.containsKey("end") ) messageTimed.secEnd = (int) (Utilities.getSecondsFromText( message.get("end").toString() ) * 1);
 			
-			messageTimed.setMessage( message.get("messages.timer.message").toString() );
+			messageTimed.setMessage( message.get("message").toString() );
 			r.tasks.add( messageTimed );
 			
 		}
@@ -397,7 +398,7 @@ public class Zones {
 			r.triggers.onTimed = time;
 
 			ResetTask t = new ResetTask( tag );
-			t.secInterval = time.resetSeconds;
+			t.secStart = time.resetSeconds;
 			r.tasks.add( t );
 			
 			
@@ -407,6 +408,14 @@ public class Zones {
 		
 		
 		r.start();
+		
+	}
+	
+	public static void startZones() {
+		
+		for ( Zone z : zones.values() ) {
+			z.start();
+		}
 		
 	}
 	

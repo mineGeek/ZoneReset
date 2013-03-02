@@ -21,12 +21,12 @@ import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 import com.github.mineGeek.ZoneReset.Actions.ActionEmptyPlayerInventory;
 import com.github.mineGeek.ZoneReset.Actions.ActionFillPlayerInventory;
 import com.github.mineGeek.ZoneReset.Actions.ActionMovePlayers;
+import com.github.mineGeek.ZoneReset.Actions.ActionPVP;
 import com.github.mineGeek.ZoneReset.Actions.ActionRemoveEntities;
 import com.github.mineGeek.ZoneReset.Actions.ActionRemoveSpawnPoints;
 import com.github.mineGeek.ZoneReset.Actions.ActionSetSpawnPoints;
 import com.github.mineGeek.ZoneReset.Actions.IAction;
 import com.github.mineGeek.ZoneReset.Actions.ResetAction;
-import com.github.mineGeek.ZoneReset.Data.Zone.ZRPVPMode;
 import com.github.mineGeek.ZoneReset.Messaging.Message;
 
 import com.github.mineGeek.ZoneReset.Tasks.MessageTask;
@@ -48,6 +48,7 @@ public class Zones {
 	private static Map<String, List<String>> interactKeys = new HashMap<String, List<String>>();
 	private static Map<String, List<String>> chunkKeys = new HashMap<String, List<String>>();
 	
+	private static Map<Integer, List<String>> chunkToZoneMap = new HashMap<Integer, List<String>>();
 
 	
 	public static Zone getZone( String tag ) {
@@ -209,6 +210,16 @@ public class Zones {
 		
 	}	
 	
+	public static Zone getZoneByPlayer( Player p ) {
+		
+		if ( chunkToZoneMap.containsKey( p.getLocation().getChunk().hashCode() ) ) {
+			return zones.get( chunkToZoneMap.get( p.getLocation().getChunk().hashCode() ) );
+		}
+		
+		return null;
+		
+	}
+	
 	public static void addZone( String tag, ConfigurationSection c ) {
 		
 		Zone r = new Zone();
@@ -255,27 +266,24 @@ public class Zones {
 			
 			messageTimed.tag = r.getTag();
 			messageTimed.scope = ZRScope.valueOf( message.containsKey("scope") ? message.get("scope").toString().toUpperCase() : "REGION" );
-			messageTimed.secStart = (int) (Utilities.getSecondsFromText( message.get("start").toString() ) * 1);
+			messageTimed.secStart = Utilities.getSecondsFromText( message.get("start").toString() ) * 1;
 			
-			if ( message.containsKey("interval") ) messageTimed.secInterval = (int) (Utilities.getSecondsFromText( message.get("interval").toString() ) * 1);
-			if ( message.containsKey("end") ) messageTimed.secEnd = (int) (Utilities.getSecondsFromText( message.get("end").toString() ) * 1);
+			if ( message.containsKey("interval") ) messageTimed.secInterval = Utilities.getSecondsFromText( message.get("interval").toString() ) * 1;
+			if ( message.containsKey("end") ) messageTimed.secEnd = Utilities.getSecondsFromText( message.get("end").toString() ) * 1;
 			
 			messageTimed.setMessage( message.get("message").toString() );
 			r.tasks.add( messageTimed );
 			
 		}
 			
-		
-		if ( c.isSet( "pvp") ) {
+		boolean trackMovements = false;
+		if ( c.contains( "pvp") ) {
 			
-			if ( c.getBoolean("pvp.on", false ) ) r.pvpMode = ZRPVPMode.ON;
-			
-			if ( c.isSet("pvp.time" ) ) {
-				
-				if ( c.isSet("pvp.time.start") ) {
-					
-				}
-				
+			ActionPVP pvp = new ActionPVP( r.tag );
+			pvp.loadFromConfig("", c);
+			if ( pvp.isEnabled() ) {
+				r.postActions.add( pvp );
+				trackMovements = true;
 			}
 			
 		}
@@ -316,7 +324,7 @@ public class Zones {
 		pre.loadFromConfig("", c);
 		if ( pre.isEnabled() ) r.postActions.add( pre );		
 		
-		boolean trackMovements = false;
+		
 
 		if ( c.isSet("trigger.onjoin.reset" ) ) {
 			
@@ -331,7 +339,7 @@ public class Zones {
 			} else if ( mode.equals("zone") ) {
 				onJoin.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
-				onJoin.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				onJoin.resetSeconds = Utilities.getSecondsFromText( mode )*1;
 				onJoin.method = ZRTriggerMode.DELAYED;
 			}
 			
@@ -352,7 +360,7 @@ public class Zones {
 			} else if ( mode.equals("zone") ) {
 				onQuit.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
-				onQuit.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				onQuit.resetSeconds = Utilities.getSecondsFromText( mode )*1;
 				onQuit.method = ZRTriggerMode.DELAYED;
 			}
 			
@@ -387,7 +395,7 @@ public class Zones {
 			} else if ( mode.equals("zone") ) {
 				enter.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
-				enter.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				enter.resetSeconds = Utilities.getSecondsFromText( mode )*1;
 				enter.method = ZRTriggerMode.DELAYED;
 			}
 			
@@ -409,7 +417,7 @@ public class Zones {
 			} else if ( mode.equals("zone") ) {
 				exit.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
-				exit.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				exit.resetSeconds = Utilities.getSecondsFromText( mode )*1;
 				exit.method = ZRTriggerMode.DELAYED;
 			}
 			
@@ -429,7 +437,7 @@ public class Zones {
 			} else if ( mode.equals("zone") ) {
 				time.method = ZRTriggerMode.INSTANT;
 			} else if ( mode.length() > 0 ) {
-				time.resetSeconds = (int)(Utilities.getSecondsFromText( mode )*1);
+				time.resetSeconds = Utilities.getSecondsFromText( mode )*1;
 				time.method = ZRTriggerMode.DELAYED;
 			}
 			
@@ -444,6 +452,27 @@ public class Zones {
 		
 		if ( trackMovements ) Config.trackMovement = true;
 		
+		
+		Area a = r.getArea();
+		if ( a != null && a.ne() != null && a.sw() != null ) {
+			
+			List<Integer> ids = a.getChunkIDs();
+			
+			if ( !ids.isEmpty() ) {
+				
+				for ( Integer i : ids ) {
+					if ( chunkToZoneMap.containsKey(i) ) {
+						chunkToZoneMap.get(i).remove( r.getTag() );
+					} else {
+						chunkToZoneMap.put(i, new ArrayList<String>());
+					}
+					
+					chunkToZoneMap.get(i).add( r.getTag() );
+				}
+				
+			}
+			
+		}
 		
 		//r.start();
 		

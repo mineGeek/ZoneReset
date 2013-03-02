@@ -64,23 +64,7 @@ public class Tracking {
 			playerToChunkMap.put( p.getName(), x );
 			
 		}
-		/*
-		if ( playerToChunkMap.containsKey( p.getName() ) && playerToChunkMap.get( p.getName() ) != p.getLocation().getChunk().hashCode() ) {
-			if ( Config.debug_area_chunkChange ) p.sendMessage( "new chunk: " + p.getLocation().getChunk().hashCode() );
-			
-			Integer i = playerToChunkMap.get( p.getName() );
-			
-			if (chunkToPlayersMap.containsKey(i) ) chunkToPlayersMap.get( i ).remove( p.getName() );
-			
-			if ( chunkToPlayersMap.containsKey( p.getLocation().getChunk().hashCode() ) ) {
-				chunkToPlayersMap.get( p.getLocation().getChunk().hashCode() ).add( p.getName() );
-			} else {
-				chunkToPlayersMap.put( p.getLocation().getChunk().hashCode(), new ArrayList<String>( Arrays.asList( p.getName() ) ) );
-			}
-		} else if ( !playerToChunkMap.containsKey( p.getName() ) ) {
-			playerToChunkMap.put( p.getName(), p.getLocation().getChunk().hashCode() );
-		}
-		*/
+
 		
 	}
 	
@@ -107,6 +91,7 @@ public class Tracking {
 			
 			if ( !chunkList.isEmpty() ) {
 				Track track = new Track( z.getTag(), z.getArea().ne(), z.getArea().sw() );
+				
 				for ( Chunk c : chunkList ) {
 					add( c.hashCode(), track  );
 				}

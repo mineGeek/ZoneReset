@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -71,6 +72,25 @@ public class Listeners implements Listener {
     public void onRespawn(PlayerRespawnEvent evt) {
 		Zones.triggerPlayerMove( evt.getPlayer() );
 	}
+	
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityDamage(EntityDamageByEntityEvent evt) {
+    	
+    	if ( evt.isCancelled() ) return;
+    	
+    	//can player use item?
+    	
+    	if ( evt.getDamager() instanceof Player ) {
+    	
+    		Player player = (Player)evt.getDamager();
+    		
+    		if ( !Utilities.pvpOk( player.getName() ) ) {
+    			Bukkit.getLogger().info(" Wha? ");
+    			if ( !player.getWorld().getPVP() ) evt.setCancelled( true );
+    		}
+    	}
+    	
+    }	
     
 	/**
 	 * When a player interacts with a block/entity

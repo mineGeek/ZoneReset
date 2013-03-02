@@ -3,11 +3,14 @@ package com.github.mineGeek.ZoneReset.Utilities;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.github.mineGeek.ZoneReset.Data.Area;
 import com.github.mineGeek.ZoneReset.Data.Zones;
+import com.github.mineGeek.ZoneReset.Events.OnZoneEnter;
+import com.github.mineGeek.ZoneReset.Events.OnZoneExit;
 
 public class Track {
 
@@ -33,11 +36,23 @@ public class Track {
 		boolean intersect = area.intersectsWith( p.getLocation() );
 		
 		if ( intersect && !in.containsKey( p.getName() ) ) {
-			in.put( p.getName() , true );
-			onEnter( p );
+			
+			OnZoneEnter event = new OnZoneEnter( Zones.getZone(tag), p );
+			Bukkit.getServer().getPluginManager().callEvent(event);
+			
+			if ( !event.isCancelled() ) {
+				in.put( p.getName() , true );	
+			}
+			
+			
 		} else if ( !intersect && in.containsKey( p.getName() ) ) {
-			in.remove( p.getName() );
-			onExit( p );
+			
+			OnZoneExit event = new OnZoneExit( Zones.getZone(tag), p );
+			Bukkit.getServer().getPluginManager().callEvent(event);
+			
+			if ( !event.isCancelled() ) {
+				in.remove( p.getName() );	
+			}
 		}
 		
 	}

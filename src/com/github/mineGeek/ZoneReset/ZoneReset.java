@@ -142,7 +142,10 @@ public class ZoneReset extends JavaPlugin {
     		Tracking.loadZones();
     	}
     	
-    	for ( Player p : this.getServer().getOnlinePlayers() ) { Tracking.updatePlayerChunkMap( p ); }
+    	for ( Player p : this.getServer().getOnlinePlayers() ) { 
+    		Tracking.updatePlayerChunkMap( p );
+    		Zones.triggerPlayerMove(p);
+    	}
     	
     	
     	/**

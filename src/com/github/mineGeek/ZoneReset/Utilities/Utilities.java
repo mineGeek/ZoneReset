@@ -1,12 +1,15 @@
 package com.github.mineGeek.ZoneReset.Utilities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 import com.github.mineGeek.ZoneReset.ZoneReset;
 import com.github.mineGeek.ZoneReset.Data.Area;
 import com.github.mineGeek.ZoneReset.Data.Zone;
+import com.github.mineGeek.ZoneReset.Data.Zone.ZRPVPMode;
 import com.github.mineGeek.ZoneReset.Data.Zones;
 
 
@@ -23,6 +27,7 @@ public class Utilities {
 
 
 	public static ZoneReset plugin;	
+	public static Map<String, ZRPVPMode> pvp = new HashMap<String, ZRPVPMode>();
 	
 	public static void startAllZones() {
 		
@@ -35,23 +40,36 @@ public class Utilities {
 	}
 		
 	
-	public static Long getSecondsFromText( String value ) {
+	public static void pvpMapClear() { pvp.clear(); }
+	public static void pvpAddPlayer( String playerName, ZRPVPMode mode ) { pvp.put( playerName, mode ); }
+	public static boolean pvpOk( String playerName ) {
+		
+		if ( pvp.containsKey( playerName ) ) {
+			if ( pvp.get( playerName ).equals( ZRPVPMode.OFF) ) return false;
+			if ( pvp.get( playerName ).equals( ZRPVPMode.ON ) ) return true;			
+		}
+		
+		return Bukkit.getPlayer(playerName).getWorld().getPVP();
+		
+	}
+	
+	public static Integer getSecondsFromText( String value ) {
 		
 		
-		if ( value == null ) return 0L;
+		if ( value == null ) return 0;
 		
 		try {
 			Matcher match = Pattern.compile("(?:(-?))?(?:(\\d+)d)?(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s)?").matcher( value );
-			Long secs = (long) 0;	
+			Integer secs = 0;	
 			boolean negative = false;
 			
 			if ( match.find() ) {
 
 				if ( match.group(1).equals( "-")  ) negative = true;
-				if ( match.group(2) != null ) secs = 60*60*24 * Long.parseLong( match.group(2) );
-				if ( match.group(3) != null ) secs += 60*60* Long.parseLong( match.group(3) );
-				if ( match.group(4) != null ) secs += 60* Long.parseLong( match.group(4) );
-				if ( match.group(5) != null ) secs += Long.parseLong( match.group(5) );
+				if ( match.group(2) != null ) secs = 60*60*24 * Integer.parseInt( match.group(2) );
+				if ( match.group(3) != null ) secs += 60*60* Integer.parseInt( match.group(3) );
+				if ( match.group(4) != null ) secs += 60* Integer.parseInt( match.group(4) );
+				if ( match.group(5) != null ) secs += Integer.parseInt( match.group(5) );
 				
 			}
 		

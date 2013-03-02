@@ -410,7 +410,7 @@ public class Set extends CommandBase {
 				z.triggers.getOnTimed().enabled = true;
 				
 				if ( option.equals("interval") ) {
-					z.triggers.getOnTimed().resetSeconds = (int) (Utilities.getSecondsFromText( option2 )*1);
+					z.triggers.getOnTimed().resetSeconds = Utilities.getSecondsFromText( option2 )*1;
 					z.triggers.getOnTimed().restartTimer = true;
 				}
 				

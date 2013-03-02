@@ -1,15 +1,14 @@
 package com.github.mineGeek.ZoneReset.Actions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import com.github.mineGeek.ZoneReset.Data.Zones;
+import com.github.mineGeek.ZoneReset.Data.Zone.ZRPVPMode;
+import com.github.mineGeek.ZoneReset.Tasks.ITask;
+import com.github.mineGeek.ZoneReset.Tasks.PVPTask;
 import com.github.mineGeek.ZoneReset.Utilities.Utilities;
 import com.github.mineGeek.ZoneReset.ZoneReset.ZRScope;
 
@@ -34,46 +33,22 @@ public class ActionPVP extends Action {
 	
 	public SubActionPVPToggle start = null;
 	public SubActionPVPToggle end = null;
-	
+
 	public ActionPVP(String tag) {
 		super(tag);
 	}
 
+	
 	@Override
 	public void run() {
 		
-		List<Player> players = new ArrayList<Player>();
-		
-		if ( this.scope.equals( ZRScope.REGION ) ) {
-			
-			List<String> ps = Zones.getZone( this.tag ).getPlayers();
-			for ( String x : ps ) {
-				if (Bukkit.getPlayer(x) != null ) players.add( Bukkit.getPlayer(x) );
-			}
-			
-		} else if ( this.scope.equals( ZRScope.WORLD ) ) {
-			
-			players = Bukkit.getWorld( Zones.getZone( this.tag ).getWorldName() ).getPlayers();
-			
-			
-		} else if ( this.scope.equals( ZRScope.SERVER ) ) {
-			Player[] ps = (Player[]) ( Bukkit.getServer().getOnlinePlayers() );
-			players.addAll( Arrays.asList( ps ) );
+		if ( on != null ) {
+			Zones.getZone( this.tag ).pvpMode = ( on ? ZRPVPMode.ON : ZRPVPMode.OFF );
+		} else {
+			Zones.getZone( this.tag ).pvpMode = ZRPVPMode.DEFAULT;
 		}
 		
-		if ( !players.isEmpty() ) {
-			
-			for ( Player p : players ) {
-				
-				if ( p.isOnline() ) {
-					
-					if ( on != null ) p.setMetadata("ZRPVP", new FixedMetadataValue( Utilities.plugin, on ) );
-				}
-				
-			}
-			
-			
-		}
+	
 		
 	}
 
@@ -89,9 +64,23 @@ public class ActionPVP extends Action {
 			
 		}
 
-		if ( this.start != null ) {
+		String[] part = new String[] {"start", "end"};
+		
+		for ( int x = 0; x <2 ; x++ ) {
 			
-			if ( start.on != null ) c.set( root + ".start", value)
+			SubActionPVPToggle p = null;
+			String pRoot = root + ".pvp." + part[x];
+			if ( x == 0 ) {
+				p = start;				
+			} else {
+				p = end;
+			}
+			
+			if ( p.on != null ) c.set( pRoot + ".on", p.on );
+			if ( p.seconds != null ) c.set( pRoot + ".time", Utilities.getTimeStampAsShorthand( p.seconds ) );			
+			if ( !p.countdownFrequencyText.isEmpty() ) c.set( pRoot + ".countdown.frequency", p.countdownFrequencyText );
+			if ( p.message != null ) c.set( pRoot + ".countdown.message", p.message );
+		
 			
 		}
 		
@@ -100,29 +89,28 @@ public class ActionPVP extends Action {
 	@Override
 	public void loadFromConfig(String root, ConfigurationSection c) {
 		
-		scope = ZRScope.valueOf( c.getString( root + ".pvp.scope", "region").toUpperCase() );
-		on = c.getBoolean( root + ".pvp.on" );
+		scope = ZRScope.valueOf( c.getString( root + "pvp.scope", "region").toUpperCase() );
+		on = c.getBoolean( root + "pvp.on" );
 
 		String[] part = new String[] {"start", "end"};
 		
 		for ( int x = 0; x <2 ; x++ ) {
 			
-			String pRoot = root + "." + part[x];
+			String pRoot = root + "pvp." + part[x];
 			
-			if ( ( c.isSet( pRoot + ".pvp.countdown.message") && c.isSet( pRoot + ".pvp.countdown.frequency") ) || c.isSet(pRoot + ".pvp.on") || c.isSet( pRoot + ".pvp.time") ) {
+			if ( ( c.isSet( pRoot + ".countdown.message") && c.isSet( pRoot + ".countdown.frequency") ) || c.isSet(pRoot + ".on") || c.isSet( pRoot + ".time") ) {
 				
-				SubActionPVPToggle pvp = new SubActionPVPToggle();
+				SubActionPVPToggle pvp = new SubActionPVPToggle( tag );
+				pvp.on = c.getBoolean( pRoot + ".enable" );
+				pvp.setSeconds( c.getString( pRoot + ".time") );
 				
-				if ( c.isSet( pRoot + ".pvp.on" ) ) pvp.on = c.getBoolean( pRoot + ".pvp.on" );
-				pvp.setSeconds( c.getString( pRoot + ".pvp.time") );
-				
-				List<String> frequency = c.getStringList( pRoot + ".pvp.countdown.frequency");
+				List<String> frequency = c.getStringList( pRoot + ".countdown.frequency");
 				if ( !frequency.isEmpty() ) {
 					for ( String y : frequency ) {
 						pvp.addCountdownFrequency(y);
 					}
 					
-					pvp.message = c.getString( pRoot + ".pvp.countdown.message");
+					pvp.message = c.getString( pRoot + ".countdown.message");
 				}
 				
 				if ( x == 0 ) {
@@ -133,6 +121,28 @@ public class ActionPVP extends Action {
 				
 			}
 		}
+		
+		if ( start != null ) {
+			
+			PVPTask t = new PVPTask( tag );
+			if ( start.on != null ) t.mode = ( start.on ? ZRPVPMode.ON : ZRPVPMode.OFF );
+			t.secStart = start.seconds;
+			Zones.getZone( tag ).tasks.add( t );
+			List<ITask> m = start.getCountdown();
+			if ( !m.isEmpty() ) Zones.getZone( tag ).tasks.add( m );
+			
+		}
+		
+		if ( end != null ) {
+			
+			PVPTask t = new PVPTask( tag );
+			if ( end.on != null ) t.mode = ( end.on ? ZRPVPMode.ON : ZRPVPMode.OFF );
+			t.secStart = end.seconds;
+			Zones.getZone( tag ).tasks.add( t );
+			List<ITask> m = end.getCountdown();
+			if ( !m.isEmpty() ) Zones.getZone( tag ).tasks.add( m );
+			
+		}			
 
 		
 	}

@@ -46,7 +46,7 @@ public class Triggerd implements Runnable {
 	
 	public void setTimerStart( String value ) {		
 		this.timerStart = value;
-		this.setTimerStartOffset( Utilities.getSecondsFromText( value ) );		
+		this.setTimerStartOffset(  Long.parseLong( Utilities.getSecondsFromText( value ).toString() )  );		
 	}
 	
 	public String getTimerStart() {
@@ -72,7 +72,7 @@ public class Triggerd implements Runnable {
 	
 	public void setTimerStop( String value ) {
 		this.timerStop = value;
-		this.setTimerStopOffset( Utilities.getSecondsFromText(value));
+		this.setTimerStopOffset( Long.parseLong( Utilities.getSecondsFromText(value).toString() ));
 	}
 	
 	public String getTimerStop() {

@@ -86,7 +86,7 @@ public class Message implements Runnable {
 		
 	}
 	
-	public Long getTime() {
+	public Integer getTime() {
 		if ( this.timeText != null ) return Utilities.getSecondsFromText( this.timeText );
 		return null;
 	}

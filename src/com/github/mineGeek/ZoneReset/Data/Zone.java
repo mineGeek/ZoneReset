@@ -1,5 +1,6 @@
 package com.github.mineGeek.ZoneReset.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -29,6 +30,8 @@ public class Zone {
 	
 	public Message	resetMessage = null;
 	public boolean	requiresNoPlayers = false;
+	
+	public List<Integer> chunkHashes = new ArrayList<Integer>();
 	
 	public String 	getTag() 				{ return this.tag; }
 	
@@ -75,6 +78,7 @@ public class Zone {
 		return Tracking.getPlayersInZone( this );
 		
 	}	
+	
 	
 	
 	public void start() {
